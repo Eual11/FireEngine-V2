@@ -1,5 +1,8 @@
 #include "../include/Shader.h"
 #include <gl/gl.h>
+#include <glm/gtc/type_ptr.hpp>
+using glm::value_ptr;
+
 Shader::Shader(const char *vertSrc, const char *fragSrc) {
   std::string vertexShaderSrc;
   std::string fragmentShaderSrc;
@@ -76,13 +79,37 @@ Shader::Shader(const char *vertSrc, const char *fragSrc) {
   }
 }
 
-void Shader::Use() { glUseProgram(ID); }
-void Shader::setInt(std::string &name, int val) const {
-  glUniform1i(glGetUniformLocation(ID, name.c_str()), val);
+void Shader::Use() const { glUseProgram(ID); }
+void Shader::setInt(std::string name, int val) const {
+  Use();
+  GL_CHECK(glUniform1i(glGetUniformLocation(ID, name.c_str()), val));
 }
-void Shader::setBool(std::string &name, bool val) const {
-  glUniform1i(glGetUniformLocation(ID, name.c_str()), val);
+void Shader::setBool(std::string name, bool val) const {
+  Use();
+  GL_CHECK(glUniform1i(glGetUniformLocation(ID, name.c_str()), val));
 }
 void Shader::setFloat(std::string name, float val) const {
-  glUniform1f(glGetUniformLocation(ID, name.c_str()), val);
+  Use();
+  GL_CHECK(glUniform1f(glGetUniformLocation(ID, name.c_str()), val));
+}
+
+void Shader::setVec3(std::string name, glm::vec3 v) {
+  Use();
+  GL_CHECK(
+      glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(v)));
+}
+void Shader::setVec4(std::string name, glm::vec4 v) {
+  Use();
+  GL_CHECK(
+      glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, value_ptr(v)));
+}
+void Shader::setMat4(std::string name, glm::mat4 m) {
+  Use();
+  GL_CHECK(glUniformMatrix4fv((glGetUniformLocation(ID, name.c_str())), 1,
+                              GL_FALSE, glm::value_ptr(m)));
+}
+void Shader::setMat3(std::string name, glm::mat3 m) {
+  Use();
+  GL_CHECK(glUniformMatrix4fv((glGetUniformLocation(ID, name.c_str())), 1,
+                              GL_FALSE, glm::value_ptr(m)));
 }

@@ -1,9 +1,10 @@
-    #version 330 core
-    out vec4 FragColor;
-    in vec4 vertColor;
-    uniform float u_time;
-  
-    void main()
-    {
-      FragColor = sin(u_time)/2.0f+0.5*vertColor;
-    };
+#version 330 core
+out vec4 FragColor;
+in vec4 finalVertColor;
+in vec2 TexCoord;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+void main()
+{
+    FragColor = texture(texture2, TexCoord)*finalVertColor;
+  }

@@ -1,0 +1,14 @@
+[
+ {
+  "directory": "C:\\Users\\Eual\\Documents\\C++\\OpenGL\\Learn",
+  "arguments": [
+   "g++",
+   "./src/main.cpp",
+   "-Wall",
+   "-Wextra",
+   "-Wpedantic",
+   "-std=c++17"
+  ],
+  "file": "./src/t.cpp"
+ }
+]
