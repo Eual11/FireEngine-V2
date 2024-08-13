@@ -15,8 +15,7 @@ class Model {
 
 public:
   Model(std::string path);
-
-  int depth = 0;
+  glm::mat4 model_transform = glm::mat4(1.0f);
   void Draw(Shader &shader);
 
 private:

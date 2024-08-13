@@ -11,11 +11,13 @@ add_library(Shader STATIC Shader.cpp)
 add_library(Mesh STATIC Mesh.cpp)
 add_library(Model STATIC Model.cpp)
 add_library(Camera STATIC Camera.cpp)
+add_library(EWindow STATIC Window.cpp)
+
 
 target_link_libraries( Model PRIVATE Mesh PRIVATE stb_image PRIVATE Shader PRIVATE glad PRIVATE  "${CMAKE_SOURCE_DIR}\\lib\\assimp-vc143-mt.lib" )
 #  PRIVATE "$ENV{C_LIBRARY_PATH}\\SDL3_mixer.lib"
 #glfw, assimp
-target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE stb_image PRIVATE Camera PRIVATE "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model )
+target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE stb_image PRIVATE Camera PRIVATE "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model PRIVATE EWindow )
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 

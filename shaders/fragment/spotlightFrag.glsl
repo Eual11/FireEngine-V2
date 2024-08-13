@@ -51,15 +51,9 @@ void main()
     float spec = max(dot(viewDir, R), 0);
     spec = pow(spec, material.shineness);
     vec3 specular = light.specular * (texture(material.texture_specular1, TexCoord).rgb * spec);
-    //specular = light.specular * (vec3(0.4, 0.4, 0.4) * spec);
 
     float theta = max(dot(light_dir, normalize(-light.direction)), 0.0f);
-    if (theta > light.cutoff || true)
-    {
-        result = ambient + 2.0 * diffuse + specular;
-    }
-    else {
-        result = ambient;
-    }
+
+    result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0f);
 }
