@@ -41,6 +41,7 @@ void Mesh::Draw(Shader &shader) {
   unsigned int numSpecular = 1;
 
   glBindVertexArray(VAO);
+
   shader.Use();
 
   for (size_t i = 0; i < textures.size(); i++) {
@@ -50,6 +51,7 @@ void Mesh::Draw(Shader &shader) {
     if (tex.type == "texture_diffuse") {
       tex_name = tex.type + std::to_string(numDiffuse++);
     } else if (tex.type == "texture_specular") {
+      printf("%s\n", tex.path.c_str());
       tex_name = tex.type + std::to_string(numSpecular++);
     }
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, tex.ID));

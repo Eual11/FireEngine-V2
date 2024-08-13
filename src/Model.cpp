@@ -6,6 +6,7 @@
 #include <glm/matrix.hpp>
 Model::Model(std::string path) { loadModel(path); }
 void Model::Draw(Shader &shader) {
+  shader.setMat4("model", model_transform);
   /* glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); */
   for (auto &mesh : meshes) {
     mesh.Draw(shader);
@@ -112,6 +113,7 @@ Mesh Model::processMesh(glm::mat4 &m, aiMesh *mesh, const aiScene *scene) {
 
     std::vector<Texture> specular_textures =
         loadMaterialTexture(mat, aiTextureType_SPECULAR, "texture_specular");
+
     textures.insert(textures.end(), specular_textures.begin(),
                     specular_textures.end());
   }

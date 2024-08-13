@@ -1,6 +1,4 @@
 #include "../include/Camera.h"
-#include <glm/ext/quaternion_geometric.hpp>
-
 void Camera::UpdateVectors() {
   glm::vec3 direction;
   direction.x = cos(glm::radians(fPitch)) * cos(glm::radians(fYaw));
@@ -32,26 +30,42 @@ Camera::Camera(float posx, float posy, float posz, float upx, float upy,
 }
 
 void Camera::ProcessInput(CameraMovement Movement, float deltaTime) {
-  float velocity = fCameraSpeed * deltaTime;
+glm::vec3 direction(0.0f);
+switch (Movement) {
+case CameraMovement::FORWARD:
+  direction += Front;
+  break;
+case CameraMovement::BACKWARD:
+  direction -= Front;
+  break;
+case CameraMovement::LEFT:
+  direction -= Right;
+  break;
+case CameraMovement::RIGHT:
+  direction += Right;
+  break;
+case CameraMovement::STATIC:
+  // Decelerate when no movement is detected
+  cameraVelocity -= acceleration * deltaTime;
+  if (cameraVelocity < 0.0f) {
+    cameraVelocity = 0.0f;
+  }
+  break;
+}
 
-  switch (Movement) {
-  case CameraMovement::FORWARD: {
+// Normalize the direction vector only if there is movement
+if (glm::length(direction) > 0.0f) {
+  direction = glm::normalize(direction);
+  cameraVelocity += acceleration * deltaTime;
+  if (cameraVelocity > max_speed) {
+    cameraVelocity = max_speed;
+  }
+}
 
-    Pos += velocity * Front;
-    break;
-  }
-  case CameraMovement::BACKWARD: {
-    Pos -= velocity * Front;
-    break;
-  }
-  case CameraMovement::LEFT: {
-    Pos -= velocity * Right;
-    break;
-  }
-  case CameraMovement::RIGHT:
-    Pos += velocity * Right;
-    break;
-  }
+// Apply movement if there is a direction
+if (glm::length(direction) > 0.0f) {
+  Pos += direction * cameraVelocity * deltaTime;
+}
 }
 void Camera::ProcessMouseMovement(float xOffset, float yOffset,
                                   bool constrainPitch) {
@@ -71,11 +85,19 @@ void Camera::ProcessMouseMovement(float xOffset, float yOffset,
 }
 
 void Camera::ProcessScroll(float yOffset) {
-  Zoom -= yOffset;
+  Fov -= yOffset;
 
-  if (Zoom >= 53.0)
-    Zoom = 53.0;
+  if (Fov >= 53.0)
+    Fov = 53.0;
 
-  if (Zoom <= 1.0)
-    Zoom = 1.0;
+  if (Fov <= 1.0)
+    Fov = 1.0;
+}
+void Camera::UpdateUniforms(Shader &shader) {
+  shader.setMat4("view", getLookAt());
+  shader.setMat4("project", getProjection());
+}
+void Camera::SetAspectRatio(float aspect) { aspectRatio = aspect; }
+glm::mat4 Camera::getProjection() {
+  return glm::perspective(glm::radians(Fov), aspectRatio, zNear, zFar);
 }

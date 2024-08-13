@@ -1,6 +1,7 @@
 #include "../include/Camera.h"
 #include "../include/Model.h"
 #include "../include/Shader.h"
+#include "../include/Window.h"
 #include "../include/stb_image.h"
 #include <GLFW/glfw3.h>
 #include <cmath>
@@ -8,10 +9,12 @@
 #include <glad/glad.h>
 #include <glm/common.hpp>
 #include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <memory>
 #include <vector>
 
 int WINDOW_WIDTH = 800;
@@ -42,55 +45,11 @@ void scroll_callback(GLFWwindow *gWindow, double xPos, double yPos);
 void HandleInput();
 int main() {
 
-  INIT();
-  std::vector<glm::vec3> cubePositions = {
-      glm::vec3(0.0f, 0.0f, 0.0f),    glm::vec3(2.0f, 5.0f, -15.0f),
-      glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
-      glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
-      glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
-      glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
-
-  // Cube vertex data
-  float cubeVertices[] = {
-      // Positions          // Normals           // Texture Coords
-      -1.0f, -1.0f, -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f, 0.0f,
-      1.0f,  -1.0f, -1.0f, 0.0f,  0.0f,  -1.0f, 1.0f, 0.0f,
-      1.0f,  1.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 1.0f, 1.0f,
-      -1.0f, 1.0f,  -1.0f, 0.0f,  0.0f,  -1.0f, 0.0f, 1.0f,
-
-      -1.0f, -1.0f, 1.0f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-      1.0f,  -1.0f, 1.0f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-      1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-      -1.0f, 1.0f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-
-      -1.0f, 1.0f,  1.0f,  -1.0f, 0.0f,  0.0f,  1.0f, 0.0f,
-      -1.0f, 1.0f,  -1.0f, -1.0f, 0.0f,  0.0f,  1.0f, 1.0f,
-      -1.0f, -1.0f, -1.0f, -1.0f, 0.0f,  0.0f,  0.0f, 1.0f,
-      -1.0f, -1.0f, 1.0f,  -1.0f, 0.0f,  0.0f,  0.0f, 0.0f,
-
-      1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-      1.0f,  1.0f,  -1.0f, 1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-      1.0f,  -1.0f, -1.0f, 1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-      1.0f,  -1.0f, 1.0f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-
-      -1.0f, -1.0f, -1.0f, 0.0f,  -1.0f, 0.0f,  0.0f, 1.0f,
-      1.0f,  -1.0f, -1.0f, 0.0f,  -1.0f, 0.0f,  1.0f, 1.0f,
-      1.0f,  -1.0f, 1.0f,  0.0f,  -1.0f, 0.0f,  1.0f, 0.0f,
-      -1.0f, -1.0f, 1.0f,  0.0f,  -1.0f, 0.0f,  0.0f, 0.0f,
-
-      -1.0f, 1.0f,  -1.0f, 0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-      1.0f,  1.0f,  -1.0f, 0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-      1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-      -1.0f, 1.0f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f};
-
-  unsigned int indices[] = {
-      0,  1,  2,  2,  3,  0,  // Back face
-      4,  5,  6,  6,  7,  4,  // Front face
-      8,  9,  10, 10, 11, 8,  // Left face
-      12, 13, 14, 14, 15, 12, // Right face
-      16, 17, 18, 18, 19, 16, // Bottom face
-      20, 21, 22, 22, 23, 20  // Top face
-  };
+  auto cameraPtr = std::make_shared<Camera>(camera);
+  /* INIT(); */
+  stbi_set_flip_vertically_on_load(true);
+  Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "NEW Window", false);
+  nWindow.BindCamera(cameraPtr);
   // creating some shaders
   Shader shaderProgram("../shaders/vertex/diffuse_specularVert.glsl",
                        "../shaders/fragment/spotlightFrag.glsl");
@@ -102,41 +61,16 @@ int main() {
 
   // VAO, VBO and EBO
 
-  unsigned int VAO, lightVAO, VBO, EBO;
-
   std::filesystem::path path("../models/scene.gltf");
   Model loaded_model(std::filesystem::absolute(path).string());
-  glGenVertexArrays(1, &VAO);
-  glGenVertexArrays(1, &lightVAO);
-  glBindVertexArray(VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices,
-               GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-               GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void *)0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                        (void *)(3 * sizeof(float)));
-
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8,
-                        (void *)(6 * sizeof(float)));
-
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glEnableVertexAttribArray(2);
-
-  glBindVertexArray(0);
-  glBindVertexArray(lightVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void *)0);
-  glEnableVertexAttribArray(0);
+  loaded_model.model_transform =
+      glm::scale(glm::mat4(1.0f), glm::vec3(0.09, 0.09, 0.09));
+  Model another_mode(
+      std::filesystem::absolute("../models/Teapot.fbx").string());
+  another_mode.model_transform =
+      glm::translate(glm::mat4(1.0f), glm::vec3(25.0f, 3.0f, 4));
+  another_mode.model_transform =
+      glm::scale(another_mode.model_transform, glm::vec3(2.0f, 2.0f, 2.0f));
 
   // Diffuse and Textures
   //
@@ -233,17 +167,15 @@ int main() {
 
   // passing texture
   //
-  camera.fCameraSpeed = 10.0f;
   //  camera position
-  while (!glfwWindowShouldClose(gWindow)) {
-    HandleInput();
+  while (nWindow.isOpen()) {
+
     glm::mat4 model = glm::rotate(
         glm::mat4(1.0f), ((float)glfwGetTime() * 0.0f), glm::vec3(0, 1, 0));
 
     glm::mat4 view = camera.getLookAt();
     glm::mat4 project = glm::perspective(
-        glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-        0.1f, 100.0f);
+        glm::radians(camera.Fov), nWindow.GetAspectRatio(), 0.1f, 100.0f);
     shaderProgram.Use();
 
     shaderProgram.setFloat("gTime", glfwGetTime());
@@ -261,37 +193,12 @@ int main() {
     loc = glGetUniformLocation(shaderProgram.ID, "project");
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(project));
 
-    glBindVertexArray(VAO);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    float r = 5.0f;
-    /* lightPos.x = r * sin((glfwGetTime())); */
-    /* lightPos.z = r * cos((glfwGetTime())); */
-    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-    shaderProgram.setVec3("light.diffuse", 0.5f * lightColor);
-    shaderProgram.setVec3("light.ambient", 0.2f * lightColor);
+    glm::vec3 lightColor(0.996, 0.753, 0.898);
+    shaderProgram.setVec3("light.diffuse", 0.7f * lightColor);
+    shaderProgram.setVec3("light.ambient", 0.6f * lightColor);
 
-    for (size_t i = 0; i < cubePositions.size(); i++) {
-
-      glm::mat4 rot_mat =
-          glm::translate(glm::mat4(1.0f), cubePositions[i] * 4.0f);
-      rot_mat = glm::rotate(
-          rot_mat,
-          (float)(glfwGetTime() *
-                  glm::sin((float)(2 * i * 360.0f / cubePositions.size()))),
-
-          glm::vec3(0.0f, 1.0f, 0.0f));
-      rot_mat =
-          glm::rotate(rot_mat, (float)(glfwGetTime() * 2.2f * cos(i * 10)),
-
-                      glm::vec3(1.0f, 0.0f, 0.0f));
-      rot_mat = glm::rotate(rot_mat, (float)(glfwGetTime() * 1.7f),
-                            glm::vec3(0.0f, 0.0f, 1.0f));
-      loc = glGetUniformLocation(shaderProgram.ID, "model");
-
-      glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(rot_mat));
-    }
-    glBindVertexArray(lightVAO);
     lightProgram.Use();
     lightProgram.setVec3("LightColor", lightColor);
 
@@ -300,19 +207,15 @@ int main() {
     lightProgram.setMat4("view", view);
     lightProgram.setMat4("project", project);
     lightProgram.setMat4("model", model);
-    model = glm::scale(glm::mat4(1.0f), glm::vec3(.09, 0.09, 0.09));
-    shaderProgram.setMat4("model", model);
+    nWindow.UpdateUniforms(shaderProgram);
+    nWindow.UpdateUniforms(lightProgram);
     loaded_model.Draw(shaderProgram);
-    /* glDrawElements(GL_TRIANGLES, sizeof(cubeVertices), GL_UNSIGNED_INT, 0);
-     */
-
-    deltaTime = glfwGetTime() - lastFrame;
-    lastFrame = glfwGetTime();
-    glfwPollEvents();
-    glfwSwapBuffers(gWindow);
+    another_mode.Draw(shaderProgram);
+    ;
+    nWindow.Update();
   }
+  printf("Good Bye\n");
 
-  glfwTerminate();
   return 0;
 }
 
@@ -400,5 +303,7 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 
 void scroll_callback(GLFWwindow *window, double xpos, double ypos) {
 
+  (void)window;
+  (void)xpos;
   camera.ProcessScroll(ypos);
 }
