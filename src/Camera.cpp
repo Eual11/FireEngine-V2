@@ -30,42 +30,42 @@ Camera::Camera(float posx, float posy, float posz, float upx, float upy,
 }
 
 void Camera::ProcessInput(CameraMovement Movement, float deltaTime) {
-glm::vec3 direction(0.0f);
-switch (Movement) {
-case CameraMovement::FORWARD:
-  direction += Front;
-  break;
-case CameraMovement::BACKWARD:
-  direction -= Front;
-  break;
-case CameraMovement::LEFT:
-  direction -= Right;
-  break;
-case CameraMovement::RIGHT:
-  direction += Right;
-  break;
-case CameraMovement::STATIC:
-  // Decelerate when no movement is detected
-  cameraVelocity -= acceleration * deltaTime;
-  if (cameraVelocity < 0.0f) {
-    cameraVelocity = 0.0f;
+  glm::vec3 direction(0.0f);
+  switch (Movement) {
+  case CameraMovement::FORWARD:
+    direction += Front;
+    break;
+  case CameraMovement::BACKWARD:
+    direction -= Front;
+    break;
+  case CameraMovement::LEFT:
+    direction -= Right;
+    break;
+  case CameraMovement::RIGHT:
+    direction += Right;
+    break;
+  case CameraMovement::STATIC:
+    // Decelerate when no movement is detected
+    cameraVelocity -= acceleration * deltaTime;
+    if (cameraVelocity < 0.0f) {
+      cameraVelocity = 0.0f;
+    }
+    break;
   }
-  break;
-}
 
-// Normalize the direction vector only if there is movement
-if (glm::length(direction) > 0.0f) {
-  direction = glm::normalize(direction);
-  cameraVelocity += acceleration * deltaTime;
-  if (cameraVelocity > max_speed) {
-    cameraVelocity = max_speed;
+  // Normalize the direction vector only if there is movement
+  if (glm::length(direction) > 0.0f) {
+    direction = glm::normalize(direction);
+    cameraVelocity += acceleration * 0.5 * deltaTime;
+    if (cameraVelocity > max_speed) {
+      cameraVelocity = max_speed;
+    }
   }
-}
 
-// Apply movement if there is a direction
-if (glm::length(direction) > 0.0f) {
-  Pos += direction * cameraVelocity * deltaTime;
-}
+  // Apply movement if there is a direction
+  if (glm::length(direction) > 0.0f) {
+    Pos += direction * cameraVelocity * deltaTime;
+  }
 }
 void Camera::ProcessMouseMovement(float xOffset, float yOffset,
                                   bool constrainPitch) {
@@ -94,6 +94,7 @@ void Camera::ProcessScroll(float yOffset) {
     Fov = 1.0;
 }
 void Camera::UpdateUniforms(Shader &shader) {
+  shader.setVec3("viewPos", Pos);
   shader.setMat4("view", getLookAt());
   shader.setMat4("project", getProjection());
 }
