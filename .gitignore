@@ -1,3 +1,4 @@
 build
 cpm-package-lock.cmake
 todo.md
+.cache/clangd/index

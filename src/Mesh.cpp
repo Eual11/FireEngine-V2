@@ -51,7 +51,6 @@ void Mesh::Draw(Shader &shader) {
     if (tex.type == "texture_diffuse") {
       tex_name = tex.type + std::to_string(numDiffuse++);
     } else if (tex.type == "texture_specular") {
-      printf("%s\n", tex.path.c_str());
       tex_name = tex.type + std::to_string(numSpecular++);
     }
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, tex.ID));
