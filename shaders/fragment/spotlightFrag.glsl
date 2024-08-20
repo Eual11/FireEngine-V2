@@ -6,7 +6,7 @@ struct Material
 
     sampler2D texture_diffuse1;
     sampler2D texture_specular1;
-    float shineness;
+    float shininess;
 };
 //Light Properties, in this model even light sources have ambient, diffuse and specular
 
@@ -22,14 +22,13 @@ struct SpotLight
     vec3 position;
     float cutoff;
 };
-in vec3 Normal;
-in vec4 FragPos;
-in vec2 TexCoord;
+in vec3 fragNormal;
+in vec4 fragPosition;
+in vec2 fragTexCoord;
 uniform SpotLight light;
-uniform vec3 viewPos;
+uniform vec3 uViewPos;
 uniform Material material;
-uniform sampler2D emission;
-uniform float gTime;
+uniform float uTime;
 
 out vec4 FragColor;
 void main()
@@ -38,19 +37,17 @@ void main()
     //calculating ambient lighting
     vec3 result = vec3(0.0);
 
-    vec3 light_dir = normalize(light.position - FragPos.xyz);
-    vec3 ambient = light.ambient * texture(material.texture_diffuse1, TexCoord).rgb;
+    vec3 light_dir = normalize(light.position - fragPosition.xyz);
+    vec3 ambient = light.ambient * texture(material.texture_diffuse1, fragTexCoord).rgb;
 
     //diffuse
-    float diff = max(dot(light_dir, Normal), 0.0f);
-    vec3 diffuse = light.diffuse * (texture(material.texture_diffuse1, TexCoord).rgb * diff);
-    //TODO: REMOVE
-    //diffuse = light.diffuse * (vec3(0.7, 0.2, 0.3) * diff);
-    vec3 viewDir = normalize(viewPos - FragPos.xyz);
-    vec3 R = reflect(-light.direction, Normal);
+    float diff = max(dot(light_dir, fragNormal), 0.0f);
+    vec3 diffuse = light.diffuse * (texture(material.texture_diffuse1, fragTexCoord).rgb * diff);
+    vec3 viewDir = normalize(uViewPos - fragPosition.xyz);
+    vec3 R = reflect(-light.direction, fragNormal);
     float spec = max(dot(viewDir, R), 0);
     spec = pow(spec, material.shineness);
-    vec3 specular = light.specular * (texture(material.texture_specular1, TexCoord).rgb * spec);
+    vec3 specular = light.specular * (texture(material.texture_specular1, fragTexCoord).rgb * spec);
 
     float theta = max(dot(light_dir, normalize(-light.direction)), 0.0f);
 
