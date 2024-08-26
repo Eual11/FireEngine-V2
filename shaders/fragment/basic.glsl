@@ -10,6 +10,8 @@ struct Light
     vec3 direction;
     vec3 position;
 
+    float intensity;
+
     float inner_cutoff;
     float outer_cutoff;
 
@@ -32,6 +34,7 @@ uniform vec3 uViewPos;
 uniform Material material;
 
 uniform vec3 ambientLight;
+uniform float ambientIntensity;
 
 out vec4 FragColor;
 
@@ -41,7 +44,7 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir);
 void main()
 {
     vec3 result = vec3(0.0f);
-    vec3 ambient = ambientLight * vec3(texture(material.texture_diffuse1, fragTexCoord));
+    vec3 ambient = 0.3 * ambientLight * vec3(texture(material.texture_diffuse1, fragTexCoord));
     vec3 viewDir = normalize(uViewPos - vec3(fragPosition));
 
     //calculating the cumulative directional lights
@@ -54,6 +57,7 @@ void main()
         }
     }
     result += ambient;
+
     FragColor = vec4(result, 1.0f);
 }
 
@@ -65,12 +69,11 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
 
     vec3 light_dir = normalize(-dirLight.direction);
     float diff = max(dot(light_dir, normal), 0.0f);
-    vec3 diffuse = diff * dirLight.diffuse_color * sampled_diffuse;
+    vec3 diffuse = dirLight.intensity * diff * dirLight.diffuse_color * sampled_diffuse;
     vec3 ref_vec = reflect(-light_dir, normal);
 
     float spec = pow(max(dot(ref_vec, viewDir), 0.0f), 64.0f);
     vec3 specular = spec * dirLight.specular_color * sampled_specular;
-    specular = vec3(0.0f);
     result = diffuse + specular;
     return result;
 }
