@@ -1,5 +1,4 @@
-#include "../include/EModel.h"
-#include "../include/Shader.h"
+#include "../include/EWorld.h"
 #include "../include/Window.h"
 #include "../include/stb_image.h"
 #include <GLFW/glfw3.h>
@@ -20,42 +19,41 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-double lastX = WINDOW_WIDTH / 2.0f;
-double lastY = WINDOW_HEIGHT / 2.0f;
-bool firstMove = true;
 glm::vec3 camPos(0.0f, 0.0f, 17.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 glm::vec3 lightPos(0.0f, 0.0f, 8.0f);
 
-Camera camera(camPos, cameraUp, fYaw, fPitch);
 int main() {
 
+  Camera camera(camPos, cameraUp, fYaw, fPitch);
   auto cameraPtr = std::make_shared<Camera>(camera);
-  /* INIT(); */
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "NEW Window", false);
   nWindow.BindCamera(cameraPtr);
   // creating some shaders
-  Shader shaderProgram("../shaders/vertex/diffuse_specularVert.glsl",
-                       "../shaders/fragment/spotlightFrag.glsl");
+  Shader shaderProgram("../shaders/vertex/basic.glsl",
+                       "../shaders/fragment/basic.glsl");
 
   Shader lightProgram("../shaders/vertex/lightVert.glsl",
                       "../shaders/fragment/lightFrag.glsl");
-
+  EWorld zaWardu;
+  // TODO: tidy this up, it is disguting
   std::filesystem::path path("../models/scene.gltf");
   EModel loaded_model(std::filesystem::absolute(path).string());
   loaded_model.setScale(0.09, 0.09, 0.09);
   EModel another_mode(
-      std::filesystem::absolute("../models/DamagedHelmet.gltf").string());
+      std::filesystem::absolute("../models/Teapot.fbx").string());
   another_mode.setPosition(25.0f, 3.0f, 0.0f);
   another_mode.setScale(2.0f, 2.0f, 2.0f);
-  // Diffuse and Textures
-  //
 
-  // passing texture
-  //
-  //  camera position
+  AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.5);
+  DirectionalLight dir({1.0, 1.0, 1.0}, {1.0f, 1.0f, 1.0f}, {0, -1, 0});
+  zaWardu.AddObject(std::make_shared<EModel>(loaded_model), shaderProgram);
+  zaWardu.AddObject(std::make_shared<EModel>(another_mode), shaderProgram);
+  zaWardu.AddLight(std::make_shared<AmbientLight>(amb));
+  zaWardu.AddLight(std::make_shared<DirectionalLight>(dir));
+
   while (nWindow.isOpen()) {
 
     shaderProgram.Use();
@@ -73,8 +71,7 @@ int main() {
     shaderProgram.setVec3("light.ambient", 0.6f * lightColor);
 
     nWindow.UpdateUniforms(shaderProgram);
-    loaded_model.Draw(shaderProgram);
-    another_mode.Draw(shaderProgram);
+    zaWardu.Render();
     nWindow.Update();
   }
   printf("Good Bye\n");

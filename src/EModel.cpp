@@ -22,7 +22,7 @@ glm::mat4 EModel::getModelTransformStatic() { return model_transform; }
 void EModel::setPosition(float x, float y, float z) { position = {x, y, z}; }
 glm::vec3 EModel::getPosition() { return position; }
 void EModel::Draw(Shader &shader) {
-  shader.setMat4("model", getModelTransform());
+  shader.setMat4("uModel", getModelTransform());
   for (auto &mesh : meshes) {
     mesh.Draw(shader);
   }

@@ -94,9 +94,9 @@ void Camera::ProcessScroll(float yOffset) {
     Fov = 1.0;
 }
 void Camera::UpdateUniforms(Shader &shader) {
-  shader.setVec3("viewPos", Pos);
-  shader.setMat4("view", getLookAt());
-  shader.setMat4("project", getProjection());
+  shader.setVec3("uViewPos", Pos);
+  shader.setMat4("uView", getLookAt());
+  shader.setMat4("uProjection", getProjection());
 }
 void Camera::SetAspectRatio(float aspect) { aspectRatio = aspect; }
 glm::mat4 Camera::getProjection() {

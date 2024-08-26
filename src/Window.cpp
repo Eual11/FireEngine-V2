@@ -222,7 +222,8 @@ void Window::Update() {
 }
 void Window::UpdateUniforms(Shader &shader) {
 
-  shader.setFloat("deltaTime", deltaTime);
+  shader.setFloat("uDeltaTime", deltaTime);
+  shader.setFloat("uTime", glfwGetTime());
   if (cameraBound) {
     camera_->SetAspectRatio(GetAspectRatio());
     camera_->UpdateUniforms(shader);
