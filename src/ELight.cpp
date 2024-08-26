@@ -27,3 +27,15 @@ DirectionalLight::DirectionalLight(glm::vec3 dif_col, glm::vec3 spec_color,
   direction = dir;
   this->intensity = intensity;
 }
+PointLight::PointLight(glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 pos,
+                       float intensity, float linear, float quadratic) {
+  ambient_color =
+      dif_col; // Assuming the ambient color is the same as diffuse color
+  diffuse_color = dif_col;
+  specular_color = spec_color;
+  position = pos;
+  type = POINT;
+  this->intensity = intensity;
+  this->linear = linear;
+  this->quadratic = quadratic;
+}

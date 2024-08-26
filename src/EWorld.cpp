@@ -23,10 +23,9 @@ void EWorld::Render() {
 
         if (dirCount < MAX_LIGHT_COUNT) {
           auto Dlight = std::dynamic_pointer_cast<DirectionalLight>(light);
-          std::string light_ref = "dirLights";
-          /* std::cout << "Type: " << typeid(*light).name() << std::endl; */
 
           if (Dlight) {
+            std::string light_ref = "dirLights";
             light_ref += "[" + std::to_string(dirCount) + "]";
             shader.setBool(light_ref + ".light_active", true);
             shader.setVec3(light_ref + ".diffuse_color", Dlight->diffuse_color);
@@ -41,7 +40,24 @@ void EWorld::Render() {
         break;
       }
       case POINT: {
-        pointCount++;
+        if (pointCount < MAX_LIGHT_COUNT) {
+          auto Plight = std::dynamic_pointer_cast<PointLight>(light);
+
+          if (Plight) {
+            std::string light_ref = "pointLights";
+            light_ref += "[" + std::to_string(pointCount) + "]";
+            shader.setBool(light_ref + ".light_active", true);
+            shader.setVec3(light_ref + ".diffuse_color", Plight->diffuse_color);
+            shader.setVec3(light_ref + ".specular_color",
+                           Plight->specular_color);
+            shader.setVec3(light_ref + ".position", Plight->position);
+            shader.setFloat(light_ref + ".intensity", Plight->intensity);
+            shader.setFloat(light_ref + ".constant", 1.0f);
+            shader.setFloat(light_ref + ".linear", Plight->linear);
+            shader.setFloat(light_ref + ".quadratic", Plight->quadratic);
+          }
+          pointCount++;
+        }
         break;
       }
       case SPOTLIGHT: {

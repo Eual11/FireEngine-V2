@@ -30,4 +30,13 @@ struct DirectionalLight : public ELight {
                    float intensity = 1.0f);
   glm::vec3 direction;
 };
+
+struct PointLight : public ELight {
+  PointLight(glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 pos,
+             float intensity = 1.0f, float linear = 0.7f,
+             float quadratic = 1.8f);
+  glm::vec3 position;
+  float linear;
+  float quadratic;
+};
 #endif

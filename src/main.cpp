@@ -49,10 +49,14 @@ int main() {
 
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.5);
   DirectionalLight dir({1.0, 1.0, 1.0}, {1.0f, 1.0f, 1.0f}, {0, -1, 0});
+  PointLight pnt({1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0, 0, 9});
+  PointLight pnt2({0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0, 0, 30});
   zaWardu.AddObject(std::make_shared<EModel>(loaded_model), shaderProgram);
   zaWardu.AddObject(std::make_shared<EModel>(another_mode), shaderProgram);
-  zaWardu.AddLight(std::make_shared<AmbientLight>(amb));
-  zaWardu.AddLight(std::make_shared<DirectionalLight>(dir));
+  zaWardu.AddLight(std::make_shared<PointLight>(pnt));
+  zaWardu.AddLight(std::make_shared<PointLight>(pnt2));
+  /* zaWardu.AddLight(std::make_shared<AmbientLight>(amb)); */
+  /* zaWardu.AddLight(std::make_shared<DirectionalLight>(dir)); */
 
   while (nWindow.isOpen()) {
 
