@@ -1,4 +1,5 @@
 #include "../include/EWorld.h"
+#include <memory>
 
 void EWorld::AddObject(std::shared_ptr<EModel> obj, Shader &shader) {
 
@@ -15,8 +16,12 @@ void EWorld::Render() {
     for (auto &light : Lights) {
       switch (light->type) {
       case AMBIENT: {
-        shader.setVec3("ambientLight", light->ambient_color);
-        shader.setFloat("ambientIntensity", light->intensity);
+        auto Alight = std::dynamic_pointer_cast<AmbientLight>(light);
+        if (Alight) {
+          shader.setVec3("ambientLight", Alight->ambient_color);
+          shader.setFloat("ambientIntensity", Alight->intensity);
+        }
+
         break;
       }
       case DIRECTIONAL: {
@@ -61,7 +66,24 @@ void EWorld::Render() {
         break;
       }
       case SPOTLIGHT: {
-        spotCount++;
+        if (spotCount < MAX_LIGHT_COUNT) {
+          auto Slight = std::dynamic_pointer_cast<SpotLight>(light);
+
+          if (Slight) {
+            std::string light_ref = "spotLights";
+            light_ref += "[" + std::to_string(pointCount) + "]";
+            shader.setBool(light_ref + ".light_active", true);
+            shader.setVec3(light_ref + ".diffuse_color", Slight->diffuse_color);
+            shader.setVec3(light_ref + ".specular_color",
+                           Slight->specular_color);
+            shader.setVec3(light_ref + ".direction", Slight->direction);
+            shader.setVec3(light_ref + ".position", Slight->position);
+            shader.setFloat(light_ref + ".intensity", Slight->intensity);
+            shader.setFloat(light_ref + ".inner_cutoff", Slight->inner_cutoff);
+            shader.setFloat(light_ref + ".outer_cutoff", Slight->outer_cutoff);
+          }
+          spotCount++;
+        }
         break;
       }
       case UNDEFINED: {

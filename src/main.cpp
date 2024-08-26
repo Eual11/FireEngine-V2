@@ -43,24 +43,47 @@ int main() {
   EModel loaded_model(std::filesystem::absolute(path).string());
   loaded_model.setScale(0.09, 0.09, 0.09);
   EModel another_mode(
-      std::filesystem::absolute("../models/Teapot.fbx").string());
-  another_mode.setPosition(25.0f, 3.0f, 0.0f);
-  another_mode.setScale(2.0f, 2.0f, 2.0f);
+      std::filesystem::absolute("../models/Lucy100k.ply").string());
+  another_mode.setPosition(0.0f, 0.0f, 0.0f);
+  another_mode.setScale(0.02f, 0.02f, 0.02f);
+  another_mode.setRotation(glm::radians(180.0F), 0.0f, 0.f);
 
-  AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.5);
-  DirectionalLight dir({1.0, 1.0, 1.0}, {1.0f, 1.0f, 1.0f}, {0, -1, 0});
-  PointLight pnt({1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0, 0, 9});
-  PointLight pnt2({0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0, 0, 30});
-  zaWardu.AddObject(std::make_shared<EModel>(loaded_model), shaderProgram);
+  auto pnt = std::make_shared<PointLight>(
+      glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
+  auto pnt2 = std::make_shared<PointLight>(glm::vec3(0.0f, 1.0f, 0.1f),
+                                           glm::vec3(1.0f, 0.1f, 1.0f),
+                                           glm::vec3(-7, 3, 7), 3.0f);
+  auto pnt3 = std::make_shared<PointLight>(glm::vec3(0.2f, 0.1f, 1.0f),
+                                           glm::vec3(1.0f, 1.0f, 1.0f),
+                                           glm::vec3(7, 5, 12), 3.0f);
+  AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.6);
+  SpotLight spt({1.0f, 1.0f, 1.0f}, {1.0f, 1.0, 1.0}, {0.0f, 20.0f, 3.0f},
+                {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
+                glm::cos(glm::radians(50.0f)));
   zaWardu.AddObject(std::make_shared<EModel>(another_mode), shaderProgram);
-  zaWardu.AddLight(std::make_shared<PointLight>(pnt));
-  zaWardu.AddLight(std::make_shared<PointLight>(pnt2));
-  /* zaWardu.AddLight(std::make_shared<AmbientLight>(amb)); */
-  /* zaWardu.AddLight(std::make_shared<DirectionalLight>(dir)); */
+
+  zaWardu.AddLight(std::make_shared<SpotLight>(spt));
+  zaWardu.AddLight(pnt);
+  zaWardu.AddLight(pnt2);
+  zaWardu.AddLight(pnt3);
+  zaWardu.AddLight(std::make_shared<AmbientLight>(amb));
+  float spiralRadius = 5.0f;
+  float spiralHeight = 10.0f;
+  float spiralSpeed = 1.0f;
 
   while (nWindow.isOpen()) {
+    float angle = glfwGetTime() * spiralSpeed; // Angle based on time and speed
 
+    // Calculate x and z positions using sine and cosine
+    float x = spiralRadius * cos(angle);
+    float z = spiralRadius * sin(angle);
+    float y = spiralHeight * (sin(angle / 2.0f) + 1.0f) /
+              2.0f; // Adjust height to create the spiral effect
     shaderProgram.Use();
+    pnt->setPosition(x, y, z);
+    pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
+    pnt3->setPosition(x + 4.0f, y, z + 4.0f);
 
     shaderProgram.setVec3("light.position", camera.Pos);
     shaderProgram.setVec3("light.direction", camera.Front);
@@ -70,9 +93,6 @@ int main() {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-    shaderProgram.setVec3("light.diffuse", 0.7f * lightColor);
-    shaderProgram.setVec3("light.ambient", 0.6f * lightColor);
 
     nWindow.UpdateUniforms(shaderProgram);
     zaWardu.Render();

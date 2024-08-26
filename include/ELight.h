@@ -33,10 +33,33 @@ struct DirectionalLight : public ELight {
 
 struct PointLight : public ELight {
   PointLight(glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 pos,
-             float intensity = 1.0f, float linear = 0.7f,
-             float quadratic = 1.8f);
+             float intensity = 1.0f, float linear = 0.14f,
+             float quadratic = 0.07f);
   glm::vec3 position;
   float linear;
   float quadratic;
+  // Set the position of the PointLight
+  void setPosition(float x, float y, float z) { position = glm::vec3(x, y, z); }
+
+  // Overload for setting position using glm::vec3
+  void setPosition(const glm::vec3 &newPos) { position = newPos; }
+  // 0.045	0.0075
+};
+
+struct SpotLight : public ELight {
+  glm::vec3 position;
+  glm::vec3 direction;
+  float inner_cutoff;
+  float outer_cutoff;
+  float intensity;
+
+  SpotLight(glm::vec3 dif_color, glm::vec3 spec_color, glm::vec3 pos,
+            glm::vec3 dir, float intensity = 1.0f, float inner_cutoff = 0.423f,
+            float outer_cutoff = 0.3);
+  // Set the position of the SpotLight
+  void setPosition(float x, float y, float z) { position = glm::vec3(x, y, z); }
+
+  // Overload for setting position using glm::vec3
+  void setPosition(const glm::vec3 &newPos) { position = newPos; }
 };
 #endif
