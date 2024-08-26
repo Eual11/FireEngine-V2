@@ -16,6 +16,7 @@ struct ELight {
   glm::vec3 ambient_color;
   glm::vec3 diffuse_color;
   glm::vec3 specular_color;
+  float intensity;
   LightType type = UNDEFINED;
 };
 
@@ -25,7 +26,8 @@ struct AmbientLight : public ELight {
   AmbientLight(glm::vec3 color, float intensity);
 };
 struct DirectionalLight : public ELight {
-  DirectionalLight(glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 dir);
+  DirectionalLight(glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 dir,
+                   float intensity = 1.0f);
   glm::vec3 direction;
 };
 #endif
