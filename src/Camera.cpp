@@ -11,14 +11,16 @@ void Camera::UpdateVectors() {
 
   Up = glm::normalize(glm::cross(Right, Front));
 }
-glm::mat4 Camera::getLookAt() { return glm::lookAt(Pos, Pos + Front, Up); }
+glm::mat4 Camera::getLookAt() {
+  return glm::lookAt(Position, Position + Front, Up);
+}
 
 Camera::Camera(float posx, float posy, float posz, float upx, float upy,
                float upz, float fyaw, float fpitch) {
 
-  Pos.x = posx;
-  Pos.y = posy;
-  Pos.z = posz;
+  Position.x = posx;
+  Position.y = posy;
+  Position.z = posz;
 
   worldUp.x = upx;
   worldUp.y = upy;
@@ -64,7 +66,7 @@ void Camera::ProcessInput(CameraMovement Movement, float deltaTime) {
 
   // Apply movement if there is a direction
   if (glm::length(direction) > 0.0f) {
-    Pos += direction * cameraVelocity * deltaTime;
+    Position += direction * cameraVelocity * deltaTime;
   }
 }
 void Camera::ProcessMouseMovement(float xOffset, float yOffset,
@@ -94,11 +96,13 @@ void Camera::ProcessScroll(float yOffset) {
     Fov = 1.0;
 }
 void Camera::UpdateUniforms(Shader &shader) {
-  shader.setVec3("uViewPos", Pos);
+  shader.setVec3("uViewPos", Position);
   shader.setMat4("uView", getLookAt());
   shader.setMat4("uProjection", getProjection());
 }
+
 void Camera::SetAspectRatio(float aspect) { aspectRatio = aspect; }
+void Camera::render() {}
 glm::mat4 Camera::getProjection() {
   return glm::perspective(glm::radians(Fov), aspectRatio, zNear, zFar);
 }

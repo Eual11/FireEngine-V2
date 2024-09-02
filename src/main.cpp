@@ -85,7 +85,7 @@ int main() {
     pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
     pnt3->setPosition(x + 4.0f, y, z + 4.0f);
 
-    shaderProgram.setVec3("light.position", camera.Pos);
+    shaderProgram.setVec3("light.position", camera.Position);
     shaderProgram.setVec3("light.direction", camera.Front);
     shaderProgram.setFloat(
         "light.cutoff",
