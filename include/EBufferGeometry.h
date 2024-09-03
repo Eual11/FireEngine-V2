@@ -27,11 +27,16 @@ public:
   EBufferGeometry() = default;
 
   void addCustomAttrib(VertexAttrib, const std::vector<float> &);
+  bool hasIndices();
+  size_t getIndiciesCount();
+  size_t getVertciesCount();
+  void bind();
+  void unbind();
   void dispose();
 
 private:
   std::vector<EVertex> vertices;
-  std::vector<unsigned int> indicies;
+  std::vector<unsigned int> indices;
   std::vector<VertexAttrib> predefinedAttribs;
   int currentLocation = 0;
   std::unordered_map<unsigned int, VertexAttrib> customAttribs;
