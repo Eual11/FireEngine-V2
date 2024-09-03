@@ -21,6 +21,10 @@ struct Light
 };
 struct Material
 {
+    //we might use this...
+    vec3 ambient_color;
+    vec3 diffuse_color;
+    vec3 specular_color;
     sampler2D texture_diffuse1;
     sampler2D texture_specular1;
     float shininess;

@@ -1,6 +1,8 @@
 #include "../include/EModel.h"
 #include <assimp/material.h>
+#include <assimp/types.h>
 #include <glm/trigonometric.hpp>
+#include <memory>
 EModel::EModel(std::string path) { loadModel(path); }
 glm::mat4 EModel::getModelTransform() {
   // translating
@@ -98,22 +100,47 @@ EMesh EModel::ProcessMesh(glm::mat4 &m, aiMesh *mesh, const aiScene *scene) {
 
     vertices.push_back(v);
   }
-
+  std::shared_ptr<Material> meshMaterial = nullptr;
   // loading materials
   if (mesh->mMaterialIndex >= 0) {
 
+    // TODO: IMPLEMENT A WAY TO SELECT A MATERIAL BASED ON THE SHADING MODEL
+    // USED
+    auto phongMeshMaterial = std::make_shared<PhongMaterial>(PhongMaterial());
+
+    float val = 0.0f;
+    aiColor3D color;
     aiMaterial *mat = scene->mMaterials[mesh->mMaterialIndex];
 
+    if (mat->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
+      phongMeshMaterial->shininess = val;
+    }
+    if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+      phongMeshMaterial->diffuse_color = glm::vec3(color.r, color.g, color.b);
+    }
+    if (mat->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
+      phongMeshMaterial->ambient_color = glm::vec3(color.r, color.g, color.b);
+    }
+
+    if (mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS) {
+      phongMeshMaterial->specular_color = glm::vec3(color.r, color.g, color.b);
+    }
     std::vector<ETexture> diffuseTextures =
         loadMaterialTexture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
 
-    textures.insert(textures.end(), diffuseTextures.begin(),
-                    diffuseTextures.end());
+    /* printf("Speculars has %d diffuse textures\n", diffuseTextures.size()); */
+    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                       diffuseTextures.begin(),
+                                       diffuseTextures.end());
 
     std::vector<ETexture> specularTextures =
         loadMaterialTexture(mat, aiTextureType_SPECULAR, "texture_specular");
-    textures.insert(textures.end(), specularTextures.begin(),
-                    specularTextures.end());
+    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                       specularTextures.begin(),
+                                       specularTextures.end());
+    /* printf("Speculars has %d specular textures\n", specularTextures.size());
+     */
+    meshMaterial = phongMeshMaterial;
   }
 
   for (int i = 0; i < (int)mesh->mNumFaces; i++) {
@@ -124,7 +151,9 @@ EMesh EModel::ProcessMesh(glm::mat4 &m, aiMesh *mesh, const aiScene *scene) {
     }
   }
 
-  return EMesh(vertices, textures, indicies);
+  return EMesh(
+      std::make_shared<EBufferGeometry>(EBufferGeometry(vertices, indicies)),
+      meshMaterial);
 }
 
 std::vector<ETexture> EModel::loadMaterialTexture(aiMaterial *mat,
@@ -216,6 +245,7 @@ unsigned int EModel::TextureFromFile(std::string path) {
     texID = 0;
   }
 
+  glBindTexture(GL_TEXTURE_2D, 0);
   stbi_image_free(buf);
   return texID;
 }

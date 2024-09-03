@@ -43,10 +43,10 @@ int main() {
   EModel loaded_model(std::filesystem::absolute(path).string());
   loaded_model.setScale(0.09, 0.09, 0.09);
   EModel another_mode(
-      std::filesystem::absolute("../models/Lucy100k.ply").string());
+      std::filesystem::absolute("../models/DamagedHelmet.gltf").string());
   another_mode.setPosition(0.0f, 0.0f, 0.0f);
-  another_mode.setScale(0.02f, 0.02f, 0.02f);
-  another_mode.setRotation(glm::radians(180.0F), 0.0f, 0.f);
+  /* another_mode.setScale(0.02f, 0.02f, 0.02f); */
+  /* another_mode.setRotation(glm::radians(180.0F), 0.0f, 0.f); */
 
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),

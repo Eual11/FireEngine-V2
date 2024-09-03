@@ -1,9 +1,10 @@
-#include "../include/EObjectGeometry.h"
+#include "../include/EBufferGeometry.h"
 
 EBufferGeometry::EBufferGeometry(std::vector<EVertex> verts,
                                  std::vector<unsigned int> inds) {
   this->vertices = verts;
-  this->indicies = inds;
+  this->indices = inds;
+  setupGeometry();
 }
 
 void EBufferGeometry::setupGeometry() {
@@ -18,26 +19,15 @@ void EBufferGeometry::setupGeometry() {
   glGenBuffers(1, &EBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indicies.size(),
-               indicies.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(),
+               indices.data(), GL_STATIC_DRAW);
 
   setupPredefinedAttribs();
-  /* glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(EVertex), */
-  /*                       (void *)offsetof(EVertex, Position)); */
-  /* glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(EVertex), */
-  /*                       (void *)offsetof(EVertex, Normal)); */
-  /* glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(EVertex), */
-  /*                       (void *)offsetof(EVertex, TexCoord)); */
-  /**/
-
   for (const auto &d : predefinedAttribs) {
     glEnableVertexAttribArray(d.location);
     glVertexAttribPointer(d.location, d.size, d.type, d.normalize, d.stride,
                           (void *)d.offset);
   }
-  /* glEnableVertexAttribArray(0); */
-  /* glEnableVertexAttribArray(1); */
-  /* glEnableVertexAttribArray(2); */
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -78,3 +68,9 @@ void EBufferGeometry::addCustomAttrib(VertexAttrib attrib,
   customAttribs[bufferID] = attrib;
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+void EBufferGeometry::bind() { glBindVertexArray(VAO); }
+void EBufferGeometry::unbind() { glBindVertexArray(0); }
+
+size_t EBufferGeometry::getIndiciesCount() { return indices.size(); }
+
+size_t EBufferGeometry::getVertciesCount() { return vertices.size(); }
