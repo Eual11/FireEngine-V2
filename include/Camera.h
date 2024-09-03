@@ -57,7 +57,7 @@ public:
   void ProcessScroll(float yOffset);
   void SetAspectRatio(float aspect);
   void UpdateUniforms(Shader &shader);
-  void render() override;
+  void render(Shader &) override;
 };
 
 #endif

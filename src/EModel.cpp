@@ -1,40 +1,17 @@
 #include "../include/EModel.h"
 #include <assimp/material.h>
 #include <assimp/types.h>
+#include <filesystem>
 #include <glm/trigonometric.hpp>
 #include <memory>
 EModel::EModel(std::string path) { loadModel(path); }
-glm::mat4 EModel::getModelTransform() {
-  // translating
-  glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 
-  // rotating using eular angles
-
-  model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-  model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-
-  // scaling
-  model = glm::scale(model, scale);
-  model_transform = model;
-  return model_transform;
-}
-glm::mat4 EModel::getModelTransformStatic() { return model_transform; }
-
-void EModel::setPosition(float x, float y, float z) { position = {x, y, z}; }
-glm::vec3 EModel::getPosition() { return position; }
-void EModel::Draw(Shader &shader) {
-  shader.setMat4("uModel", getModelTransform());
+void EModel::render(Shader &shader) {
+  shader.setMat4("uModel", getWorldMatrix());
   for (auto &mesh : meshes) {
-    mesh.Draw(shader);
+    mesh.render(shader);
   }
 }
-void EModel::setRotation(float fYaw, float fPitch, float fRoll) {
-  rotation = {fPitch, fYaw, fRoll};
-}
-glm::vec3 EModel::getRotation() { return rotation; }
-void EModel::setScale(float x, float y, float z) { scale = {x, y, z}; }
-glm::vec3 EModel::getScale() { return scale; }
 
 void EModel::loadModel(std::string path) {
   Assimp::Importer importer;

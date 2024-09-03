@@ -102,7 +102,7 @@ void Camera::UpdateUniforms(Shader &shader) {
 }
 
 void Camera::SetAspectRatio(float aspect) { aspectRatio = aspect; }
-void Camera::render() {}
+void Camera::render(Shader &) {}
 glm::mat4 Camera::getProjection() {
   return glm::perspective(glm::radians(Fov), aspectRatio, zNear, zFar);
 }

@@ -28,12 +28,9 @@ EMesh::~EMesh() {
   /* glDeleteBuffers(1, &EBO); */
 }
 
-void EMesh::Draw(Shader &shader) {
-
+void EMesh::render(Shader &shader) {
   if (geometry && material) {
     geometry->bind();
-    unsigned int numDiffuse = 1;
-    unsigned int numSpecular = 1;
 
     material->Apply(shader);
     size_t idxCount = geometry->getIndiciesCount();

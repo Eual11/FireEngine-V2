@@ -91,7 +91,7 @@ void EWorld::Render() {
       }
       }
     }
-    obj->Draw(shader);
+    obj->render(shader);
   }
 }
 

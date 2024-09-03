@@ -3,25 +3,21 @@
 
 #include "../include/stb_image.h"
 #include "EMesh.h"
+#include "EObject3D.h"
 #include <assimp/Importer.hpp>
 #include <assimp/material.h>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/types.h>
-#include <filesystem>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <unordered_map>
 
-class EModel {
+class EModel : public EObject3D {
 
 private:
   std::vector<EMesh> meshes;
   std::string root_path;
-  glm::vec3 position = {0.0f, 0.0f, 0.0f};
-  glm::vec3 rotation = {0.0f, 0.0f, 0.0f};
-  glm::vec3 scale = {1.0f, 1.0f, 1.0f};
-  glm::mat4 model_transform;
 
   std::unordered_map<std::string, unsigned int> loaded_texture;
 
@@ -36,15 +32,7 @@ private:
 public:
   EModel(std::string);
   void loadModel(std::string path);
-  void Draw(Shader &shader);
-  glm::mat4 getModelTransform();
-  glm::mat4 getModelTransformStatic();
-  void setPosition(float x, float y, float z);
-  glm::vec3 getPosition();
-  void setRotation(float fYaw, float fPitch, float fRoll);
-  glm::vec3 getRotation();
-  void setScale(float x, float y, float z);
-  glm::vec3 getScale();
+  void render(Shader &shader);
 };
 
 #endif

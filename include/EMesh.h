@@ -3,12 +3,13 @@
 
 #include "EBufferGeometry.h"
 #include "EMaterial.h"
+#include "EObject3D.h"
 #include "Shader.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
 
-class EMesh {
+class EMesh : public EObject3D {
 
 public:
   EMesh(std::vector<EVertex>, std::vector<ETexture>, std::vector<unsigned int>);
@@ -17,7 +18,7 @@ public:
   std::shared_ptr<EBufferGeometry> geometry = nullptr;
 
   ~EMesh();
-  void Draw(Shader &);
+  void render(Shader &) override;
 
 private:
   std::vector<ETexture> textures;
