@@ -1,4 +1,5 @@
 #include "../include/EWorld.h"
+#include <cstdio>
 #include <memory>
 
 void EWorld::AddObject(std::shared_ptr<EModel> obj, Shader &shader) {
@@ -91,7 +92,30 @@ void EWorld::Render() {
       }
       }
     }
-    obj->render(shader);
+
+    switch (obj->getType()) {
+    case EObject3D::Type::Mesh: {
+      auto mesh = std::dynamic_pointer_cast<EMesh>(obj);
+      if (mesh) {
+        mesh->render(shader);
+      }
+      break;
+    }
+    case EObject3D::Type::Model: {
+      auto model = std::dynamic_pointer_cast<EModel>(obj);
+      if (model) {
+        model->render(shader);
+      }
+      break;
+    }
+    case EObject3D::Type::Group: {
+      auto group = std::dynamic_pointer_cast<EGroup>(obj);
+      if (group) {
+        group->render(shader);
+      }
+      break;
+    }
+    }
   }
 }
 

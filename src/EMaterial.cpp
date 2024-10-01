@@ -36,6 +36,8 @@ void PhongMaterial::Apply(Shader &shader) {
       glBindTexture(GL_TEXTURE_2D, tex.ID);
     }
   }
+  shader.setBool("material.diffse_bound", diffuseBound);
+  shader.setBool("material.specular_bound", specularBound);
 
   glActiveTexture(GL_TEXTURE0);
 }

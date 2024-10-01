@@ -1,6 +1,5 @@
 #include "../include/EMesh.h"
-#include <cstddef>
-#include <memory>
+#include <iomanip>
 EMesh::EMesh(std::vector<EVertex> verts, std::vector<ETexture> texs,
              std::vector<unsigned int> indx) {
 
@@ -29,14 +28,16 @@ EMesh::~EMesh() {
 }
 
 void EMesh::render(Shader &shader) {
+
   if (geometry && material) {
     geometry->bind();
-
+    shader.setMat4("uModel", getWorldMatrix());
     material->Apply(shader);
     size_t idxCount = geometry->getIndiciesCount();
-    if (idxCount)
+    if (idxCount) {
       glDrawElements(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0);
-    else
+
+    } else
       glDrawArrays(GL_TRIANGLES, 0, geometry->getVertciesCount());
     geometry->unbind();
   }

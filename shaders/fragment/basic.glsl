@@ -27,6 +27,8 @@ struct Material
     vec3 specular_color;
     sampler2D texture_diffuse1;
     sampler2D texture_specular1;
+    bool diffuse_bound;
+    bool specular_bound;
     float shininess;
 };
 
@@ -80,14 +82,19 @@ void main()
     }
     result += ambient;
 
-    FragColor = vec4(result, 1.0f);
+    //NOTE: debugging normals
+    FragColor = vec4(normalize(fragNormal) * 0.5 + 0.5, 1.0f);
 }
 
 vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
 {
     vec3 result = vec3(0.0f);
-    vec3 sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
-    vec3 sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
+    vec3 sampled_diffuse = vec3(1.0f);
+    vec3 sampled_specular = vec3(1.0f);
+    if (material.diffuse_bound)
+        sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
+    if (material.specular_bound)
+        sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
 
     vec3 light_dir = normalize(-dirLight.direction);
     float diff = max(dot(light_dir, normal), 0.0f);
@@ -102,8 +109,13 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
 vec3 calculatePointLight(Light pointLight, vec3 normal, vec3 viewDir)
 {
     vec3 result = vec3(0.0f);
-    vec3 sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
-    vec3 sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
+    vec3 sampled_diffuse = vec3(1.0f);
+    vec3 sampled_specular = vec3(1.0f);
+    if (material.diffuse_bound)
+        sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
+    if (material.specular_bound)
+        sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
+
     float D = length(pointLight.position - vec3(fragPosition));
     //attenuation
     float F_at = 1.0f / (pointLight.constant + D * pointLight.linear + D * D * pointLight.quadratic);
@@ -135,8 +147,12 @@ vec3 calculateSpotLight(Light spotLight, vec3 normal, vec3 viewDir)
         float epsilon = spotLight.inner_cutoff - spotLight.outer_cutoff;
 
         float I = clamp((theta - spotLight.outer_cutoff) / epsilon, 0.0f, 1.0f);
-        vec3 sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
-        vec3 sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
+        vec3 sampled_diffuse = vec3(1.0f);
+        vec3 sampled_specular = vec3(1.0f);
+        if (material.diffuse_bound)
+            sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
+        if (material.specular_bound)
+            sampled_specular = vec3(texture(material.texture_specular1, fragTexCoord));
 
         float diff = max(dot(light_dir, normal), 0);
         vec3 diffuse = spotLight.intensity * diff * sampled_diffuse * spotLight.diffuse_color;

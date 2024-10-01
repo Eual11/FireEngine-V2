@@ -1,3 +1,4 @@
+#include "../include/EModelLoader.h"
 #include "../include/EWorld.h"
 #include "../include/Window.h"
 #include "../include/stb_image.h"
@@ -40,14 +41,18 @@ int main() {
   EWorld zaWardu;
   // TODO: tidy this up, it is disguting
   std::filesystem::path path("../models/scene.gltf");
-  EModel loaded_model(std::filesystem::absolute(path).string());
-  loaded_model.setScale(0.09, 0.09, 0.09);
-  EModel another_mode(
-      std::filesystem::absolute("../models/DamagedHelmet.gltf").string());
-  another_mode.setPosition(0.0f, 0.0f, 0.0f);
-  /* another_mode.setScale(0.02f, 0.02f, 0.02f); */
-  /* another_mode.setRotation(glm::radians(180.0F), 0.0f, 0.f); */
 
+  EModelLoader loader;
+  auto cube = loader.loadModel(
+      std::filesystem::absolute("../models/cube.obj").string());
+
+  cube->setPosition(6, 0, 0);
+  cube->setRotation(0.0f, 45.0f, 0);
+  auto another_mode = loader.loadModel(
+      std::filesystem::absolute("../models/cube.obj").string());
+
+  another_mode->setPosition(3, 0, 0);
+  another_mode->add(cube);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
@@ -61,7 +66,8 @@ int main() {
   SpotLight spt({1.0f, 1.0f, 1.0f}, {1.0f, 1.0, 1.0}, {0.0f, 20.0f, 3.0f},
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
-  zaWardu.AddObject(std::make_shared<EModel>(another_mode), shaderProgram);
+  zaWardu.AddObject(cube, shaderProgram);
+  zaWardu.AddObject(another_mode, shaderProgram);
 
   zaWardu.AddLight(std::make_shared<SpotLight>(spt));
   zaWardu.AddLight(pnt);
@@ -80,7 +86,6 @@ int main() {
     float z = spiralRadius * sin(angle);
     float y = spiralHeight * (sin(angle / 2.0f) + 1.0f) /
               2.0f; // Adjust height to create the spiral effect
-    shaderProgram.Use();
     pnt->setPosition(x, y, z);
     pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
     pnt3->setPosition(x + 4.0f, y, z + 4.0f);

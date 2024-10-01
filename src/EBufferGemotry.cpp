@@ -1,9 +1,11 @@
 #include "../include/EBufferGeometry.h"
+#include <cstdio>
 
 EBufferGeometry::EBufferGeometry(std::vector<EVertex> verts,
                                  std::vector<unsigned int> inds) {
   this->vertices = verts;
   this->indices = inds;
+
   setupGeometry();
 }
 

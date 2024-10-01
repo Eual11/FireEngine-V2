@@ -6,6 +6,7 @@
 // by the compiler for simple cases.
 
 // Constructor for AmbientLight
+
 AmbientLight::AmbientLight(glm::vec3 color, float intensity) {
   type = AMBIENT;
   ambient_color = color;
