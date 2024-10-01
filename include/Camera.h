@@ -50,6 +50,7 @@ public:
          float fyaw, float fpitch);
   glm::mat4 getLookAt();
   glm::mat4 getProjection();
+  Camera::Type getType() override { return Type::Camera; }
 
   void ProcessInput(CameraMovement, float deltaTime);
   void ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch);
