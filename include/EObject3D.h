@@ -6,11 +6,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
-#include <vector>
 
-class EObject3D : std::enable_shared_from_this<EObject3D> {
+class EObject3D : public std::enable_shared_from_this<EObject3D> {
 
 public:
+  enum class Type { Base, Mesh, Group, Model, Camera, Scene, Light };
   glm::vec3 Position;
   glm::quat Rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
   glm::vec3 Scale = glm::vec3(1.0f);
@@ -20,7 +20,7 @@ public:
 
   glm::vec3 worldUp = {0.0f, 1.0f, 0.0f};
   glm::mat4 worldModelMatrix = glm::mat4(1.0f);
-  glm::mat4 localModelMatrix= glm::mat4(1.0f);
+  glm::mat4 localModelMatrix = glm::mat4(1.0f);
 
   EObject3D()
       : Position(0.0f), Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
@@ -32,6 +32,7 @@ public:
   glm::mat4 viewMatrix = glm::mat4(1.0f);
 
   glm::mat4 getModelViewMatrix(void);
+  virtual Type getType() { return Type::Base; }
 
   std::weak_ptr<EObject3D> parent;
 
@@ -60,8 +61,10 @@ public:
               const glm::vec3 &up = {0.0f, 1.0f, 0.0f});
   void add(const std::shared_ptr<EObject3D> &);
   void remove(const std::shared_ptr<EObject3D> &);
+  void setModelMatrix(glm::mat4 transform);
+  std::vector<std::shared_ptr<EObject3D>> getChildren();
 
-private:
+protected:
   std::vector<std::shared_ptr<EObject3D>> children;
 };
 #endif

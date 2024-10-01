@@ -35,10 +35,19 @@ public:
   virtual ~Material() = default;
 };
 
+class BasicMaterial : public Material {
+
+public:
+  BasicMaterial();
+  BasicMaterial(glm::vec3 ambient_color, glm::vec3 diffuse_color,
+                glm::vec3 specular_color);
+};
+
 class PhongMaterial : public Material {
 
 public:
   PhongMaterial();
+
   void Apply(Shader &shader) override;
   ~PhongMaterial() override = default;
 };

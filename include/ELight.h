@@ -9,8 +9,10 @@ enum LightType {
   POINT,
   SPOTLIGHT,
 };
+#include "EObject3D.h"
 #include <glm/ext/vector_float3.hpp>
-struct ELight {
+class ELight : public EObject3D {
+public:
   ELight() = default;
   virtual ~ELight() = default;
   glm::vec3 ambient_color;
@@ -18,6 +20,10 @@ struct ELight {
   glm::vec3 specular_color;
   float intensity;
   LightType type = UNDEFINED;
+  void render(Shader &shader) override {
+    // do nothing
+  };
+  Type getType() override { return Type::Light; }
 };
 
 struct AmbientLight : public ELight {
