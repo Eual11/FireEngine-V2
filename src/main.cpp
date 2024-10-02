@@ -30,15 +30,15 @@ int main() {
 
   Camera camera(camPos, cameraUp, fYaw, fPitch);
   auto cameraPtr = std::make_shared<Camera>(camera);
+  /* auto windowPtr =  */
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "NEW Window", false);
   nWindow.BindCamera(cameraPtr);
   // creating some shaders
   Shader shaderProgram("../shaders/vertex/basic.glsl",
                        "../shaders/fragment/basic.glsl");
 
-  Shader lightProgram("../shaders/vertex/lightVert.glsl",
-                      "../shaders/fragment/lightFrag.glsl");
-  EWorld zaWardu;
+  EWorld zaWardu(&nWindow);
+
   // TODO: tidy this up, it is disguting
   std::filesystem::path path("../models/scene.gltf");
 
@@ -49,7 +49,7 @@ int main() {
   cube->setPosition(6, 0, 0);
   cube->setRotation(0.0f, 45.0f, 0);
   auto another_mode = loader.loadModel(
-      std::filesystem::absolute("../models/cube.obj").string());
+      std::filesystem::absolute("../models/DamagedHelmet.gltf").string());
 
   another_mode->setPosition(3, 0, 0);
   another_mode->add(cube);
@@ -73,6 +73,14 @@ int main() {
   zaWardu.AddLight(pnt);
   zaWardu.AddLight(pnt2);
   zaWardu.AddLight(pnt3);
+  zaWardu.loadCubeMaps({
+      "../assets/water_scene_cubeMap/right.jpg",
+      "../assets/water_scene_cubeMap/left.jpg",
+      "../assets/water_scene_cubeMap/top.jpg",
+      "../assets/water_scene_cubeMap/bottom.jpg",
+      "../assets/water_scene_cubeMap/front.jpg",
+      "../assets/water_scene_cubeMap/back.jpg",
+  });
   zaWardu.AddLight(std::make_shared<AmbientLight>(amb));
   float spiralRadius = 5.0f;
   float spiralHeight = 10.0f;
@@ -99,7 +107,6 @@ int main() {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    nWindow.UpdateUniforms(shaderProgram);
     zaWardu.Render();
     nWindow.Update();
   }
