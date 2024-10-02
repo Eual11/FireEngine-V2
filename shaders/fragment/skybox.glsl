@@ -1,0 +1,8 @@
+//skybox fragment shader
+in vec3 skyboxTexCoord;
+out vec4 FragColor;
+uniform samplerCube skybox;
+void main()
+{
+    FragColor = texture(skybox, skyboxTexCoord);
+}
