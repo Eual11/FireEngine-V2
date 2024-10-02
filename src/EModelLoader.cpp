@@ -23,7 +23,6 @@ std::shared_ptr<EModel> EModelLoader::loadModel(std::string path) {
   } catch (std::bad_weak_ptr &) {
     printf("BAD PTR\n!!!");
   }
-  printf("Model loded\n");
   return model;
 }
 std::shared_ptr<EObject3D> EModelLoader::ProcessNode(glm::mat4 m, aiNode *node,

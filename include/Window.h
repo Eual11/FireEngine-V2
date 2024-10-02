@@ -45,6 +45,7 @@ public:
   void DestroyWindow();
 
   float GetAspectRatio();
+  std::shared_ptr<Camera> getBoundCamera() const { return camera_; }
   GLFWwindow *GetRef();
   void SetContextVersion(unsigned int major, unsigned int minor);
   // activating the window by setting it as the current opengl context

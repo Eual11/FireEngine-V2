@@ -7,8 +7,121 @@ void EWorld::AddObject(std::shared_ptr<EModel> obj, Shader &shader) {
   std::pair<std::shared_ptr<EModel>, Shader &> shader_obj(obj, shader);
   Objects.push_back(shader_obj);
 }
+unsigned int EWorld::loadCubeMaps(std::vector<std::string> faces) {
+
+  // the order should be
+  // right, left, top, bottom, front, back
+  float skyboxVertices[] = {
+      // positions
+      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+  // loading cube maps
+  glGenTextures(1, &skyboxCubeMap);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxCubeMap);
+
+  int width, height, nchr;
+
+  stbi_set_flip_vertically_on_load(false);
+  for (int i = 0; i < (int)faces.size(); i++) {
+
+    unsigned char *data =
+        stbi_load(faces[i].c_str(), &width, &height, &nchr, 0);
+
+    if (data) {
+      unsigned int format;
+
+      switch (nchr) {
+      case 1: {
+        format = GL_RED;
+        break;
+      }
+      case 3: {
+        format = GL_RGB;
+        break;
+      }
+      case 4: {
+        format = GL_RGBA;
+        break;
+      }
+      }
+
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height,
+                   0, format, GL_UNSIGNED_BYTE, data);
+      stbi_image_free(data);
+    } else {
+      fprintf(stderr, "Failed to load cube map data %s\n", faces[i].c_str());
+      stbi_image_free(data);
+    }
+  }
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+  skyboxShader = std::make_shared<Shader>(
+      Shader("../shaders/vertex/sykbox.glsl",
+             "../shaders/fragment/skybox.glsl")); // generating skybox VAO
+  unsigned int vbo;
+  glGenVertexArrays(1, &skyboxVAO);
+  glGenBuffers(1, &vbo);
+  glBindVertexArray(skyboxVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices,
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
+
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  hasSkyBox = true;
+  return skyboxCubeMap;
+}
+
+void EWorld::RenderSkybox() {
+  // disabling depth mapping so the sky box won't write anything to the depth
+  // buffer
+
+  if (skyboxShader) {
+    glDepthMask(GL_FALSE);
+    skyboxShader->Use();
+    if (attachedWindow) {
+      attachedWindow->UpdateUniforms(*skyboxShader);
+      if (attachedWindow->getBoundCamera()) {
+        glm::mat4 view =
+            glm::mat4(glm::mat3(attachedWindow->getBoundCamera()->getLookAt()));
+        skyboxShader->setMat4("uView", view);
+      }
+    }
+    glBindVertexArray(skyboxVAO);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxCubeMap);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDepthMask(GL_TRUE);
+  }
+}
 void EWorld::Render() {
+
+  if (hasSkyBox) {
+    RenderSkybox();
+  }
   for (auto &[obj, shader] : Objects) {
+    if (attachedWindow) {
+      attachedWindow->UpdateUniforms(shader);
+    }
     unsigned int dirCount = 0;
     unsigned int pointCount = 0;
     unsigned int spotCount = 0;
