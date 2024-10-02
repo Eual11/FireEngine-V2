@@ -35,7 +35,7 @@ int main() {
   nWindow.BindCamera(cameraPtr);
   // creating some shaders
   Shader shaderProgram("../shaders/vertex/basic.glsl",
-                       "../shaders/fragment/basic.glsl");
+                       "../shaders/fragment/env_map.glsl");
 
   EWorld zaWardu(&nWindow);
 

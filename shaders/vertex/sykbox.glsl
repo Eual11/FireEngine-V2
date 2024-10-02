@@ -8,5 +8,6 @@ void main()
 {
     skyboxTexCoord = aPos;
     mat4 view = mat4(mat3(uView));
-    gl_Position = uProjection * view * vec4(aPos, 1.0f);
+    vec4 pos = uProjection * view * vec4(aPos, 1.0f);
+    gl_Position = pos.xyww;
 }

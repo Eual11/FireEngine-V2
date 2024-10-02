@@ -115,9 +115,6 @@ void EWorld::RenderSkybox() {
 }
 void EWorld::Render() {
 
-  if (hasSkyBox) {
-    RenderSkybox();
-  }
   for (auto &[obj, shader] : Objects) {
     if (attachedWindow) {
       attachedWindow->UpdateUniforms(shader);
@@ -229,6 +226,12 @@ void EWorld::Render() {
       break;
     }
     }
+  }
+
+  if (hasSkyBox) {
+    glDepthFunc(GL_LEQUAL);
+    RenderSkybox();
+    glDepthFunc(GL_LESS);
   }
 }
 
