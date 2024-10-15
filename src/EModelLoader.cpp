@@ -1,7 +1,8 @@
 #include "../include/EModelLoader.h"
 #include <memory>
 
-std::shared_ptr<EModel> EModelLoader::loadModel(std::string path) {
+std::shared_ptr<EModel>
+EModelLoader::loadModel(std::string path, std::shared_ptr<Material> material) {
   auto model = std::make_shared<EModel>();
 
   Assimp::Importer importer;
@@ -22,6 +23,11 @@ std::shared_ptr<EModel> EModelLoader::loadModel(std::string path) {
     model->add(ProcessNode(glm::mat4(1.0f), scene->mRootNode, scene));
   } catch (std::bad_weak_ptr &) {
     printf("BAD PTR\n!!!");
+  }
+
+  // settign material to overide the model's material
+  if (material) {
+    model->setMaterial(material);
   }
   return model;
 }

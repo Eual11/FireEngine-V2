@@ -1,4 +1,5 @@
 #include "../include/EModelLoader.h"
+#include "../include/ERenderer.h"
 #include "../include/EWorld.h"
 #include "../include/Window.h"
 #include "../include/stb_image.h"
@@ -34,25 +35,29 @@ int main() {
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "NEW Window", false);
   nWindow.BindCamera(cameraPtr);
   // creating some shaders
-  Shader shaderProgram("../shaders/vertex/basic.glsl",
-                       "../shaders/fragment/env_map.glsl");
 
-  EWorld zaWardu(&nWindow);
+  auto zaWardu = std::make_shared<EWorld>(&nWindow);
+  ERenderer rend(&nWindow);
 
   // TODO: tidy this up, it is disguting
+  UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
   std::filesystem::path path("../models/scene.gltf");
 
   EModelLoader loader;
+  /* auto mat = std::make_shared<NormalMaterial>(NormalMaterial()); */
+  auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/test.glsl",
+                                              "../shaders/fragment/basic.glsl",
+                                              uniforms);
   auto cube = loader.loadModel(
-      std::filesystem::absolute("../models/cube.obj").string());
+      std::filesystem::absolute("../models/Suzanne.obj").string(), mat);
 
   cube->setPosition(6, 0, 0);
   cube->setRotation(0.0f, 45.0f, 0);
+
   auto another_mode = loader.loadModel(
-      std::filesystem::absolute("../models/DamagedHelmet.gltf").string());
+      std::filesystem::absolute("../models/DamagedHelmet.gltf").string(), mat);
 
   another_mode->setPosition(3, 0, 0);
-  another_mode->add(cube);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
@@ -66,14 +71,15 @@ int main() {
   SpotLight spt({1.0f, 1.0f, 1.0f}, {1.0f, 1.0, 1.0}, {0.0f, 20.0f, 3.0f},
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
-  zaWardu.AddObject(cube, shaderProgram);
-  zaWardu.AddObject(another_mode, shaderProgram);
 
-  zaWardu.AddLight(std::make_shared<SpotLight>(spt));
-  zaWardu.AddLight(pnt);
-  zaWardu.AddLight(pnt2);
-  zaWardu.AddLight(pnt3);
-  zaWardu.loadCubeMaps({
+  zaWardu->add(another_mode);
+  zaWardu->add(cube);
+
+  zaWardu->AddLight(std::make_shared<SpotLight>(spt));
+  zaWardu->AddLight(pnt);
+  zaWardu->AddLight(pnt2);
+  zaWardu->AddLight(pnt3);
+  zaWardu->loadCubeMaps({
       "../assets/water_scene_cubeMap/right.jpg",
       "../assets/water_scene_cubeMap/left.jpg",
       "../assets/water_scene_cubeMap/top.jpg",
@@ -81,7 +87,7 @@ int main() {
       "../assets/water_scene_cubeMap/front.jpg",
       "../assets/water_scene_cubeMap/back.jpg",
   });
-  zaWardu.AddLight(std::make_shared<AmbientLight>(amb));
+  zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   float spiralRadius = 5.0f;
   float spiralHeight = 10.0f;
   float spiralSpeed = 1.0f;
@@ -98,16 +104,11 @@ int main() {
     pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
     pnt3->setPosition(x + 4.0f, y, z + 4.0f);
 
-    shaderProgram.setVec3("light.position", camera.Position);
-    shaderProgram.setVec3("light.direction", camera.Front);
-    shaderProgram.setFloat(
-        "light.cutoff",
-        glm::cos(glm::radians(12.5f))); // setting the matrials
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    zaWardu.Render();
+    mat->uniforms["time"] = glfwGetTime();
+    rend.Render(zaWardu);
     nWindow.Update();
   }
   printf("Good Bye\n");

@@ -90,6 +90,9 @@ void Window::DisableCursor() {
   cursorEnabled_ = false;
 }
 
+// TODO: decouple window and camera
+// in the current set up, multiple cameras
+// are a distant dream
 void Window::BindCamera(std::shared_ptr<Camera> camera) {
   camera_ = camera;
   cameraBound = true;

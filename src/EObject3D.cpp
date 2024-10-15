@@ -76,7 +76,7 @@ void EObject3D::add(const std::shared_ptr<EObject3D> &child) {
     try {
       child->parent = shared_from_this();
     } catch (const std::bad_weak_ptr &) {
-      printf("Bad weak ptr\n");
+      printf("Bad A weak ptr\n");
     }
     children.push_back(child);
     child->updateWorldMatrix();

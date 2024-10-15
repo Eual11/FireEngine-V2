@@ -5,6 +5,9 @@
 // memeory
 // TODO: GET A BETTER STRUCTURE
 void EModel::render(Shader &shader) {
+  if (material) {
+    material->Apply(shader);
+  }
   for (auto &child : children) {
     child->render(shader);
   }

@@ -93,6 +93,7 @@ void Shader::setFloat(std::string name, float val) const {
   GL_CHECK(glUniform1f(glGetUniformLocation(ID, name.c_str()), val));
 }
 
+
 void Shader::setVec3(std::string name, glm::vec3 v) {
   Use();
   GL_CHECK(

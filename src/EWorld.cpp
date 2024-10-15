@@ -238,3 +238,5 @@ void EWorld::Render() {
 void EWorld::AddLight(std::shared_ptr<ELight> light) {
   Lights.push_back(light);
 }
+
+void EWorld::render(Shader &shader) {}

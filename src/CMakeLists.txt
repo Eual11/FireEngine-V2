@@ -2,7 +2,7 @@ set(EXECUTABLE_NAME "e")
 include_directories($ENV{CPLUS_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/include")
 
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(${EXECUTABLE_NAME} ./main.cpp)
 add_library(glad STATIC glad.c)
@@ -14,6 +14,7 @@ add_library(Material STATIC EMaterial.cpp)
 add_library(Mesh STATIC EMesh.cpp)
 add_library(Group STATIC EGroup.cpp)
 add_library(Model STATIC EModel.cpp)
+add_library(Renderer STATIC ERenderer.cpp)
 add_library(ModelLoader STATIC EModelLoader.cpp)
 add_library(Camera STATIC Camera.cpp)
 add_library(EWindow STATIC Window.cpp)
@@ -26,9 +27,11 @@ target_link_libraries(Mesh PRIVATE BufferGeometry PRIVATE Material)
 target_link_libraries(Model PRIVATE Mesh PRIVATE Group  PRIVATE Shader PRIVATE glad  )
 target_link_libraries(ModelLoader PRIVATE Mesh PRIVATE Group PRIVATE stb_image PRIVATE Shader PRIVATE glad PRIVATE  "${CMAKE_SOURCE_DIR}\\lib\\assimp-vc143-mt.lib" )
 target_link_libraries(EWorld PRIVATE Model PRIVATE ELight)
+
+target_link_libraries(Renderer PRIVATE EWorld PRIVATE Model PRIVATE ELight PRIVATE EWindow)
 #  PRIVATE "$ENV{C_LIBRARY_PATH}\\SDL3_mixer.lib"
 #glfw, assimp
-target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE stb_image PRIVATE Camera PRIVATE "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model PRIVATE EWindow PRIVATE EWorld PRIVATE ModelLoader )
+target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE stb_image PRIVATE Camera PRIVATE Renderer PRIVATE  "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model PRIVATE EWindow PRIVATE EWorld PRIVATE ModelLoader )
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 
