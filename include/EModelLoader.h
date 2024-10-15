@@ -34,6 +34,7 @@ private:
 
 public:
   EModelLoader() = default;
-  std::shared_ptr<EModel> loadModel(std::string path);
+  std::shared_ptr<EModel>
+  loadModel(std::string path, std::shared_ptr<Material> material = nullptr);
 };
 #endif

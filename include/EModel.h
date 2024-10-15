@@ -2,6 +2,7 @@
 #define __EMODELN_H
 #include "../include/stb_image.h"
 #include "EGroup.h"
+#include "EMaterial.h"
 #include "EMesh.h"
 #include "EObject3D.h"
 #include <assimp/Importer.hpp>
@@ -11,6 +12,7 @@
 #include <assimp/types.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <memory>
 class EModel : public EObject3D {
 
 public:
@@ -38,6 +40,11 @@ public:
   void loadModel(std::string path);
   void render(Shader &shader) override;
   Type getType() override;
+  std::shared_ptr<Material> getMaterial() const { return material; }
+  void setMaterial(std::shared_ptr<Material> mat) { this->material = mat; }
+
+private:
+  std::shared_ptr<Material> material = nullptr;
 };
 
 #endif

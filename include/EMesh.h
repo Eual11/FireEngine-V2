@@ -21,10 +21,12 @@ public:
   ~EMesh();
   void render(Shader &) override;
   Type getType() override { return Type::Mesh; }
+  void setMaterial(std::shared_ptr<Material> mat) { material = mat; };
+  std::shared_ptr<Material> getMaterial() const { return material; };
 
 private:
   std::vector<ETexture> textures;
-  std::shared_ptr<Material> material;
+  std::shared_ptr<Material> material = nullptr;
 
   unsigned int VAO, VBO, EBO;
 };

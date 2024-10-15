@@ -10,7 +10,7 @@
 class EObject3D : public std::enable_shared_from_this<EObject3D> {
 
 public:
-  enum class Type { Base, Mesh, Group, Model, Camera, Scene, Light };
+  enum class Type { Base, Mesh, Group, Model, Camera, World, Light };
   glm::vec3 Position;
   glm::quat Rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
   glm::vec3 Scale = glm::vec3(1.0f);

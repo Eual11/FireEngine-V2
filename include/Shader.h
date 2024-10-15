@@ -16,14 +16,16 @@ public:
   unsigned int ID;
   unsigned int vertexShader;
   unsigned int fragmentShader;
+  std::string vertSrc;
+  std::string fragSrc;
 
   Shader(const char *vertSrc, const char *fragSrc);
+  Shader() = default;
 
   void Use() const;
   void setInt(std::string name, int val) const;
   void setBool(std::string name, bool val) const;
   void setFloat(std::string name, float val) const;
-  void setDouble(std::string name, float val) const;
   void setVec3(std::string name, glm::vec3 v);
   void setVec4(std::string name, glm::vec4 v);
 
@@ -33,4 +35,5 @@ public:
   void setVec3(std::string name, float x, float y, float z);
   void setVec4(std::string name, float x, float y, float z, float w);
 };
+
 #endif
