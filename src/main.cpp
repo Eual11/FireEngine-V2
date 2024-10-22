@@ -76,9 +76,40 @@ int main() {
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
-  zaWardu->add(another_mode);
-  zaWardu->add(cube);
+  /* zaWardu->add(another_mode); */
+  /* zaWardu->add(cube); */
 
+  auto geo = std::make_shared<EBufferGeometry>();
+  float verts[] = {
+      // positions
+      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+
+  VertexAttrib pos_attrib;
+  pos_attrib.name = "position";
+  pos_attrib.size = 3;
+  pos_attrib.offset = 0;
+
+  geo->addCustomAttribF(pos_attrib, verts, sizeof(verts));
+
+  auto test_obj = std::make_shared<EMesh>(geo, mat);
+  std::cout << "gaming " << test_obj << "\n";
+  zaWardu->add(test_obj);
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);
   zaWardu->AddLight(pnt2);

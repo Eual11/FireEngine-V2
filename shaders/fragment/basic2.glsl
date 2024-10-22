@@ -23,6 +23,6 @@ void main()
 {
     vec3 sampled_diffuse = vec3(texture(tex, fragTexCoord));
 
-    //sampled_diffuse = vec3(1.0f);
+    sampled_diffuse = vec3(1.0f);
     FragColor = vec4(sampled_diffuse, 1.0f);
 }

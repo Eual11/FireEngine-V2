@@ -8,6 +8,12 @@ EBufferGeometry::EBufferGeometry(std::vector<EVertex> verts,
 
   setupGeometry();
 }
+EBufferGeometry::EBufferGeometry() {
+
+  // generating VAO and unbinding it
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(0);
+}
 
 void EBufferGeometry::setupGeometry() {
   glGenVertexArrays(1, &VAO);
@@ -51,22 +57,22 @@ void EBufferGeometry::setupPredefinedAttribs() {
                                currentLocation++, offsetof(EVertex, TexCoord),
                                GL_FALSE});
 }
-void EBufferGeometry::addCustomAttrib(VertexAttrib attrib,
-                                      const std::vector<float> &data) {
+void EBufferGeometry::addCustomAttribF(VertexAttrib attrib, const float *data,
+                                       size_t len) {
   glBindVertexArray(VAO);
   unsigned int bufferID;
   glGenBuffers(1, &bufferID);
   glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data.size(), data.data(),
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
 
   glVertexAttribPointer(currentLocation, attrib.size, attrib.type,
-                        attrib.normalize, attrib.size, (void *)attrib.offset);
+                        attrib.normalize, attrib.size * sizeof(float),
+                        (void *)attrib.offset);
 
-  // maybe enable it later?
-
+  printf("location: %zu len \n", len);
   glEnableVertexAttribArray(currentLocation++);
+
   customAttribs[bufferID] = attrib;
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

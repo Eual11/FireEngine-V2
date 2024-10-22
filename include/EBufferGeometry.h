@@ -13,20 +13,20 @@ struct EVertex {
 };
 struct VertexAttrib {
   std::string name;
-  GLenum type;
+  GLenum type = GL_FLOAT;
   int size;
   int stride;
   int location;
-  size_t offset;
-  bool normalize;
+  size_t offset = 0;
+  bool normalize = GL_FALSE;
 };
 class EBufferGeometry {
 
 public:
   EBufferGeometry(std::vector<EVertex>, std::vector<unsigned int>);
-  EBufferGeometry() = default;
+  EBufferGeometry();
 
-  void addCustomAttrib(VertexAttrib, const std::vector<float> &);
+  void addCustomAttribF(VertexAttrib, const float *, size_t size);
   bool hasIndices();
   size_t getIndiciesCount();
   size_t getVertciesCount();
