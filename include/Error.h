@@ -2,7 +2,6 @@
 #define _ERROR_H
 /* #define LOG ; */
 #include <glad/glad.h>
-#include <iostream>
 #include <string>
 inline void checkOpenGLError(const char *stmt, const char *fname, int line) {
   GLenum err = glGetError();

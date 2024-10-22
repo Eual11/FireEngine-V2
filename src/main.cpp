@@ -27,6 +27,7 @@ glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
 glm::vec3 lightPos(0.0f, 0.0f, 8.0f);
 
+// TODO: somehow the child mesh's frag shaders is being executed
 int main() {
 
   Camera camera(camPos, cameraUp, fYaw, fPitch);
@@ -43,17 +44,20 @@ int main() {
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
   std::filesystem::path path("../models/scene.gltf");
 
+  auto tex = ETexture::load(
+      "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+  uniforms["tex"] = tex;
   EModelLoader loader;
   /* auto mat = std::make_shared<NormalMaterial>(NormalMaterial()); */
   auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/test.glsl",
-                                              "../shaders/fragment/basic.glsl",
+                                              "../shaders/fragment/basic2.glsl",
                                               uniforms);
+
   auto cube = loader.loadModel(
       std::filesystem::absolute("../models/Suzanne.obj").string(), mat);
 
   cube->setPosition(6, 0, 0);
   cube->setRotation(0.0f, 45.0f, 0);
-
   auto another_mode = loader.loadModel(
       std::filesystem::absolute("../models/DamagedHelmet.gltf").string(), mat);
 

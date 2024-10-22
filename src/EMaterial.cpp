@@ -1,4 +1,5 @@
 #include "../include/EMaterial.h"
+#include <memory>
 #include <type_traits>
 #include <variant>
 
@@ -105,10 +106,11 @@ ShaderMaterial::ShaderMaterial(std::string vSrc, std::string fSrc,
 }
 void ShaderMaterial::Apply(Shader &shader) {
   shader.Use();
+  unsigned int texUnitIndex = 0;
   for (auto &[name, value] : uniforms) {
     std::visit(
-        [&shader, name](auto &&arg) {
-          using T = std::decay_t<decltype(arg)>; // Removed parentheses here
+        [&shader, name, &texUnitIndex](auto &&arg) {
+          using T = std::decay_t<decltype(arg)>;
           if constexpr (std::is_same_v<T, bool>) {
             shader.setBool(name, arg);
           } else if constexpr (std::is_same_v<T, int>) {
@@ -124,8 +126,13 @@ void ShaderMaterial::Apply(Shader &shader) {
             shader.setMat3(name, arg);
           } else if constexpr (std::is_same_v<T, glm::mat4>) {
             shader.setMat4(name, arg);
+          } else if constexpr (std::is_same_v<T, std::shared_ptr<ETexture>>) {
+            glActiveTexture(GL_TEXTURE0 + texUnitIndex);
+            shader.setInt(name, texUnitIndex++);
+            glBindTexture(GL_TEXTURE_2D, arg->ID);
           }
         },
         value);
   }
+  glActiveTexture(GL_TEXTURE0);
 }

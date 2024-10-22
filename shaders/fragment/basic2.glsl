@@ -1,10 +1,10 @@
 #version 330 core
-
 in vec4 finalVertColor;
 in vec2 finalTexCoord;
 
 in vec2 fragTexCoord;
 out vec4 FragColor;
+uniform sampler2D tex;
 struct Material
 {
     //we might use this...
@@ -21,9 +21,8 @@ uniform Material material;
 //niform sampler2D texture2;
 void main()
 {
-    vec3 sampled_diffuse = material.diffuse_color;
-    if (material.diffuse_bound)
-        sampled_diffuse = vec3(texture(material.texture_specular1, fragTexCoord));
+    vec3 sampled_diffuse = vec3(texture(tex, fragTexCoord));
 
+    //sampled_diffuse = vec3(1.0f);
     FragColor = vec4(sampled_diffuse, 1.0f);
 }

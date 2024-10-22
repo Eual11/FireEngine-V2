@@ -66,7 +66,6 @@ std::shared_ptr<EMesh> EModelLoader::ProcessMesh(glm::mat4 &m, aiMesh *mesh,
   std::vector<ETexture> textures;
   std::vector<unsigned int> indicies;
 
-  glm::mat4 m_ive = m;
   // Loading vertices
   for (int i = 0; i < (int)mesh->mNumVertices; i++) {
 

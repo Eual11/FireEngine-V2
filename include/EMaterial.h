@@ -1,21 +1,15 @@
 #ifndef _EMATERIAL_H
 #define _EMATERIAL_H
-
+#include "ETexture.h"
 #include "Shader.h"
 #include <glm/ext/vector_float3.hpp>
-#include <string>
+#include <memory>
 #include <unordered_map>
 #include <variant>
-#include <vector>
 
 using Uniform = std::variant<bool, int, float, double, glm::vec4, glm::vec3,
-                             glm::mat4, glm::mat3>;
+                             glm::mat4, glm::mat3, std::shared_ptr<ETexture>>;
 using UniformMap = std::unordered_map<std::string, Uniform>;
-struct ETexture {
-  unsigned int ID = 0;
-  std::string type;
-  std::string path;
-};
 
 enum MaterialType {
 
