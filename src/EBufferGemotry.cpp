@@ -70,7 +70,6 @@ void EBufferGeometry::addCustomAttribF(VertexAttrib attrib, const float *data,
                         attrib.normalize, attrib.size * sizeof(float),
                         (void *)attrib.offset);
 
-  printf("location: %zu len \n", len);
   glEnableVertexAttribArray(currentLocation++);
 
   customAttribs[bufferID] = attrib;

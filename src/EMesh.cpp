@@ -38,7 +38,7 @@ void EMesh::render(Shader &shader) {
       glDrawElements(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0);
 
     } else
-      glDrawArrays(GL_TRIANGLES, 0, geometry->getVertciesCount());
+      glDrawArrays(GL_TRIANGLES, 0, 32);
     geometry->unbind();
   }
 }

@@ -50,7 +50,6 @@ Window::Window(int w, int h, std::string title, bool fullscreen) {
   EnableResizing();
   EnableVsync();
   DisableCursor();
-  EnableDepthTesting();
   EnableScrollInput();
   EnableMouseInput();
 };
@@ -74,13 +73,6 @@ void Window::EnableResizing() {
 
   glfwSetFramebufferSizeCallback(window_, (GLFWframebuffersizefun)callback);
   resizeUpdatesEnabled_ = true;
-}
-
-void Window::EnableDepthTesting() {
-  if (depthTestingEnabled_)
-    return;
-  glEnable(GL_DEPTH_TEST);
-  depthTestingEnabled_ = true;
 }
 
 void Window::DisableCursor() {

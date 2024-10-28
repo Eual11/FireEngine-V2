@@ -53,15 +53,16 @@ int main() {
                                               "../shaders/fragment/basic2.glsl",
                                               uniforms);
 
-  auto cube = loader.loadModel(
-      std::filesystem::absolute("../models/Suzanne.obj").string(), mat);
+  auto suzan = loader.loadModel(
+      std::filesystem::absolute("../models/scene.gltf").string(), mat);
 
-  cube->setPosition(6, 0, 0);
-  cube->setRotation(0.0f, 45.0f, 0);
-  auto another_mode = loader.loadModel(
+  suzan->setPosition(0, 0, 4);
+  suzan->setScale(0.1, 0.1, 0.1);
+  suzan->setRotation(0.0f, 45.0f, 0);
+  auto helm = loader.loadModel(
       std::filesystem::absolute("../models/DamagedHelmet.gltf").string(), mat);
 
-  another_mode->setPosition(3, 0, 0);
+  helm->setPosition(0, 0, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
@@ -76,40 +77,9 @@ int main() {
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
-  /* zaWardu->add(another_mode); */
-  /* zaWardu->add(cube); */
+  zaWardu->add(helm);
+  zaWardu->add(suzan);
 
-  auto geo = std::make_shared<EBufferGeometry>();
-  float verts[] = {
-      // positions
-      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
-      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
-
-      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
-      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
-
-      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
-
-      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-
-      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
-
-      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
-      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
-
-  VertexAttrib pos_attrib;
-  pos_attrib.name = "position";
-  pos_attrib.size = 3;
-  pos_attrib.offset = 0;
-
-  geo->addCustomAttribF(pos_attrib, verts, sizeof(verts));
-
-  auto test_obj = std::make_shared<EMesh>(geo, mat);
-  std::cout << "gaming " << test_obj << "\n";
-  zaWardu->add(test_obj);
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);
   zaWardu->AddLight(pnt2);
