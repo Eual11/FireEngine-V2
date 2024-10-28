@@ -56,7 +56,6 @@ public:
   void EnableVsync();
   void EnableKeyInput();
   void EnableScrollInput();
-  void EnableDepthTesting();
   void EnableResizing();
   void EnableMouseInput();
 
