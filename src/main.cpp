@@ -49,20 +49,19 @@ int main() {
   uniforms["tex"] = tex;
   EModelLoader loader;
   /* auto mat = std::make_shared<NormalMaterial>(NormalMaterial()); */
-  auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/test.glsl",
+  auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/basic.glsl",
                                               "../shaders/fragment/basic2.glsl",
                                               uniforms);
-
   auto suzan = loader.loadModel(
-      std::filesystem::absolute("../models/scene.gltf").string(), mat);
+      std::filesystem::absolute("../models/cube.obj").string(), mat);
 
   suzan->setPosition(0, 0, 4);
-  suzan->setScale(0.1, 0.1, 0.1);
+  /* suzan->setScale(0.02, 0.02, 0.02); */
   suzan->setRotation(0.0f, 45.0f, 0);
   auto helm = loader.loadModel(
       std::filesystem::absolute("../models/DamagedHelmet.gltf").string(), mat);
 
-  helm->setPosition(0, 0, 0);
+  helm->setPosition(10, 1, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
@@ -108,10 +107,6 @@ int main() {
     pnt->setPosition(x, y, z);
     pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
     pnt3->setPosition(x + 4.0f, y, z + 4.0f);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     mat->uniforms["time"] = glfwGetTime();
     rend.Render(zaWardu);
     nWindow.Update();

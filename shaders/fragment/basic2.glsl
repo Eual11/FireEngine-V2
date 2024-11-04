@@ -32,9 +32,8 @@ void main()
 {
     vec3 sampled_diffuse = vec3(texture(tex, fragTexCoord));
 
-    float fogDensity = 0.9;
+    float fogDensity = 0;
     vec3 fogColor = vec3(0.92, 0.913, 0.931);
     float depthVec = exp(-pow(LinearizeDepth(gl_FragCoord.z), fogDensity));
-    //sampled_diffuse = vec3(1.0f);
     FragColor = vec4(mix(sampled_diffuse, fogColor, fogDensity), 1.0f);
 }

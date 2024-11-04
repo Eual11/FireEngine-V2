@@ -1,5 +1,4 @@
 #include "../include/ERenderer.h"
-#include <memory>
 
 ERenderer::ERenderer() {
   EnableDepthTesting();
@@ -13,33 +12,63 @@ void PrintShaderMap(
     const Shader &shader = *entry.second;
 
     // Print the address of the EObject3D and Shader name
-    std::cout << "Object Address: " << obj_ptr.get() << " | Shader: " << &shader
-              << std::endl;
+    /* std::cout << "Object Address: " << obj_ptr.get() << " | Shader: " <<
+     * &shader */
+    /*           << std::endl; */
   }
 }
 ERenderer::ERenderer(Window *window) {
   this->window = window;
 
   EnableDepthTesting();
+  EnableStencilTesting();
   setDepthTestFunc(GL_LESS);
+
+  outlineShader =
+      std::make_shared<Shader>("../shaders/vertex/basic.glsl",
+                               "../shaders/fragment/normal_material.glsl");
 }
 
 void ERenderer::EnableDepthTesting() {
-  if (!depthTestingEnabled_) {
+  if (!depthTestingEnabled) {
     glEnable(GL_DEPTH_TEST);
-    depthTestingEnabled_ = true;
+    depthTestingEnabled = true;
+    clearBit |= GL_DEPTH_BUFFER_BIT;
   }
 }
+void ERenderer::EnableStencilTesting() {
+  glEnable(GL_STENCIL_TEST);
+  stencilTestingEnabled = true;
+  clearBit |= GL_STENCIL_BUFFER_BIT;
+}
+void ERenderer::DisableStencilTesting() {
+  if (!stencilTestingEnabled)
+    return;
+  glDisable(GL_STENCIL_TEST);
+  stencilTestingEnabled = false;
+  clearBit &= (~GL_STENCIL_BUFFER_BIT);
+}
 void ERenderer::DisableDepthTesting() {
-  if (depthTestingEnabled_) {
+  if (depthTestingEnabled) {
     glDisable(GL_DEPTH_TEST);
-    depthTestingEnabled_ = false;
+    depthTestingEnabled = false;
+    clearBit &= (~GL_DEPTH_BUFFER_BIT);
   }
+}
+void inline ERenderer::setClearColor(float r, float g, float b, float a) {
+  clearColor = {r, g, b, a};
+  glClearColor(r, g, b, a);
 }
 void ERenderer::setDepthTestFunc(unsigned int func) { glDepthFunc(func); }
 
 void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
+  glClear(clearBit);
+  if (world->hasSkyBox) {
+    glDepthFunc(GL_LEQUAL);
+    RenderSkybox(world);
+    glDepthFunc(GL_LESS);
+  }
   if (!shaders_compiled) {
     CompileWorldShader(world);
     try {
@@ -57,22 +86,37 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
       Shader &shader = *shader_map[child].get();
       if (window) {
         window->UpdateUniforms(shader);
+        window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, shader);
+
+        // enable writing to stencil buffer
+        glStencilMask(0xFF);
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        auto scale = child->getScale();
         child->render(shader);
+
+        child->setScale(scale.x * 1.03, scale.y * 1.03, scale.z * 1.03);
+        // disable writing to stencil and depth buffer
+        DisableDepthTesting();
+        glStencilMask(0x00);
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        child->render(*outlineShader);
+
+        child->setScale(scale.x, scale.y, scale.z);
+        glStencilMask(0xFF);
+        EnableDepthTesting();
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
       }
     } else
       FetchShaderAndRender(world, child);
-  }
-  if (world->hasSkyBox) {
-    glDepthFunc(GL_LEQUAL);
-    RenderSkybox(world);
-    glDepthFunc(GL_LESS);
   }
 }
 
 void ERenderer::RenderSkybox(std::shared_ptr<EWorld> &world) {
   if (shader_map.find(world) != shader_map.end()) {
     glDepthMask(GL_FALSE);
+    glStencilMask(0x00);
     Shader &skyboxShader = *shader_map[world];
     skyboxShader.Use();
     Window *attachedWindow = window;
@@ -88,6 +132,7 @@ void ERenderer::RenderSkybox(std::shared_ptr<EWorld> &world) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, world->getSkyboxCubeMap());
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glDepthMask(GL_TRUE);
+    glStencilMask(0xFF);
   }
 }
 void ERenderer::CompileShaders(std::shared_ptr<EObject3D> object) {
@@ -116,7 +161,7 @@ void ERenderer::CompileMeshShader(std::shared_ptr<EObject3D> &object) {
         default_fragment_shader_sources.end()) {
       fragSrc = default_fragment_shader_sources[mesh->getMaterial()->type];
 
-      std::cout << "fragSrc: " << fragSrc << std::endl;
+      /* std::cout << "fragSrc: " << fragSrc << std::endl; */
       std::string shader_src = vertSrc + fragSrc;
       if (compiled_shaders.find(shader_src) == compiled_shaders.end()) {
 
@@ -260,8 +305,25 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
       Shader *shader = shader_map[obj].get();
       if (window) {
         window->UpdateUniforms(*shader);
+        window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, *shader);
-        obj->render(*shader);
+
+        glStencilMask(0xFF);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        obj->render(*outlineShader);
+
+        auto scale = obj->getScale();
+        obj->setScale(scale.x * 1.03, scale.y * 1.03, scale.z * 1.03);
+        // disable writing to stencil and depth buffer
+        glStencilMask(0x00);
+        DisableDepthTesting();
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        obj->render(*outlineShader);
+        obj->setScale(scale.x, scale.y, scale.z);
+        glStencilMask(0xFF);
+        EnableDepthTesting();
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
       }
     }
   }

@@ -14,7 +14,7 @@ void main()
 {
     float wobbleX = uAmp * 0.01 * sin(inPosition.y * 10.0f + 5 * uTime);
     float wobbleZ = uAmp * 0.01 * cos(inPosition.y * 10.0f + 5 * uTime);
-    vec3 pos = inPosition + vec3(0, 0, 0);
+    vec3 pos = inPosition + vec3(wobbleX, 0, wobbleZ);
     gl_Position = uProjection * uView * uModel * vec4(pos, 1.0f);
     fragPosition = ((uModel * vec4(inPosition, 1.0f)));
     fragNormal = normalize(mat3(transpose(inverse(uModel))) * inNormal);

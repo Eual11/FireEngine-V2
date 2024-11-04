@@ -11,13 +11,22 @@ public:
   ERenderer(Window *window);
   void setWindow(Window *_win) { window = _win; }
   void EnableDepthTesting();
+  void EnableStencilTesting();
   void DisableDepthTesting();
+  void DisableStencilTesting();
+  void inline setClearColor(float r, float g, float b, float a = 1.0f);
   void setDepthTestFunc(unsigned int);
+
   void Render(std::shared_ptr<EWorld> &);
 
 private:
   Window *window = nullptr;
-  bool depthTestingEnabled_;
+  bool depthTestingEnabled;
+  bool stencilTestingEnabled = false;
+  glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+  unsigned int clearBit = GL_COLOR_BUFFER_BIT;
+
+  std::shared_ptr<Shader> outlineShader = nullptr;
 
   //
   // this will stored every shadder mapped to the objects
