@@ -37,16 +37,18 @@ void ERenderer::EnableDepthTesting() {
   }
 }
 void ERenderer::EnableStencilTesting() {
-  glEnable(GL_STENCIL_TEST);
-  stencilTestingEnabled = true;
-  clearBit |= GL_STENCIL_BUFFER_BIT;
+  if (!stencilTestingEnabled) {
+    glEnable(GL_STENCIL_TEST);
+    stencilTestingEnabled = true;
+    clearBit |= GL_STENCIL_BUFFER_BIT;
+  }
 }
 void ERenderer::DisableStencilTesting() {
-  if (!stencilTestingEnabled)
-    return;
-  glDisable(GL_STENCIL_TEST);
-  stencilTestingEnabled = false;
-  clearBit &= (~GL_STENCIL_BUFFER_BIT);
+  if (stencilTestingEnabled) {
+    glDisable(GL_STENCIL_TEST);
+    stencilTestingEnabled = false;
+    clearBit &= (~GL_STENCIL_BUFFER_BIT);
+  }
 }
 void ERenderer::DisableDepthTesting() {
   if (depthTestingEnabled) {
@@ -89,23 +91,26 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, shader);
 
-        // enable writing to stencil buffer
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glStencilMask(0xFF);
-        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        auto scale = child->getScale();
         child->render(shader);
 
-        child->setScale(scale.x * 1.03, scale.y * 1.03, scale.z * 1.03);
-        // disable writing to stencil and depth buffer
+        auto scale = child->getScale();
+
+        child->setScale(scale.x * outlineSize, scale.y * outlineSize,
+                        scale.z * outlineSize);
+
+        // enable writing to stencil buffer
         DisableDepthTesting();
         glStencilMask(0x00);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        child->render(*outlineShader);
 
+        child->render(*outlineShader);
+        // scaling back to original
         child->setScale(scale.x, scale.y, scale.z);
-        glStencilMask(0xFF);
         EnableDepthTesting();
+        glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
       }
     } else
@@ -314,7 +319,8 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
         obj->render(*outlineShader);
 
         auto scale = obj->getScale();
-        obj->setScale(scale.x * 1.03, scale.y * 1.03, scale.z * 1.03);
+        obj->setScale(scale.x * outlineSize, scale.y * outlineSize,
+                      scale.z * outlineSize);
         // disable writing to stencil and depth buffer
         glStencilMask(0x00);
         DisableDepthTesting();

@@ -21,12 +21,13 @@ public:
 
 private:
   Window *window = nullptr;
-  bool depthTestingEnabled;
+  bool depthTestingEnabled = false;
   bool stencilTestingEnabled = false;
   glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
   unsigned int clearBit = GL_COLOR_BUFFER_BIT;
 
   std::shared_ptr<Shader> outlineShader = nullptr;
+  float outlineSize = 1.2;
 
   //
   // this will stored every shadder mapped to the objects

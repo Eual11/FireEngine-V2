@@ -96,6 +96,8 @@ int main() {
   float spiralHeight = 10.0f;
   float spiralSpeed = 1.0f;
 
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   while (nWindow.isOpen()) {
     float angle = glfwGetTime() * spiralSpeed; // Angle based on time and speed
 
