@@ -1,3 +1,4 @@
+#include "../include/EBoxGeometry.h"
 #include "../include/EModelLoader.h"
 #include "../include/ERenderer.h"
 #include "../include/EWorld.h"
@@ -10,6 +11,7 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
+#include <glm/ext/scalar_constants.hpp>
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -76,8 +78,25 @@ int main() {
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
+  // some funny demo for box geometry
+
+  float radius = 10.0f;
+  for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) {
+
+    auto box = std::make_shared<EBoxGeometry>();
+    auto newMesh = std::make_shared<EMesh>(box, mat);
+    newMesh->setPosition(radius * glm::cos(theta), radius * glm::sin(theta), 5);
+    zaWardu->add(newMesh);
+  }
+  for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) {
+
+    auto box = std::make_shared<EBoxGeometry>();
+    auto newMesh = std::make_shared<EMesh>(box, mat);
+    newMesh->setPosition(radius * glm::cos(theta), 0, radius * glm::sin(theta));
+    zaWardu->add(newMesh);
+  }
   zaWardu->add(helm);
-  zaWardu->add(suzan);
+  /* zaWardu->add(suzan); */
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);
