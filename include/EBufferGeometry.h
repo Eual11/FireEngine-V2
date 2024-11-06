@@ -34,7 +34,7 @@ public:
   void unbind();
   void dispose();
 
-private:
+protected:
   std::vector<EVertex> vertices;
   std::vector<unsigned int> indices;
   std::vector<VertexAttrib> predefinedAttribs;

@@ -6,6 +6,7 @@ EBufferGeometry::EBufferGeometry(std::vector<EVertex> verts,
   this->vertices = verts;
   this->indices = inds;
 
+  glGenVertexArrays(1, &VAO);
   setupGeometry();
 }
 EBufferGeometry::EBufferGeometry() {
@@ -16,7 +17,6 @@ EBufferGeometry::EBufferGeometry() {
 }
 
 void EBufferGeometry::setupGeometry() {
-  glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
   glGenBuffers(1, &VBO);
 

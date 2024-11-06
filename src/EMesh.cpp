@@ -1,5 +1,4 @@
 #include "../include/EMesh.h"
-#include <iomanip>
 EMesh::EMesh(std::vector<EVertex> verts, std::vector<ETexture> texs,
              std::vector<unsigned int> indx) {
 
