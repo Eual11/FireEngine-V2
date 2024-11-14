@@ -37,12 +37,15 @@ private:
   bool firstMove = true;
   float deltaTime = 0.0f;
 
+  std::vector<std::function<void(int, int)>> registeredResizeCallbacks;
+
   std::shared_ptr<Camera> camera_ = nullptr;
 
 public:
   Window(int w, int h, std::string title, bool fullscreen);
   ~Window();
   void DestroyWindow();
+  ImageSize getSize() { return size_; }
 
   float GetAspectRatio();
   std::shared_ptr<Camera> getBoundCamera() const { return camera_; }
@@ -80,6 +83,9 @@ public:
   void MouseCallback(double xpos, double ypos);
   void ScrollCallback(double xpos, double yPos);
   void HandleInput(int key, int scancode, int action, int mod);
+  void addResizeCallback(std::function<void(int, int)> callback) {
+    registeredResizeCallbacks.push_back(callback);
+  }
   bool isOpen();
 };
 #endif

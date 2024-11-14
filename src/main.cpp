@@ -79,22 +79,24 @@ int main() {
                 glm::cos(glm::radians(50.0f)));
 
   // some funny demo for box geometry
-
-  float radius = 10.0f;
-  for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) {
-
-    auto box = std::make_shared<EBoxGeometry>();
-    auto newMesh = std::make_shared<EMesh>(box, mat);
-    newMesh->setPosition(radius * glm::cos(theta), radius * glm::sin(theta), 5);
-    zaWardu->add(newMesh);
-  }
-  for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) {
-
-    auto box = std::make_shared<EBoxGeometry>();
-    auto newMesh = std::make_shared<EMesh>(box, mat);
-    newMesh->setPosition(radius * glm::cos(theta), 0, radius * glm::sin(theta));
-    zaWardu->add(newMesh);
-  }
+  /**/
+  /* float radius = 10.0f; */
+  /* for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) { */
+  /**/
+  /*   auto box = std::make_shared<EBoxGeometry>(); */
+  /*   auto newMesh = std::make_shared<EMesh>(box, mat); */
+  /*   newMesh->setPosition(radius * glm::cos(theta), radius * glm::sin(theta),
+   * 5); */
+  /*   zaWardu->add(newMesh); */
+  /* } */
+  /* for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) { */
+  /**/
+  /*   auto box = std::make_shared<EBoxGeometry>(); */
+  /*   auto newMesh = std::make_shared<EMesh>(box, mat); */
+  /*   newMesh->setPosition(radius * glm::cos(theta), 0, radius *
+   * glm::sin(theta)); */
+  /*   zaWardu->add(newMesh); */
+  /* } */
   zaWardu->add(helm);
   /* zaWardu->add(suzan); */
 

@@ -149,6 +149,9 @@ void Window::FrameBufferResizeCallback(int w, int h) {
   if (cameraBound) {
     camera_->SetAspectRatio((float)w / (float)h);
   }
+  for (const auto &cbk : registeredResizeCallbacks) {
+    cbk(w, h);
+  }
 }
 void Window::EnableKeyInput() {
   if (keyInputEnabled_)

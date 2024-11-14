@@ -1,4 +1,6 @@
 #include "../include/ERenderer.h"
+#include "../include/EQuadGeometry.h"
+#include <memory>
 
 ERenderer::ERenderer() {
   EnableDepthTesting();
@@ -27,6 +29,20 @@ ERenderer::ERenderer(Window *window) {
   outlineShader =
       std::make_shared<Shader>("../shaders/vertex/basic.glsl",
                                "../shaders/fragment/normal_material.glsl");
+
+  auto geo = std::make_shared<EQuadGeometry>(1.0f, 1.0f);
+
+  auto mat = std::make_shared<ShaderMaterial>(
+      "../shaders/vertex/quad_verts.glsl", "../shaders/fragment/fb.glsl");
+
+  fbQuad = std::make_shared<EMesh>(geo, mat);
+  auto qd = std::static_pointer_cast<EObject3D>(fbQuad);
+  CompileMeshShader(qd);
+  framebuffer =
+      std::make_unique<EFrameBuffer>(window->getSize().w, window->getSize().h);
+  framebuffer->Bind();
+  window->addResizeCallback(
+      [this](int w, int h) { framebuffer->Resize(w, h); });
 }
 
 void ERenderer::EnableDepthTesting() {
@@ -65,6 +81,7 @@ void ERenderer::setDepthTestFunc(unsigned int func) { glDepthFunc(func); }
 
 void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
+  glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
   glClear(clearBit);
   if (world->hasSkyBox) {
     glDepthFunc(GL_LEQUAL);
@@ -86,7 +103,9 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
     if (shader_map.find(child) != shader_map.end()) {
       Shader &shader = *shader_map[child].get();
+
       if (window) {
+        // rendering to default framebuffer
         window->UpdateUniforms(shader);
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, shader);
@@ -116,6 +135,27 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     } else
       FetchShaderAndRender(world, child);
   }
+
+  if (shader_map.find(std::static_pointer_cast<EObject3D>(fbQuad)) !=
+      shader_map.end()) {
+    Shader &shader = *shader_map[fbQuad].get();
+
+    if (window) {
+      framebuffer->Unbind();
+      DisableDepthTesting();
+      glViewport(0, 0, window->getSize().w, window->getSize().h);
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT);
+      glActiveTexture(GL_TEXTURE0);
+      shader.setInt("screenTexture", 0);
+      glBindTexture(GL_TEXTURE_2D, framebuffer->getTexture());
+      window->UpdateUniforms(shader);
+      fbQuad->render(shader);
+      EnableDepthTesting();
+      glBindTexture(GL_TEXTURE_2D, 0);
+      framebuffer->Bind();
+    }
+  }
 }
 
 void ERenderer::RenderSkybox(std::shared_ptr<EWorld> &world) {
@@ -139,6 +179,10 @@ void ERenderer::RenderSkybox(std::shared_ptr<EWorld> &world) {
     glDepthMask(GL_TRUE);
     glStencilMask(0xFF);
   }
+
+  // pipe the output of framebuffer to the window's framebuffer with
+  // post-processing (currently only forward rendering post post-processing)
+  //
 }
 void ERenderer::CompileShaders(std::shared_ptr<EObject3D> object) {
 

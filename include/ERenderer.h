@@ -1,6 +1,7 @@
 #ifndef __ERENDERER_H__
 #define __ERENDERER_H__
 
+#include "EFrameBuffer.h"
 #include "EMaterial.h"
 #include "EObject3D.h"
 #include "EWorld.h"
@@ -28,6 +29,9 @@ private:
 
   std::shared_ptr<Shader> outlineShader = nullptr;
   float outlineSize = 1.2;
+  std::unique_ptr<EFrameBuffer> framebuffer;
+
+  std::shared_ptr<EMesh> fbQuad;
 
   //
   // this will stored every shadder mapped to the objects
