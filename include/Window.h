@@ -45,7 +45,7 @@ public:
   Window(int w, int h, std::string title, bool fullscreen);
   ~Window();
   void DestroyWindow();
-  ImageSize getSize() { return size_; }
+  ImageSize getSize() const { return size_; }
 
   float GetAspectRatio();
   std::shared_ptr<Camera> getBoundCamera() const { return camera_; }
