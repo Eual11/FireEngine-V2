@@ -1,7 +1,7 @@
 #ifndef __EGREYSCALEEFFECT__
 #define __EGREYSCALEEFFECT__
 
-#include "EPostProcessingEffect.h"
+#include "EPostProcessingPipeline.h"
 
 struct EGreyscaleEffect : EPostProcessingEffect {
 

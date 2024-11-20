@@ -90,4 +90,5 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
   while ((err = glGetError()) != GL_NO_ERROR) {
     std::cerr << "OpenGL Error: " << std::hex << err << std::endl;
   }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

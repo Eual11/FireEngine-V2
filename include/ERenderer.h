@@ -4,6 +4,7 @@
 #include "EFrameBuffer.h"
 #include "EMaterial.h"
 #include "EObject3D.h"
+#include "EPostProcessingPipeline.h"
 #include "EWorld.h"
 #include "Window.h"
 class ERenderer {
@@ -17,6 +18,7 @@ public:
   void DisableStencilTesting();
   void inline setClearColor(float r, float g, float b, float a = 1.0f);
   void setDepthTestFunc(unsigned int);
+  void addEffect(const std::shared_ptr<EPostProcessingEffect> &);
 
   void Render(std::shared_ptr<EWorld> &);
 
@@ -29,9 +31,11 @@ private:
 
   std::shared_ptr<Shader> outlineShader = nullptr;
   float outlineSize = 1.2;
-  std::unique_ptr<EFrameBuffer> framebuffer;
+  /* std::unique_ptr<EFrameBuffer> framebuffer; */
 
   std::shared_ptr<EMesh> fbQuad;
+
+  EPostProcessingPipeline effectPipeline;
 
   //
   // this will stored every shadder mapped to the objects

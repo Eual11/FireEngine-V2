@@ -1,9 +1,18 @@
 #ifndef _EPOSTPROCESSINGPIPELINE_
 #define _EPOSTPROCESSINGPIPELINE_
 #include "EFrameBuffer.h"
-#include "EPostProcessingEffect.h"
+#include "EMesh.h"
+#include "EQuadGeometry.h"
 #include "Window.h"
 #include <memory>
+struct EPostProcessingEffect {
+  virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+                     EFrameBuffer &);
+  std::unique_ptr<Shader> effect;
+
+  virtual ~EPostProcessingEffect();
+};
+
 class EPostProcessingPipeline {
 
 private:
@@ -14,7 +23,9 @@ private:
   Shader screenShader = Shader("../shaders/vertex/quad_verts.glsl",
                                "../shaders/fragment/fb.glsl");
 
+  std::shared_ptr<EMesh> quad;
   int inputIndex = 0;
+  int outputIndex = 1;
 
 public:
   std::shared_ptr<EFrameBuffer> getInputFramebuffer() {
@@ -27,5 +38,6 @@ public:
     effects.push_back(effect);
   }
   void applyEffects();
+  void Init();
 };
 #endif

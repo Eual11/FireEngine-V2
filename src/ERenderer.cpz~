@@ -39,8 +39,8 @@ ERenderer::ERenderer(Window *window) {
   fbQuad = std::make_shared<EMesh>(geo, mat);
   auto qd = std::static_pointer_cast<EObject3D>(fbQuad);
   CompileMeshShader(qd);
-  effectPipeline = EPostProcessingPipeline(window);
-  effectPipeline.Init();
+  effectPipeline = std::make_unique<EPostProcessingPipeline>(window);
+  /* ffectPipeline.Init(); */
 }
 
 void ERenderer::EnableDepthTesting() {
