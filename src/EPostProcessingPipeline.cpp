@@ -34,11 +34,14 @@ void EPostProcessingPipeline::applyEffects() {
   for (const auto &effect : effects) {
 
     effect->Apply(*window, quad, *framebuffers[inputIndex].get(),
-                  *framebuffers[inputIndex].get());
+                  *framebuffers[outputIndex].get());
     std::swap(inputIndex, outputIndex);
   }
-  // render the finan output to the screen
+
+  // clearing both buffers
+  //  render the finan output to the screen
   RenderToScreen();
+  std::swap(inputIndex, outputIndex);
 }
 void EPostProcessingPipeline::RenderToScreen() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -50,6 +53,28 @@ void EPostProcessingPipeline::RenderToScreen() {
   glBindTexture(GL_TEXTURE_2D, framebuffers[inputIndex]->getTexture());
   window->UpdateUniforms(screenShader);
   quad->render(screenShader);
-  glEnable(GL_DEPTH_TEST);
   glBindTexture(GL_TEXTURE_2D, 0);
+  glEnable(GL_DEPTH_TEST);
+}
+EGreyscaleEffect::EGreyscaleEffect(float intensity) {
+  effect = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                    "../shaders/fragment/Greyscale.glsl");
+  effect->setFloat("intensity", intensity);
+}
+
+void EGreyscaleEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
+                             EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+
+  outBuffer.Bind();
+  glDisable(GL_DEPTH_TEST);
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  effect->setInt("screenTexture", 0);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(effect.get()));
+  quad->render(*(effect.get()));
+  glEnable(GL_DEPTH_TEST);
+  outBuffer.Unbind();
 }

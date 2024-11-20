@@ -5,12 +5,12 @@
 #include "EQuadGeometry.h"
 #include "Window.h"
 #include <memory>
+
+enum class PostProcessingEffect { Greyscale, Ivert, GaussianBlur3x3 };
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
-                     EFrameBuffer &);
+                     EFrameBuffer &) = 0;
   std::unique_ptr<Shader> effect;
-
-  virtual ~EPostProcessingEffect();
 };
 
 class EPostProcessingPipeline {
@@ -21,7 +21,7 @@ private:
   std::shared_ptr<EFrameBuffer> framebuffers[2];
   Window *window = nullptr;
   Shader screenShader = Shader("../shaders/vertex/quad_verts.glsl",
-                               "../shaders/fragment/fb.glsl");
+                               "../shaders/fragment/displayScreen.glsl");
 
   std::shared_ptr<EMesh> quad;
   int inputIndex = 0;
@@ -39,5 +39,13 @@ public:
   }
   void applyEffects();
   void Init();
+};
+
+struct EGreyscaleEffect : public EPostProcessingEffect {
+
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+
+  EGreyscaleEffect(float intensity = 1.0f);
 };
 #endif

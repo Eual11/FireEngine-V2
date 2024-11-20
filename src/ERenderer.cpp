@@ -140,7 +140,13 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     Shader &shader = *shader_map[fbQuad].get();
 
     if (window) {
+      // effects should be able to depth value to the depth buffer
+      glDepthMask(GL_FALSE);
+      DisableDepthTesting();
       effectPipeline.applyEffects();
+      // enabling it back, it is etiquette to revert what you did
+      glDepthMask(GL_TRUE);
+      EnableDepthTesting();
     }
   }
 }
@@ -419,5 +425,20 @@ void ERenderer::addEffect(
     const std::shared_ptr<EPostProcessingEffect> &effect) {
   if (window) {
     effectPipeline.addEffect(effect);
+  }
+}
+void ERenderer::addEfect(PostProcessingEffect effectType) {
+  switch (effectType) {
+  case PostProcessingEffect::Greyscale: {
+    auto newEffect = std::make_shared<EGreyscaleEffect>();
+    effectPipeline.addEffect(newEffect);
+    break;
+  }
+  case PostProcessingEffect::Ivert: {
+    break;
+  }
+  case PostProcessingEffect::GaussianBlur3x3: {
+    break;
+  }
   }
 }
