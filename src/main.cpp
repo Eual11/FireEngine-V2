@@ -1,4 +1,3 @@
-#include "../include/EBoxGeometry.h"
 #include "../include/EModelLoader.h"
 #include "../include/ERenderer.h"
 #include "../include/EWorld.h"

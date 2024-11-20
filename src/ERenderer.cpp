@@ -142,6 +142,8 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
     if (window) {
       framebuffer->Unbind();
+      // post processing effect
+
       DisableDepthTesting();
       glViewport(0, 0, window->getSize().w, window->getSize().h);
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
