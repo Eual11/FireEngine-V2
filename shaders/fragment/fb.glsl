@@ -52,5 +52,5 @@ void main()
         col += sampledTex[i] * edgeDetection[i];
     }
 
-    FragColor = vec4(col, 1.0f);
+    FragColor = vec4(texture(screenTexture, TexCoord).rgb, 1.0f);
 }

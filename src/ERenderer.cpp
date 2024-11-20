@@ -79,6 +79,7 @@ void ERenderer::setDepthTestFunc(unsigned int func) { glDepthFunc(func); }
 
 void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
+  effectPipeline.getInputFramebuffer()->Bind();
   glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
   glClear(clearBit);
   if (world->hasSkyBox) {
@@ -139,7 +140,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     Shader &shader = *shader_map[fbQuad].get();
 
     if (window) {
-      /* effectPipeline.applyEffects(); */
+      effectPipeline.applyEffects();
     }
   }
 }
