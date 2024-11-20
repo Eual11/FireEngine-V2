@@ -14,5 +14,6 @@ void main()
     gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0f);
     fragPosition = ((uModel * vec4(inPosition, 1.0f)));
     fragNormal = normalize(mat3(transpose(inverse(uModel))) * inNormal);
+
     fragTexCoord = inTexCoord;
 }
