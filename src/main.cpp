@@ -42,6 +42,7 @@ int main() {
   ERenderer rend(&nWindow);
 
   rend.addEfect(PostProcessingEffect::Greyscale);
+  rend.addEfect(PostProcessingEffect::Invert);
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
   std::filesystem::path path("../models/scene.gltf");

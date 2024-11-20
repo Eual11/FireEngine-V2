@@ -24,7 +24,7 @@ ERenderer::ERenderer(Window *window) {
   this->window = window;
 
   EnableDepthTesting();
-  EnableStencilTesting();
+  /* EnableStencilTesting(); */
   setDepthTestFunc(GL_LESS);
 
   outlineShader =
@@ -124,7 +124,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
         glStencilMask(0x00);
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
-        child->render(*outlineShader);
+        /* child->render(*outlineShader); */
         // scaling back to original
         child->setScale(scale.x, scale.y, scale.z);
         EnableDepthTesting();
@@ -434,7 +434,10 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     effectPipeline.addEffect(newEffect);
     break;
   }
-  case PostProcessingEffect::Ivert: {
+  case PostProcessingEffect::Invert: {
+    auto newEffect = std::make_shared<EInvertEffect>();
+    effectPipeline.addEffect(newEffect);
+    break;
     break;
   }
   case PostProcessingEffect::GaussianBlur3x3: {

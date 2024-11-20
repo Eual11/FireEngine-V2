@@ -6,10 +6,11 @@
 #include "Window.h"
 #include <memory>
 
-enum class PostProcessingEffect { Greyscale, Ivert, GaussianBlur3x3 };
+enum class PostProcessingEffect { Greyscale, Invert, GaussianBlur3x3 };
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
                      EFrameBuffer &) = 0;
+  virtual ~EPostProcessingEffect() = default;
   std::unique_ptr<Shader> effect;
 };
 
@@ -45,7 +46,16 @@ struct EGreyscaleEffect : public EPostProcessingEffect {
 
   void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
              EFrameBuffer &) override;
+  ~EGreyscaleEffect() override = default;
 
   EGreyscaleEffect(float intensity = 1.0f);
+};
+struct EInvertEffect : public EPostProcessingEffect {
+
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+
+  EInvertEffect();
+  ~EInvertEffect() override = default;
 };
 #endif

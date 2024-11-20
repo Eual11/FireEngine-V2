@@ -19,6 +19,7 @@ public:
   void inline setClearColor(float r, float g, float b, float a = 1.0f);
   void setDepthTestFunc(unsigned int);
   void addEffect(const std::shared_ptr<EPostProcessingEffect> &);
+  void addEfect(PostProcessingEffect);
 
   void Render(std::shared_ptr<EWorld> &);
 
