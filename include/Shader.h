@@ -26,6 +26,7 @@ public:
   void setInt(std::string name, int val) const;
   void setBool(std::string name, bool val) const;
   void setFloat(std::string name, float val) const;
+  void setVec2(std::string name, glm::vec2 v);
   void setVec3(std::string name, glm::vec3 v);
   void setVec4(std::string name, glm::vec4 v);
 

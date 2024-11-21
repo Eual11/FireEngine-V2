@@ -438,10 +438,15 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     auto newEffect = std::make_shared<EInvertEffect>();
     effectPipeline.addEffect(newEffect);
     break;
+  }
+  case PostProcessingEffect::GaussianBlur: {
+    auto newEffect = std::make_shared<EGaussianBlur>();
+    effectPipeline.addEffect(newEffect);
     break;
   }
-  case PostProcessingEffect::GaussianBlur3x3: {
-    break;
+  case PostProcessingEffect::Quantize: {
+    auto newEffect = std::make_shared<EQuantization>();
+    effectPipeline.addEffect(newEffect);
   }
   }
 }

@@ -220,8 +220,13 @@ void Window::Update() {
 }
 void Window::UpdateUniforms(Shader &shader) {
 
+  // change in time between the last frame and current frame
   shader.setFloat("uDeltaTime", deltaTime);
+  // total time elapsed since the start of the program
   shader.setFloat("uTime", glfwGetTime());
+  shader.setVec2("uResolution", glm::vec2(size_.w, size_.h));
+
+  // resolution of screen
   if (cameraBound) {
     camera_->SetAspectRatio(GetAspectRatio());
     camera_->UpdateUniforms(shader);

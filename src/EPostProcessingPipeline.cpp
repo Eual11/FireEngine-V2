@@ -117,3 +117,56 @@ void EInvertEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
 
   UnlockDepthAndStencil();
 }
+
+EGaussianBlur::EGaussianBlur(unsigned int radius) {
+
+  effect = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                    "../shaders/fragment/GaussianBlur.glsl");
+  this->radius = radius;
+}
+void EGaussianBlur::Apply(Window &window, std::shared_ptr<EMesh> &quad,
+                          EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+
+  LockDepthAndStencil();
+
+  outBuffer.Bind();
+
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.01);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  effect->setInt("screenTexture", 0);
+  effect->setInt("radius", radius);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(effect.get()));
+  quad->render(*(effect.get()));
+  outBuffer.Unbind();
+
+  UnlockDepthAndStencil();
+}
+EQuantization::EQuantization(unsigned int steps_) {
+  this->quantizationLevels = steps_;
+
+  effect = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                    "../shaders/fragment/Quantize.glsl");
+}
+void EQuantization::Apply(Window &window, std::shared_ptr<EMesh> &quad,
+                          EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+
+  LockDepthAndStencil();
+
+  outBuffer.Bind();
+
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.01);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  effect->setInt("screenTexture", 0);
+  effect->setInt("levels", quantizationLevels);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(effect.get()));
+  quad->render(*(effect.get()));
+  outBuffer.Unbind();
+
+  UnlockDepthAndStencil();
+}

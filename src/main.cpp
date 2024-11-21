@@ -34,14 +34,18 @@ int main() {
   Camera camera(camPos, cameraUp, fYaw, fPitch);
   auto cameraPtr = std::make_shared<Camera>(camera);
   /* auto windowPtr =  */
-  Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "NEW Window", false);
+  Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Firev2", false);
   nWindow.BindCamera(cameraPtr);
   // creating some shaders
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
 
+  /* rend.addEfect(PostProcessingEffect::GaussianBlur); */
+  /* rend.addEfect(PostProcessingEffect::Invert); */
+  rend.addEfect(PostProcessingEffect::Quantize);
   rend.addEfect(PostProcessingEffect::Invert);
+
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
   std::filesystem::path path("../models/scene.gltf");

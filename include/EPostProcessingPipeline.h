@@ -6,7 +6,7 @@
 #include "Window.h"
 #include <memory>
 
-enum class PostProcessingEffect { Greyscale, Invert, GaussianBlur3x3 };
+enum class PostProcessingEffect { Greyscale, Invert, GaussianBlur, Quantize };
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
                      EFrameBuffer &) = 0;
@@ -62,5 +62,23 @@ struct EInvertEffect : public EPostProcessingEffect {
 
   EInvertEffect();
   ~EInvertEffect() override = default;
+};
+
+struct EGaussianBlur : public EPostProcessingEffect {
+  unsigned int radius = 1;
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+  EGaussianBlur(unsigned int radius = 1);
+  ~EGaussianBlur() override = default;
+};
+
+struct EQuantization : public EPostProcessingEffect {
+
+  // number of quantization steps to map to
+  unsigned int quantizationLevels = 64;
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+  EQuantization(unsigned int steps = 64);
+  ~EQuantization() override = default;
 };
 #endif
