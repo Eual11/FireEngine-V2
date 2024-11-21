@@ -1,6 +1,21 @@
 #include "../include/EPostProcessingPipeline.h"
 #include <memory>
 
+void EPostProcessingEffect::LockDepthAndStencil() {
+  glDisable(GL_STENCIL_TEST);
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_FALSE);
+  glStencilMask(0x00);
+}
+
+void EPostProcessingEffect::UnlockDepthAndStencil() {
+
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glStencilMask(0xFF);
+  glDepthMask(GL_TRUE);
+}
+
 EPostProcessingPipeline::EPostProcessingPipeline(Window *window) {
   this->window = window;
   if (window) {
@@ -64,11 +79,10 @@ EGreyscaleEffect::EGreyscaleEffect(float intensity) {
 
 void EGreyscaleEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
                              EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
-  glDisable(GL_STENCIL_TEST);
-  glStencilMask(0x00); // Disable writing to the stencil buffer
+  // Disable writing to the stencil buffer
 
+  LockDepthAndStencil();
   outBuffer.Bind();
-  glDisable(GL_DEPTH_TEST);
   glViewport(0, 0, window.getSize().w, window.getSize().h);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -77,10 +91,8 @@ void EGreyscaleEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
   glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
   window.UpdateUniforms(*(effect.get()));
   quad->render(*(effect.get()));
-  glEnable(GL_DEPTH_TEST);
   outBuffer.Unbind();
-  glStencilMask(0xFF);       // Re-enable stencil writing (if needed)
-  glEnable(GL_STENCIL_TEST); // Re-enable stencil test if required
+  UnlockDepthAndStencil();
 }
 EInvertEffect::EInvertEffect() {
   effect = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
@@ -89,11 +101,10 @@ EInvertEffect::EInvertEffect() {
 
 void EInvertEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
                           EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
-  glDisable(GL_STENCIL_TEST);
-  glStencilMask(0x00); // Disable writing to the stencil buffer
+
+  LockDepthAndStencil();
 
   outBuffer.Bind();
-  glDisable(GL_DEPTH_TEST);
   glViewport(0, 0, window.getSize().w, window.getSize().h);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -102,8 +113,7 @@ void EInvertEffect::Apply(Window &window, std::shared_ptr<EMesh> &quad,
   glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
   window.UpdateUniforms(*(effect.get()));
   quad->render(*(effect.get()));
-  glEnable(GL_DEPTH_TEST);
   outBuffer.Unbind();
-  glStencilMask(0xFF);       // Re-enable stencil writing (if needed)
-  glEnable(GL_STENCIL_TEST); // Re-enable stencil test if required
+
+  UnlockDepthAndStencil();
 }

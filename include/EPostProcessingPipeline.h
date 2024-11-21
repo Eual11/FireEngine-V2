@@ -12,6 +12,11 @@ struct EPostProcessingEffect {
                      EFrameBuffer &) = 0;
   virtual ~EPostProcessingEffect() = default;
   std::unique_ptr<Shader> effect;
+
+  // protection to avoid writing and modifying stencil and depth buffers
+  // when post processing effects are applied
+  void LockDepthAndStencil();
+  void UnlockDepthAndStencil();
 };
 
 class EPostProcessingPipeline {
