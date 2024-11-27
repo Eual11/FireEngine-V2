@@ -32,12 +32,14 @@ struct Material
     float shininess;
 };
 
-uniform Light dirLights[MAX_LIGHTS_COUNT];
-uniform Light pointLights[MAX_LIGHTS_COUNT];
-uniform Light spotLights[MAX_LIGHTS_COUNT];
 in vec4 fragPosition;
 in vec3 fragNormal;
 in vec2 fragTexCoord;
+
+uniform Light dirLights[MAX_LIGHTS_COUNT];
+uniform Light pointLights[MAX_LIGHTS_COUNT];
+uniform Light spotLights[MAX_LIGHTS_COUNT];
+
 uniform vec3 uViewPos;
 uniform Material material;
 

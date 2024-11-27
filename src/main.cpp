@@ -30,42 +30,27 @@ glm::vec3 lightPos(0.0f, 0.0f, 8.0f);
 
 // TODO: somehow the child mesh's frag shaders is being executed
 int main() {
-
   Camera camera(camPos, cameraUp, fYaw, fPitch);
   auto cameraPtr = std::make_shared<Camera>(camera);
-  /* auto windowPtr =  */
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Firev2", false);
   nWindow.BindCamera(cameraPtr);
-  // creating some shaders
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
 
-  /* rend.addEfect(PostProcessingEffect::GaussianBlur); */
-  /* rend.addEfect(PostProcessingEffect::Invert); */
   rend.addEfect(PostProcessingEffect::Quantize);
-  rend.addEfect(PostProcessingEffect::Invert);
 
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
-  std::filesystem::path path("../models/scene.gltf");
 
   auto tex = ETexture::load(
       "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
   uniforms["tex"] = tex;
   EModelLoader loader;
-  /* auto mat = std::make_shared<NormalMaterial>(NormalMaterial()); */
   auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/basic.glsl",
-                                              "../shaders/fragment/basic2.glsl",
+                                              "../shaders/fragment/basic.glsl",
                                               uniforms);
-  auto suzan = loader.loadModel(
-      std::filesystem::absolute("../models/cube.obj").string(), mat);
-
-  suzan->setPosition(0, 0, 4);
-  /* suzan->setScale(0.02, 0.02, 0.02); */
-  suzan->setRotation(0.0f, 45.0f, 0);
-  auto helm = loader.loadModel(
-      std::filesystem::absolute("../models/DamagedHelmet.gltf").string(), mat);
+  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
 
   helm->setPosition(10, 1, 0);
   auto pnt = std::make_shared<PointLight>(
@@ -74,47 +59,39 @@ int main() {
   auto pnt2 = std::make_shared<PointLight>(glm::vec3(0.0f, 1.0f, 0.1f),
                                            glm::vec3(1.0f, 0.1f, 1.0f),
                                            glm::vec3(-7, 3, 7), 3.0f);
-  auto pnt3 = std::make_shared<PointLight>(glm::vec3(0.2f, 0.1f, 1.0f),
-                                           glm::vec3(1.0f, 1.0f, 1.0f),
-                                           glm::vec3(7, 5, 12), 3.0f);
+  Ref<PointLight> pnt3 = createRef<PointLight>(glm::vec3(0.2f, 0.1f, 1.0f),
+                                               glm::vec3(1.0f, 1.0f, 1.0f),
+                                               glm::vec3(7, 5, 12), 3.0f);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.6);
   SpotLight spt({1.0f, 1.0f, 1.0f}, {1.0f, 1.0, 1.0}, {0.0f, 20.0f, 3.0f},
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
-  // some funny demo for box geometry
-  /**/
-  /* float radius = 10.0f; */
-  /* for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) { */
-  /**/
-  /*   auto box = std::make_shared<EBoxGeometry>(); */
-  /*   auto newMesh = std::make_shared<EMesh>(box, mat); */
-  /*   newMesh->setPosition(radius * glm::cos(theta), radius * glm::sin(theta),
-   * 5); */
-  /*   zaWardu->add(newMesh); */
-  /* } */
-  /* for (float theta = 0; theta < 2 * glm::pi<float>(); theta += 0.2) { */
-  /**/
-  /*   auto box = std::make_shared<EBoxGeometry>(); */
-  /*   auto newMesh = std::make_shared<EMesh>(box, mat); */
-  /*   newMesh->setPosition(radius * glm::cos(theta), 0, radius *
-   * glm::sin(theta)); */
-  /*   zaWardu->add(newMesh); */
-  /* } */
   zaWardu->add(helm);
-  /* zaWardu->add(suzan); */
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);
   zaWardu->AddLight(pnt2);
   zaWardu->AddLight(pnt3);
+  /**/
+  /* zaWardu->loadCubeMaps({ */
+  /*     "../assets/water_scene_cubeMap/right.jpg", */
+  /*     "../assets/water_scene_cubeMap/left.jpg", */
+  /*     "../assets/water_scene_cubeMap/top.jpg", */
+  /*     "../assets/water_scene_cubeMap/bottom.jpg", */
+  /*     "../assets/water_scene_cubeMap/front.jpg", */
+  /*     "../assets/water_scene_cubeMap/back.jpg", */
+  /* }); */
+
   zaWardu->loadCubeMaps({
-      "../assets/water_scene_cubeMap/right.jpg",
-      "../assets/water_scene_cubeMap/left.jpg",
-      "../assets/water_scene_cubeMap/top.jpg",
-      "../assets/water_scene_cubeMap/bottom.jpg",
-      "../assets/water_scene_cubeMap/front.jpg",
-      "../assets/water_scene_cubeMap/back.jpg",
+
+      "../assets/blue_sky_cubeMaps/px.png",
+      "../assets/blue_sky_cubeMaps/nx.png",
+      "../assets/blue_sky_cubeMaps/py.png",
+      "../assets/blue_sky_cubeMaps/ny.png",
+      "../assets/blue_sky_cubeMaps/pz.png",
+      "../assets/blue_sky_cubeMaps/nz.png",
+
   });
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   float spiralRadius = 5.0f;

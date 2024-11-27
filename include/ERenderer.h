@@ -7,6 +7,14 @@
 #include "EPostProcessingPipeline.h"
 #include "EWorld.h"
 #include "Window.h"
+
+template <typename T> using Ref = std::shared_ptr<T>;
+
+template <typename T, typename... Args>
+
+std::shared_ptr<T> createRef(Args &&...args) {
+  return std::make_shared<T>(std::forward<Args>(args)...);
+}
 class ERenderer {
 public:
   ERenderer();

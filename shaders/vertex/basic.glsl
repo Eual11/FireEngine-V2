@@ -5,6 +5,7 @@ layout(location = 2) in vec2 inTexCoord;
 uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProjection;
+
 out vec4 fragPosition;
 out vec3 fragNormal;
 out vec2 fragTexCoord;

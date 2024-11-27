@@ -14,7 +14,7 @@ uniform sampler2D screenTexture;
 void main()
 {
     int radius = 10;
-    int scale = 2;
+    int scale = 10;
     float sigma = 1;
     float sum = 0.0f;
     vec4 color = vec4(0.0f);

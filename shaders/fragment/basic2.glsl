@@ -1,8 +1,7 @@
 #version 330 core
-in vec4 finalVertColor;
-in vec2 finalTexCoord;
 
 in vec2 fragTexCoord;
+
 out vec4 FragColor;
 uniform sampler2D tex;
 

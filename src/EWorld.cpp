@@ -7,6 +7,22 @@ void EWorld::AddObject(std::shared_ptr<EModel> obj, Shader &shader) {
   std::pair<std::shared_ptr<EModel>, Shader &> shader_obj(obj, shader);
   Objects.push_back(shader_obj);
 }
+
+/**
+ * @brief Loads a cube map texture from six individual image files.
+ *
+ * @param faces A vector of 6 file paths, specifying the cube map faces in the
+ * following order:
+ *              1. Right (positive X)
+ *              2. Left (negative X)
+ *              3. Top (positive Y)
+ *              4. Bottom (negative Y)
+ *              5. Front (positive Z)
+ *              6. Back (negative Z)
+ *              Each file should be in a format supported by your image loading
+ * library (e.g., JPG, PNG).
+ *
+ */
 unsigned int EWorld::loadCubeMaps(std::vector<std::string> faces) {
 
   // the order should be
