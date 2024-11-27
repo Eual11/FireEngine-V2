@@ -73,7 +73,6 @@ int main() {
   zaWardu->AddLight(pnt);
   zaWardu->AddLight(pnt2);
   zaWardu->AddLight(pnt3);
-  /**/
   /* zaWardu->loadCubeMaps({ */
   /*     "../assets/water_scene_cubeMap/right.jpg", */
   /*     "../assets/water_scene_cubeMap/left.jpg", */
@@ -82,15 +81,16 @@ int main() {
   /*     "../assets/water_scene_cubeMap/front.jpg", */
   /*     "../assets/water_scene_cubeMap/back.jpg", */
   /* }); */
+  /**/
 
   zaWardu->loadCubeMaps({
 
-      "../assets/blue_sky_cubeMaps/px.png",
-      "../assets/blue_sky_cubeMaps/nx.png",
-      "../assets/blue_sky_cubeMaps/py.png",
-      "../assets/blue_sky_cubeMaps/ny.png",
-      "../assets/blue_sky_cubeMaps/pz.png",
-      "../assets/blue_sky_cubeMaps/nz.png",
+      "../assets/space_2/skybox_right1.png",
+      "../assets/space_2/skybox_left2.png",
+      "../assets/space_2/skybox_top3.png",
+      "../assets/space_2/skybox_bottom4.png",
+      "../assets/space_2/skybox_front5.png",
+      "../assets/space_2/skybox_back6.png",
 
   });
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
