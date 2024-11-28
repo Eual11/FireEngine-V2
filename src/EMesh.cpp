@@ -31,13 +31,23 @@ void EMesh::render(Shader &shader) {
   if (geometry && material) {
     geometry->bind();
     shader.setMat4("uModel", getWorldMatrix());
+    shader.setBool("uInstanced", instanced);
     material->Apply(shader);
     size_t idxCount = geometry->getIndiciesCount();
-    if (idxCount) {
-      glDrawElements(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0);
+    if (!instanced) {
+      if (idxCount) {
+        glDrawElements(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0);
 
-    } else
-      glDrawArrays(GL_TRIANGLES, 0, 32);
+      } else
+        glDrawArrays(GL_TRIANGLES, 0, 32);
+    } else {
+      if (idxCount) {
+        glDrawElementsInstanced(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0,
+                                instanceMatricies.size());
+
+      } else
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 32, instanceMatricies.size());
+    }
     geometry->unbind();
   }
 }

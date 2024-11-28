@@ -18,22 +18,6 @@ class EModel : public EObject3D {
 public:
   std::shared_ptr<EGroup> rootNode = nullptr;
 
-  /* private: */
-  /*   std::string root_path; */
-  /**/
-  /*   std::unordered_map<std::string, unsigned int> loaded_texture; */
-  /**/
-  /*   std::shared_ptr<EObject3D> ProcessNode(glm::mat4 m, aiNode *node, */
-  /*                                          const aiScene *scene); */
-  /*   std::shared_ptr<EMesh> ProcessMesh(glm::mat4 &m, aiMesh *mesh, */
-  /*                                      const aiScene *scene); */
-  /**/
-  /*   // loading material */
-  /*   std::vector<ETexture> loadMaterialTexture(aiMaterial *mat, aiTextureType
-   * type, */
-  /*                                             std::string name); */
-  /*   unsigned int TextureFromFile(std::string path); */
-  /**/
 public:
   EModel(std::string);
   EModel() = default;

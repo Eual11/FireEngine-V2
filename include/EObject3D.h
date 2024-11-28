@@ -25,7 +25,7 @@ public:
   EObject3D()
       : Position(0.0f), Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
         Scale(1.0f), worldModelMatrix(glm::mat4(1.0f)),
-        localModelMatrix(glm::mat4(1.0f)){};
+        localModelMatrix(glm::mat4(1.0f)) {};
 
   void setRotationFromEuler(const glm::vec3 &);
   glm::vec3 getRotationAsEuler(void);

@@ -1,3 +1,4 @@
+#include "../include/EBoxGeometry.h"
 #include "../include/EModelLoader.h"
 #include "../include/ERenderer.h"
 #include "../include/EWorld.h"
@@ -38,8 +39,6 @@ int main() {
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
 
-  rend.addEfect(PostProcessingEffect::Quantize);
-
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
 
@@ -50,11 +49,45 @@ int main() {
   auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/basic.glsl",
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
-  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
 
+  unsigned int amount = 10;
+  std::vector<glm::mat4> modelMatrices;
+  modelMatrices.reserve(amount);
+  srand(glfwGetTime()); // initialize random seed
+  float radius = 50.0;
+  float offset = 2.5f;
+  for (unsigned int i = 0; i < amount; i++) {
+    glm::mat4 model = glm::mat4(1.0f);
+    // 1. translation: displace along circle with 'radius' in range [-offset,
+    // offset]
+    float angle = (float)i / (float)amount * 360.0f;
+    float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+    float x = sin(angle) * radius + displacement;
+    displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+    float y = displacement *
+              0.4f; // keep height of field smaller compared to width of x and z
+    displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+    float z = cos(angle) * radius + displacement;
+    model = glm::translate(model, glm::vec3(x, y, z));
+
+    // 2. scale: scale between 0.05 and 0.25f
+    float scale = (rand() % 20) / 100.0f + 0.05;
+    model = glm::scale(model, glm::vec3(scale));
+
+    // 3. rotation: add random rotation around a (semi)randomly picked rotation
+    // axis vector
+    float rotAngle = (rand() % 360);
+    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+    // 4. now add to list of matrices
+    modelMatrices[i] = model;
+  }
+  auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
+
+  cube->enableInstanced(modelMatrices);
   auto mars = loader.loadModel("../models/planet/planet.obj");
   mars->setPosition(0, 0, -10);
-  helm->setPosition(10, 1, 0);
+  cube->setPosition(10, 1, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
@@ -69,7 +102,7 @@ int main() {
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
-  zaWardu->add(helm);
+  zaWardu->add(cube);
   zaWardu->add(mars);
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
