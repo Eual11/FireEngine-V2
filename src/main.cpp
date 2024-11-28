@@ -52,6 +52,8 @@ int main() {
                                               uniforms);
   auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
 
+  auto mars = loader.loadModel("../models/planet/planet.obj");
+  mars->setPosition(0, 0, -10);
   helm->setPosition(10, 1, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -68,6 +70,7 @@ int main() {
                 glm::cos(glm::radians(50.0f)));
 
   zaWardu->add(helm);
+  zaWardu->add(mars);
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);

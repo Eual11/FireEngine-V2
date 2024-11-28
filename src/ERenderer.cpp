@@ -112,9 +112,12 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
         child->render(shader);
 
-        auto scale = child->getScale();
+        if(outlinesEnabled)
+        {
+                  auto scale = child->getScale();
 
         child->setScale(scale.x * outlineSize, scale.y * outlineSize,
                         scale.z * outlineSize);
@@ -130,6 +133,9 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
         EnableDepthTesting();
         glStencilMask(0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+        }
+
       }
     } else
       FetchShaderAndRender(world, child);
@@ -353,17 +359,26 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
         glStencilMask(0xFF);
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        obj->render(*outlineShader);
+        obj->render(*shader);
 
-        auto scale = obj->getScale();
-        obj->setScale(scale.x * outlineSize, scale.y * outlineSize,
-                      scale.z * outlineSize);
-        // disable writing to stencil and depth buffer
+                // disable writing to stencil and depth buffer
         glStencilMask(0x00);
         DisableDepthTesting();
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+          if(outlinesEnabled)
+          {
+            auto scale = obj->getScale();
+        obj->setScale(scale.x * outlineSize, scale.y * outlineSize,
+                      scale.z * outlineSize);
+
+
         obj->render(*outlineShader);
         obj->setScale(scale.x, scale.y, scale.z);
+
+
+
+          }
         glStencilMask(0xFF);
         EnableDepthTesting();
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

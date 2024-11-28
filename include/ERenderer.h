@@ -22,6 +22,16 @@ public:
   void setWindow(Window *_win) { window = _win; }
   void EnableDepthTesting();
   void EnableStencilTesting();
+  // HACK: outlines should be a property of mesh/model not the renderer itself
+  // but we will leave this for now
+  void EnableOutlines() {
+    if (!outlinesEnabled)
+      outlinesEnabled = true;
+  }
+  void DisableOutlines() {
+    if (outlinesEnabled)
+      outlinesEnabled = false;
+  }
   void DisableDepthTesting();
   void DisableStencilTesting();
   void inline setClearColor(float r, float g, float b, float a = 1.0f);
@@ -35,6 +45,7 @@ private:
   Window *window = nullptr;
   bool depthTestingEnabled = false;
   bool stencilTestingEnabled = false;
+  bool outlinesEnabled = false;
   glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
   unsigned int clearBit = GL_COLOR_BUFFER_BIT;
 
