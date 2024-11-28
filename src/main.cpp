@@ -24,7 +24,7 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-glm::vec3 camPos(0.0f, 0.0f, 17.0f);
+glm::vec3 camPos(0.0f, 40.0f, 100.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
@@ -51,51 +51,52 @@ int main() {
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
 
-  unsigned int amount = 1000;
+  unsigned int amount = 10000;
   std::vector<glm::mat4> modelMatrices;
   modelMatrices.resize(amount);
   srand(glfwGetTime()); // initialize random seed
-  float radius = 10.0;
-  float offset = 2.5f;
+  float radius = 50.0;
+  float offset = 40.5f;
   for (unsigned int i = 0; i < amount; i++) {
     glm::mat4 model = glm::mat4(1.0f);
 
-    float scale = (rand() % 20) / 100.0f + 0.05;
-    model = glm::scale(model, glm::vec3(scale));
-
-    // 1. translation: displace along circle with 'radius' in range [-offset,
-    // offset]
-    // 2. scale: scale between 0.5 and 2.5f
-    // 3. rotation: add random rotation around a (semi)randomly picked rotation
-    // axis vector
-    float rotAngle = (rand() % 360);
-    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-    // 4. now add to list of matrices
-    modelMatrices[i] = model;
-
+    // translate
+    //
     float angle = (float)i / (float)amount * 360.0f;
     float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
     float x = sin(angle) * radius + displacement;
     displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
     float y = displacement *
-              0.4f; // keep height of field smaller compared to width of x and z
+              0.1f; // keep height of field smaller compared to width of x and z
+
     displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
     float z = cos(angle) * radius + displacement;
     model = glm::translate(model, glm::vec3(x, y, z));
+
+    float rotAngle = (rand() % 360);
+    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+    // scale
+    float scale = (rand() % 20) / 100.0f + 0.05;
+    model = glm::scale(model, glm::vec3(scale));
+    // 4. now add to list of matrices
+
+    modelMatrices[i] = model;
   }
   auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
 
-  auto astroid = loader.loadModel("../models/rock/rock.obj");
+  auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
   astroid->enableInstanced(modelMatrices);
-  astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f));
-  astroid->setRotation(45, 10, 0);
-  auto mars = loader.loadModel("../models/planet/planet.obj");
-  mars->setPosition(0, 0, -10);
-  astroid->setPosition(10, 1, 0);
+  /* astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f)); */
+  /* astroid->setRotation(45, 10, 0); */
+  auto mars = loader.loadModel("../models/planet/planet.obj", mat);
+  mat->uniforms["radius"] = radius;
+  mars->setPosition(0, 0, 0);
+  mars->setScale(4, 4, 4);
+  astroid->setPosition(0, 0, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(5, 15, 7), 10.0f, 0.045f, 0.0075f);
+      glm::vec3(5, 15, 7), 1.20f, 0.045f, 0.0075f);
   auto pnt2 = std::make_shared<PointLight>(glm::vec3(0.0f, 1.0f, 0.1f),
                                            glm::vec3(1.0f, 0.1f, 1.0f),
                                            glm::vec3(-7, 3, 7), 10.0f);
@@ -112,8 +113,8 @@ int main() {
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
   zaWardu->AddLight(pnt);
-  zaWardu->AddLight(pnt2);
-  zaWardu->AddLight(pnt3);
+  /* zaWardu->AddLight(pnt2); */
+  /* zaWardu->AddLight(pnt3); */
   /* zaWardu->loadCubeMaps({ */
   /*     "../assets/water_scene_cubeMap/right.jpg", */
   /*     "../assets/water_scene_cubeMap/left.jpg", */
@@ -149,9 +150,10 @@ int main() {
     float z = spiralRadius * sin(angle);
     float y = spiralHeight * (sin(angle / 2.0f) + 1.0f) /
               2.0f; // Adjust height to create the spiral effect
-    pnt->setPosition(x, y, z);
-    pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
-    pnt3->setPosition(x + 4.0f, y, z + 4.0f);
+    /* pnt->setPosition(x, y, z); */
+    /* pnt2->setPosition(x + 2.0f, y, z + 2.0f); // Offset for different lights
+     */
+    /* pnt3->setPosition(x + 4.0f, y, z + 4.0f); */
     mat->uniforms["time"] = glfwGetTime();
     rend.Render(zaWardu);
     nWindow.Update();
