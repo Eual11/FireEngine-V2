@@ -59,6 +59,7 @@ public:
   void SetAspectRatio(float aspect);
   void UpdateUniforms(Shader &shader);
   void render(Shader &) override;
+  void setInstanceUBO(unsigned int ubo, unsigned int count) override {};
 };
 
 #endif

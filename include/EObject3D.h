@@ -56,6 +56,7 @@ public:
 
   glm::mat4 getWorldMatrix() const { return worldModelMatrix; }
   virtual void render(Shader &) = 0;
+  void virtual setInstanceUBO(unsigned int ubo, unsigned int count) = 0;
   virtual ~EObject3D() = default;
   void lookAt(const glm::vec3 &target,
               const glm::vec3 &up = {0.0f, 1.0f, 0.0f});

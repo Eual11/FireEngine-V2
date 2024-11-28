@@ -9,5 +9,11 @@ public:
   EGroup() : EObject3D() {}
   Type getType() override;
   void render(Shader &) override;
+  void setInstanceUBO(unsigned int ubo, unsigned int count) override {
+
+    for (auto &child : children) {
+      child->setInstanceUBO(ubo, count);
+    }
+  };
 };
 #endif

@@ -23,6 +23,7 @@ public:
   void render(Shader &shader) override {
     // do nothing
   };
+  void setInstanceUBO(unsigned int ubo, unsigned int count) override {};
   Type getType() override { return Type::Light; }
 };
 

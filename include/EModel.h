@@ -23,12 +23,15 @@ public:
   EModel() = default;
   void loadModel(std::string path);
   void render(Shader &shader) override;
+  void enableInstanced(const std::vector<glm::mat4> &matrices);
   Type getType() override;
   std::shared_ptr<Material> getMaterial() const { return material; }
   void setMaterial(std::shared_ptr<Material> mat) { this->material = mat; }
+  void setInstanceUBO(unsigned int ubo, unsigned int count) override {};
 
 private:
   std::shared_ptr<Material> material = nullptr;
+  bool instanced = false;
 };
 
 #endif

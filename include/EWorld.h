@@ -44,6 +44,7 @@ public:
   unsigned int getSkyboxVAO() const { return skyboxVAO; }
   unsigned int getSkyboxCubeMap() const { return skyboxCubeMap; }
   std::vector<std::shared_ptr<ELight>> Lights;
+  void setInstanceUBO(unsigned int ubo, unsigned int count) override {};
 };
 
 #endif
