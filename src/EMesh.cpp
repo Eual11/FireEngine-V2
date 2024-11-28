@@ -43,10 +43,10 @@ void EMesh::render(Shader &shader) {
     } else {
       if (idxCount) {
         glDrawElementsInstanced(GL_TRIANGLES, idxCount, GL_UNSIGNED_INT, 0,
-                                instanceMatricies.size());
+                                instaceCount);
 
       } else
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 32, instanceMatricies.size());
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 32, instaceCount);
     }
     geometry->unbind();
   }

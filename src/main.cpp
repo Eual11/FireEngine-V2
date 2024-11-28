@@ -5,6 +5,7 @@
 #include "../include/Window.h"
 #include "../include/stb_image.h"
 #include <GLFW/glfw3.h>
+#include <cmath>
 #include <filesystem>
 #include <glad/glad.h>
 #include <glm/common.hpp>
@@ -50,16 +51,29 @@ int main() {
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
 
-  unsigned int amount = 10;
+  unsigned int amount = 1000;
   std::vector<glm::mat4> modelMatrices;
-  modelMatrices.reserve(amount);
+  modelMatrices.resize(amount);
   srand(glfwGetTime()); // initialize random seed
-  float radius = 50.0;
+  float radius = 10.0;
   float offset = 2.5f;
   for (unsigned int i = 0; i < amount; i++) {
     glm::mat4 model = glm::mat4(1.0f);
+
+    float scale = (rand() % 20) / 100.0f + 0.05;
+    model = glm::scale(model, glm::vec3(scale));
+
     // 1. translation: displace along circle with 'radius' in range [-offset,
     // offset]
+    // 2. scale: scale between 0.5 and 2.5f
+    // 3. rotation: add random rotation around a (semi)randomly picked rotation
+    // axis vector
+    float rotAngle = (rand() % 360);
+    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+    // 4. now add to list of matrices
+    modelMatrices[i] = model;
+
     float angle = (float)i / (float)amount * 360.0f;
     float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
     float x = sin(angle) * radius + displacement;
@@ -69,31 +83,22 @@ int main() {
     displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
     float z = cos(angle) * radius + displacement;
     model = glm::translate(model, glm::vec3(x, y, z));
-
-    // 2. scale: scale between 0.05 and 0.25f
-    float scale = (rand() % 20) / 100.0f + 0.05;
-    model = glm::scale(model, glm::vec3(scale));
-
-    // 3. rotation: add random rotation around a (semi)randomly picked rotation
-    // axis vector
-    float rotAngle = (rand() % 360);
-    model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-    // 4. now add to list of matrices
-    modelMatrices[i] = model;
   }
   auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
 
-  cube->enableInstanced(modelMatrices);
+  auto astroid = loader.loadModel("../models/rock/rock.obj");
+  astroid->enableInstanced(modelMatrices);
+  astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f));
+  astroid->setRotation(45, 10, 0);
   auto mars = loader.loadModel("../models/planet/planet.obj");
   mars->setPosition(0, 0, -10);
-  cube->setPosition(10, 1, 0);
+  astroid->setPosition(10, 1, 0);
   auto pnt = std::make_shared<PointLight>(
       glm::vec3(1.0f, 0.3f, 0.1f), glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(5, 15, 7), 3.0f, 0.045f, 0.0075f);
+      glm::vec3(5, 15, 7), 10.0f, 0.045f, 0.0075f);
   auto pnt2 = std::make_shared<PointLight>(glm::vec3(0.0f, 1.0f, 0.1f),
                                            glm::vec3(1.0f, 0.1f, 1.0f),
-                                           glm::vec3(-7, 3, 7), 3.0f);
+                                           glm::vec3(-7, 3, 7), 10.0f);
   Ref<PointLight> pnt3 = createRef<PointLight>(glm::vec3(0.2f, 0.1f, 1.0f),
                                                glm::vec3(1.0f, 1.0f, 1.0f),
                                                glm::vec3(7, 5, 12), 3.0f);
@@ -102,7 +107,7 @@ int main() {
                 {0.0f, -1.0f, 0.f}, 1.0f, glm::cos(glm::radians(30.0f)),
                 glm::cos(glm::radians(50.0f)));
 
-  zaWardu->add(cube);
+  zaWardu->add(astroid);
   zaWardu->add(mars);
 
   zaWardu->AddLight(std::make_shared<SpotLight>(spt));
