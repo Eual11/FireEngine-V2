@@ -478,5 +478,11 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     effectPipeline.addEffect(newEffect);
     break;
   }
+  case PostProcessingEffect::Bloom: {
+    auto newEffect =
+        std::make_shared<EBloom>(window->getSize().w, window->getSize().h);
+    effectPipeline.addEffect(newEffect);
+    break;
+  }
   }
 }

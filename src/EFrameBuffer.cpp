@@ -1,9 +1,10 @@
 #include "../include/EFrameBuffer.h"
 
-EFrameBuffer::EFrameBuffer(int width, int height) {
+EFrameBuffer::EFrameBuffer(int width, int height, bool onlyColor) {
 
   this->width = width;
   this->height = height;
+  this->onlyColor = onlyColor;
   glGenFramebuffers(1, &fbo);
 
   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -23,21 +24,25 @@ EFrameBuffer::EFrameBuffer(int width, int height) {
 
   // depth_stencil renderbuffers
 
-  glGenRenderbuffers(1, &rbo);
-  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+  if (!onlyColor) {
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, rbo);
-
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                              GL_RENDERBUFFER, rbo);
+  }
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 
     // dispose resources
     std::cerr << "Error Framebuffer not complete\n";
     glDeleteFramebuffers(1, &fbo);
     glDeleteTextures(1, &color_attachment);
-    glDeleteRenderbuffers(1, &rbo);
+
+    if (!onlyColor) {
+      glDeleteRenderbuffers(1, &rbo);
+    }
   } else {
     std::cout << "Farmebuffer Created\n";
   }
@@ -58,9 +63,11 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
   // deleteing old color attachment and renderbuffers
   glDeleteTextures(1, &color_attachment);
   color_attachment = 0;
-  glDeleteRenderbuffers(1, &rbo);
-  rbo = 0;
 
+  if (!onlyColor) {
+    glDeleteRenderbuffers(1, &rbo);
+    rbo = 0;
+  }
   glGenTextures(1, &color_attachment);
   glBindTexture(GL_TEXTURE_2D, color_attachment);
 
@@ -72,15 +79,17 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                          color_attachment, 0);
 
-  glGenRenderbuffers(1, &rbo);
+  if (!onlyColor) {
 
-  glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glGenRenderbuffers(1, &rbo);
 
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, new_w, new_h);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, new_w, new_h);
 
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+                              GL_RENDERBUFFER, rbo);
+  }
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     std::cerr << "Couldn't Resize Frame buffer\n";
   } else {

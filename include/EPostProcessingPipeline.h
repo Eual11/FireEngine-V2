@@ -15,6 +15,7 @@ enum class PostProcessingEffect {
   Quantize,
   Downsample,
   Threshold,
+  Bloom,
 };
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
@@ -114,5 +115,24 @@ struct EThreshold : public EPostProcessingEffect {
   EThreshold(float threshold = 0.5);
   void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
              EFrameBuffer &) override;
+};
+
+struct EBloom : public EPostProcessingEffect {
+  float threshold = 0.4;
+  EBloom(int w, int h, float threshold = 0.5);
+
+  std::shared_ptr<EFrameBuffer> framebuffers[2];
+  std::shared_ptr<EFrameBuffer> sceneBuffer;
+  std::unique_ptr<Shader> effects[4];
+  std::unique_ptr<Shader> mix;
+  std::unique_ptr<Shader> copyScene;
+  int inputIndex = 0;
+  int outputIndex = 1;
+
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+
+  void ApplyLocal(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+                  EFrameBuffer &, Shader *);
 };
 #endif

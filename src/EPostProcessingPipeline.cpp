@@ -1,4 +1,5 @@
 #include "../include/EPostProcessingPipeline.h"
+#include <algorithm>
 #include <memory>
 
 void EPostProcessingEffect::LockDepthAndStencil() {
@@ -19,10 +20,10 @@ void EPostProcessingEffect::UnlockDepthAndStencil() {
 EPostProcessingPipeline::EPostProcessingPipeline(Window *window) {
   this->window = window;
   if (window) {
-    framebuffers[0] = std::make_shared<EFrameBuffer>(window->getSize().w,
-                                                     window->getSize().h);
-    framebuffers[1] = std::make_shared<EFrameBuffer>(window->getSize().w,
-                                                     window->getSize().h);
+    framebuffers[0] = std::make_shared<EFrameBuffer>(
+        window->getSize().w, window->getSize().h, false);
+    framebuffers[1] = std::make_shared<EFrameBuffer>(
+        window->getSize().w, window->getSize().h, false);
     auto geo = std::make_shared<EQuadGeometry>(1.0f, 1.0f);
 
     auto mat = std::make_shared<ShaderMaterial>(
@@ -241,4 +242,102 @@ void EThreshold::Apply(Window &window, std::shared_ptr<EMesh> &quad,
 
   outBuffer.Unbind();
   UnlockDepthAndStencil();
+}
+EBloom::EBloom(int w, int h, float threshold) {
+
+  this->threshold = threshold;
+  framebuffers[0] = std::make_shared<EFrameBuffer>(w, h);
+  framebuffers[1] = std::make_shared<EFrameBuffer>(w, h);
+  effects[0] = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                        "../shaders/fragment/Threshold.glsl");
+
+  effects[1] = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                        "../shaders/fragment/Downsample.glsl");
+  effects[2] = std::make_unique<Shader>(
+      "../shaders/vertex/quad_verts.glsl",
+      "../shaders/fragment/GaussianBlurHorizontal.glsl");
+  effects[3] =
+      std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                               "../shaders/fragment/GaussianBulrVertical.glsl");
+
+  copyScene =
+      std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                               "../shaders/fragment/displayScreen.glsl");
+
+  mix = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                 "../shaders/fragment/MixBloom.glsl");
+}
+void EBloom::Apply(Window &window, std::shared_ptr<EMesh> &quad,
+                   EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+  LockDepthAndStencil();
+
+  // copy scene to input framebuffer;
+  framebuffers[inputIndex]->Bind();
+
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  copyScene->setInt("screenTexture", 0);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(copyScene.get()));
+  quad->render(*(copyScene.get()));
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  int idx = 0;
+  framebuffers[inputIndex]->Unbind();
+
+  for (const auto &effect : effects) {
+    if (idx == 0) {
+      effect->setFloat("threshold", 0.4);
+    }
+    if (idx == 1) {
+      effect->setFloat("factor", 2);
+    }
+    if (idx == 2) {
+      effect->setInt("radius", 16);
+    }
+    if (idx == 3) {
+      effect->setInt("radius", 16);
+    }
+    ApplyLocal(window, quad, *framebuffers[inputIndex].get(),
+               *framebuffers[outputIndex].get(), effect.get());
+    std::swap(inputIndex, outputIndex);
+    idx++;
+  }
+
+  // mxing the result with the scene
+  outBuffer.Bind();
+
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  mix->setInt("screenTexture", 0);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+
+  glActiveTexture(GL_TEXTURE1);
+  mix->setInt("bloomTexture", 1);
+  glBindTexture(GL_TEXTURE_2D, framebuffers[inputIndex]->getTexture());
+
+  window.UpdateUniforms(*(mix.get()));
+  quad->render(*(mix.get()));
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  outBuffer.Unbind();
+  UnlockDepthAndStencil();
+}
+
+void EBloom::ApplyLocal(Window &window, std::shared_ptr<EMesh> &quad,
+                        EFrameBuffer &inBuffer, EFrameBuffer &outBuffer,
+                        Shader *effect) {
+
+  outBuffer.Bind();
+  glViewport(0, 0, window.getSize().w, window.getSize().h);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glActiveTexture(GL_TEXTURE0);
+  effect->setInt("screenTexture", 0);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(effect));
+  quad->render(*(effect));
+  glBindTexture(GL_TEXTURE_2D, 0);
+  outBuffer.Unbind();
 }
