@@ -12,7 +12,8 @@ enum class PostProcessingEffect {
   GaussianBlurFull,
   GaussianBlurHorizontal,
   GaussianBlurVertical,
-  Quantize
+  Quantize,
+  Downsample,
 };
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
@@ -94,5 +95,14 @@ struct EQuantization : public EPostProcessingEffect {
              EFrameBuffer &) override;
   EQuantization(unsigned int steps = 64);
   ~EQuantization() override = default;
+};
+
+struct EDownsample : public EPostProcessingEffect {
+
+  // downsampling factor, 50% mean the resulting texture will be 50% smaller
+  float factor = 0.5;
+  EDownsample(float f = 0.5);
+  virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+                     EFrameBuffer &) override;
 };
 #endif

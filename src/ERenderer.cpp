@@ -467,5 +467,9 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     auto newEffect = std::make_shared<EQuantization>();
     effectPipeline.addEffect(newEffect);
   }
+  case PostProcessingEffect::Downsample: {
+    auto newEffect = std::make_shared<EDownsample>();
+    effectPipeline.addEffect(newEffect);
+  }
   }
 }

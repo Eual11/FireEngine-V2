@@ -196,3 +196,28 @@ void EQuantization::Apply(Window &window, std::shared_ptr<EMesh> &quad,
 
   UnlockDepthAndStencil();
 }
+
+EDownsample::EDownsample(float f) {
+  this->factor = f;
+  effect = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
+                                    "../shaders/fragment/displayScreen.glsl");
+}
+void EDownsample::Apply(Window &window, std::shared_ptr<EMesh> &quad,
+                        EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+  LockDepthAndStencil();
+  outBuffer.Bind();
+  glViewport(0.0, 0.0, window.getSize().w, window.getSize().h);
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glViewport(0.0, 0.0, window.getSize().w * factor,
+             window.getSize().h * factor);
+  glActiveTexture(GL_TEXTURE0);
+  effect->setInt("screenTexture", 0);
+  glBindTexture(GL_TEXTURE_2D, inBuffer.getTexture());
+  window.UpdateUniforms(*(effect.get()));
+  quad->render(*(effect.get()));
+
+  outBuffer.Unbind();
+  UnlockDepthAndStencil();
+}
