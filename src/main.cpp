@@ -39,7 +39,9 @@ int main() {
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
+  rend.addEfect(PostProcessingEffect::Threshold);
   rend.addEfect(PostProcessingEffect::Downsample);
+  rend.addEfect(PostProcessingEffect::GaussianBlurFull);
 
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};

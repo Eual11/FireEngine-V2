@@ -466,10 +466,17 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
   case PostProcessingEffect::Quantize: {
     auto newEffect = std::make_shared<EQuantization>();
     effectPipeline.addEffect(newEffect);
+    break;
   }
   case PostProcessingEffect::Downsample: {
     auto newEffect = std::make_shared<EDownsample>();
     effectPipeline.addEffect(newEffect);
+    break;
+  }
+  case PostProcessingEffect::Threshold: {
+    auto newEffect = std::make_shared<EThreshold>();
+    effectPipeline.addEffect(newEffect);
+    break;
   }
   }
 }
