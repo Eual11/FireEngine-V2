@@ -1,4 +1,5 @@
 #include "../include/EFrameBuffer.h"
+
 EFrameBuffer::EFrameBuffer(int width, int height) {
 
   this->width = width;

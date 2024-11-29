@@ -100,8 +100,8 @@ struct EQuantization : public EPostProcessingEffect {
 struct EDownsample : public EPostProcessingEffect {
 
   // downsampling factor, 50% mean the resulting texture will be 50% smaller
-  float factor = 0.5;
-  EDownsample(float f = 0.5);
+  float factor = 4;
+  EDownsample(float f = 4.0f);
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
                      EFrameBuffer &) override;
 };
