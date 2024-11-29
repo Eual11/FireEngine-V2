@@ -115,27 +115,24 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
         child->render(shader);
 
-        if(outlinesEnabled)
-        {
-                  auto scale = child->getScale();
+        if (outlinesEnabled) {
+          auto scale = child->getScale();
 
-        child->setScale(scale.x * outlineSize, scale.y * outlineSize,
-                        scale.z * outlineSize);
+          child->setScale(scale.x * outlineSize, scale.y * outlineSize,
+                          scale.z * outlineSize);
 
-        // enable writing to stencil buffer
-        DisableDepthTesting();
-        glStencilMask(0x00);
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+          // enable writing to stencil buffer
+          DisableDepthTesting();
+          glStencilMask(0x00);
+          glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
-        child->render(*outlineShader);
-        // scaling back to original
-        child->setScale(scale.x, scale.y, scale.z);
-        EnableDepthTesting();
-        glStencilMask(0xFF);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
+          child->render(*outlineShader);
+          // scaling back to original
+          child->setScale(scale.x, scale.y, scale.z);
+          EnableDepthTesting();
+          glStencilMask(0xFF);
+          glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         }
-
       }
     } else
       FetchShaderAndRender(world, child);
@@ -361,24 +358,19 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         obj->render(*shader);
 
-                // disable writing to stencil and depth buffer
+        // disable writing to stencil and depth buffer
         glStencilMask(0x00);
         DisableDepthTesting();
         glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 
-          if(outlinesEnabled)
-          {
-            auto scale = obj->getScale();
-        obj->setScale(scale.x * outlineSize, scale.y * outlineSize,
-                      scale.z * outlineSize);
+        if (outlinesEnabled) {
+          auto scale = obj->getScale();
+          obj->setScale(scale.x * outlineSize, scale.y * outlineSize,
+                        scale.z * outlineSize);
 
-
-        obj->render(*outlineShader);
-        obj->setScale(scale.x, scale.y, scale.z);
-
-
-
-          }
+          obj->render(*outlineShader);
+          obj->setScale(scale.x, scale.y, scale.z);
+        }
         glStencilMask(0xFF);
         EnableDepthTesting();
         glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -454,9 +446,21 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     effectPipeline.addEffect(newEffect);
     break;
   }
-  case PostProcessingEffect::GaussianBlur: {
-    auto newEffect = std::make_shared<EGaussianBlur>();
+  case PostProcessingEffect::GaussianBlurHorizontal: {
+    auto newEffect = std::make_shared<EGaussianBlurH>();
     effectPipeline.addEffect(newEffect);
+    break;
+  }
+  case PostProcessingEffect::GaussianBlurVertical: {
+    auto newEffect = std::make_shared<EGaussianBlurV>();
+    effectPipeline.addEffect(newEffect);
+    break;
+  }
+  case PostProcessingEffect::GaussianBlurFull: {
+    auto Hblur = std::make_shared<EGaussianBlurH>();
+    auto Vblur = std::make_shared<EGaussianBlurV>();
+    effectPipeline.addEffect(Hblur);
+    effectPipeline.addEffect(Vblur);
     break;
   }
   case PostProcessingEffect::Quantize: {

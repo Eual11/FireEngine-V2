@@ -6,7 +6,14 @@
 #include "Window.h"
 #include <memory>
 
-enum class PostProcessingEffect { Greyscale, Invert, GaussianBlur, Quantize };
+enum class PostProcessingEffect {
+  Greyscale,
+  Invert,
+  GaussianBlurFull,
+  GaussianBlurHorizontal,
+  GaussianBlurVertical,
+  Quantize
+};
 struct EPostProcessingEffect {
   virtual void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
                      EFrameBuffer &) = 0;
@@ -17,6 +24,7 @@ struct EPostProcessingEffect {
   // when post processing effects are applied
   void LockDepthAndStencil();
   void UnlockDepthAndStencil();
+  int internalEffectsCount = 1;
 };
 
 class EPostProcessingPipeline {
@@ -64,14 +72,20 @@ struct EInvertEffect : public EPostProcessingEffect {
   ~EInvertEffect() override = default;
 };
 
-struct EGaussianBlur : public EPostProcessingEffect {
+struct EGaussianBlurH : public EPostProcessingEffect {
   unsigned int radius = 1;
   void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
              EFrameBuffer &) override;
-  EGaussianBlur(unsigned int radius = 1);
-  ~EGaussianBlur() override = default;
+  EGaussianBlurH(unsigned int radius = 1);
+  ~EGaussianBlurH() override = default;
 };
-
+struct EGaussianBlurV : public EPostProcessingEffect {
+  unsigned int radius = 1;
+  void Apply(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
+             EFrameBuffer &) override;
+  EGaussianBlurV(unsigned int radius = 1);
+  ~EGaussianBlurV() override = default;
+};
 struct EQuantization : public EPostProcessingEffect {
 
   // number of quantization steps to map to

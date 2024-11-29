@@ -17,7 +17,7 @@ out vec2 fragTexCoord;
 
 void main()
 {
-    float velocity = 0.3;
+    float velocity = 0.4;
     float angularVelocity = velocity / radius;
     float theta = angularVelocity * uTime;
     vec4 pos = vec4(inPosition, 1.0f);

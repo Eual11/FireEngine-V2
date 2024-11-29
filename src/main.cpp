@@ -24,7 +24,7 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-glm::vec3 camPos(0.0f, 40.0f, 100.0f);
+glm::vec3 camPos(0.0f, 20.0f, 100.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
@@ -39,6 +39,7 @@ int main() {
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
+  rend.addEfect(PostProcessingEffect::GaussianBlurFull);
 
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
@@ -51,7 +52,7 @@ int main() {
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
 
-  unsigned int amount = 10000;
+  unsigned int amount = 1000;
   std::vector<glm::mat4> modelMatrices;
   modelMatrices.resize(amount);
   srand(glfwGetTime()); // initialize random seed
