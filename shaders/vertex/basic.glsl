@@ -26,7 +26,7 @@ void main()
     pos += dist;
     if (uInstanced)
     {
-        transformMatrix = instanceMatrix;
+        transformMatrix = instanceMatrix * uModel;
         gl_Position = uProjection * uView * transformMatrix * pos;
     }
     else {

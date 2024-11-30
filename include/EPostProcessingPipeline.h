@@ -122,7 +122,6 @@ struct EBloom : public EPostProcessingEffect {
   EBloom(int w, int h, float threshold = 0.5);
 
   std::shared_ptr<EFrameBuffer> framebuffers[2];
-  std::shared_ptr<EFrameBuffer> sceneBuffer;
   std::unique_ptr<Shader> effects[4];
   std::unique_ptr<Shader> mix;
   std::unique_ptr<Shader> copyScene;
@@ -134,5 +133,7 @@ struct EBloom : public EPostProcessingEffect {
 
   void ApplyLocal(Window &, std::shared_ptr<EMesh> &, EFrameBuffer &,
                   EFrameBuffer &, Shader *);
+  int width;
+  int height;
 };
 #endif

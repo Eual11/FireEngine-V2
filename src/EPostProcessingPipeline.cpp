@@ -246,6 +246,8 @@ void EThreshold::Apply(Window &window, std::shared_ptr<EMesh> &quad,
 EBloom::EBloom(int w, int h, float threshold) {
 
   this->threshold = threshold;
+  this->width = w;
+  this->height = h;
   framebuffers[0] = std::make_shared<EFrameBuffer>(w, h);
   framebuffers[1] = std::make_shared<EFrameBuffer>(w, h);
   effects[0] = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
@@ -269,7 +271,16 @@ EBloom::EBloom(int w, int h, float threshold) {
 }
 void EBloom::Apply(Window &window, std::shared_ptr<EMesh> &quad,
                    EFrameBuffer &inBuffer, EFrameBuffer &outBuffer) {
+
   LockDepthAndStencil();
+
+  if (window.getSize().w != width || window.getSize().h != height) {
+    // change in width and height
+    framebuffers[0]->Resize(window.getSize().w, window.getSize().h);
+    framebuffers[1]->Resize(window.getSize().w, window.getSize().h);
+    width = window.getSize().w;
+    height = window.getSize().h;
+  }
 
   // copy scene to input framebuffer;
   framebuffers[inputIndex]->Bind();
