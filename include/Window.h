@@ -1,6 +1,9 @@
 #ifndef __WINDOW__H
 #define __WINDOW__H
 
+#include "../_dep/imgui-src/imgui.h"
+#include "../_dep/imgui-src/imgui_impl_glfw.h"
+#include "../_dep/imgui-src/imgui_impl_opengl3.h"
 #include "../include/Camera.h"
 #include "../include/Shader.h"
 #include <GLFW/glfw3.h>
@@ -23,6 +26,8 @@ private:
 
   // default
   bool keyInputEnabled_ = false;
+
+  ImGuiIO *imguiIO;
   bool mouseInputEnabled_ = false;
   bool scollInputEnabled_ = false;
   bool cursorEnabled_ = true;

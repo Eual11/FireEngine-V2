@@ -32,6 +32,7 @@ Window::Window(int w, int h, std::string title, bool fullscreen) {
     printf("Couldn't Create window_\n");
   }
 
+  // creating imgui context
   glfwSetWindowUserPointer(window_, this);
 
   // activate and set viewport
@@ -52,6 +53,14 @@ Window::Window(int w, int h, std::string title, bool fullscreen) {
   DisableCursor();
   EnableScrollInput();
   EnableMouseInput();
+
+  // create imgui context
+  ImGui::CreateContext();
+  imguiIO = &ImGui::GetIO();
+  imguiIO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+  ImGui_ImplGlfw_InitForOpenGL(window_, true);
+  ImGui_ImplOpenGL3_Init("#version 330");
 };
 Window::~Window() { DestroyWindow(); }
 
@@ -81,6 +90,11 @@ void Window::DisableCursor() {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   cursorEnabled_ = false;
 }
+void Window::EnableCursor() {
+  if (cursorEnabled_)
+    return;
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
 
 // TODO: decouple window and camera
 // in the current set up, multiple cameras
@@ -104,6 +118,12 @@ void Window::EnableMouseInput() {
   glfwSetCursorPosCallback(window_, callback);
   mouseInputEnabled_ = true;
 }
+void Window::DisableMouseInput() {
+  if (!mouseInputEnabled_)
+    return;
+
+  glfwSetCursorPosCallback(window_, nullptr);
+}
 
 void Window::EnableScrollInput() {
   if (scollInputEnabled_)
@@ -119,6 +139,9 @@ void Window::EnableScrollInput() {
   scollInputEnabled_ = true;
 }
 void Window::MouseCallback(double xpos, double ypos) {
+
+  if (imguiIO->WantCaptureMouse)
+    return;
   float deltaX = cursorPosX - xpos;
   float deltaY = cursorPosY - ypos;
   cursorPosX = xpos;
@@ -137,6 +160,8 @@ void Window::MouseCallback(double xpos, double ypos) {
 }
 void Window::ScrollCallback(double xoffset, double yoffset) {
   (void)(xoffset);
+  if (imguiIO->WantCaptureMouse)
+    return;
   if (cameraBound) {
     camera_->ProcessScroll(yoffset);
   }
@@ -169,6 +194,9 @@ void Window::EnableKeyInput() {
 }
 
 void Window::HandleInput(int key, int scancode, int action, int mod) {
+
+  if (imguiIO->WantCaptureKeyboard || imguiIO->WantTextInput)
+    return;
   // TODO: This is bad
   if (key == GLFW_KEY_ESCAPE) {
     glfwWindowShouldClose(window_);
@@ -202,6 +230,13 @@ void Window::HandleInput(int key, int scancode, int action, int mod) {
 
 bool Window::isOpen() { return (window_ != nullptr && isOpen_); }
 void Window::DestroyWindow() {
+  // closing imgui
+  //
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+
+  ImGui::DestroyContext();
+
   glfwSetWindowUserPointer(window_, nullptr);
   glfwSetWindowShouldClose(window_, true);
   glfwDestroyWindow(window_);

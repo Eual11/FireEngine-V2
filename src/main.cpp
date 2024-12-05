@@ -1,3 +1,4 @@
+#include "../_dep/imgui-src/imgui.h"
 #include "../include/EBoxGeometry.h"
 #include "../include/EModelLoader.h"
 #include "../include/ERenderer.h"
@@ -36,7 +37,7 @@ int main() {
   auto cameraPtr = std::make_shared<Camera>(camera);
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Firev2", false);
   nWindow.BindCamera(cameraPtr);
-  nWindow.DisableVsync();
+  nWindow.EnableCursor();
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
@@ -53,7 +54,7 @@ int main() {
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
 
-  unsigned int amount = 10000;
+  unsigned int amount = 10;
   std::vector<glm::mat4> modelMatrices;
   modelMatrices.resize(amount);
   srand(glfwGetTime()); // initialize random seed
@@ -105,9 +106,6 @@ int main() {
 
   pnt->setPosition(0, 20, 0);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
-  zaWardu->add(astroid);
-  zaWardu->add(sun);
-  zaWardu->add(helm);
 
   /* zaWardu->AddLight(pnt); */
   /* zaWardu->AddLight(pnt2); */
@@ -140,8 +138,17 @@ int main() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   while (nWindow.isOpen()) {
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::ShowDemoWindow();
     mat->uniforms["time"] = glfwGetTime();
     rend.Render(zaWardu);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     nWindow.Update();
   }
   printf("Good Bye\n");

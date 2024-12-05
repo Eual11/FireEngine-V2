@@ -1,9 +1,23 @@
 set(EXECUTABLE_NAME "e")
-include_directories($ENV{CPLUS_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/include")
+include_directories($ENV{CPLUS_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/_dep/imgui_src" "${CMAKE_SOURCE_DIR}/_dep/imgui-src/backends")
+
 
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(imgui_SOURCE_DIR "${CMAKE_SOURCE_DIR}/_dep/imgui-src")
+
+
+add_library(imgui 
+  ${imgui_SOURCE_DIR}/imgui.cpp ${imgui_SOURCE_DIR}/imgui.h 
+  ${imgui_SOURCE_DIR}/imconfig.h ${imgui_SOURCE_DIR}/imgui_demo.cpp 
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp ${imgui_SOURCE_DIR}/imgui_internal.h 
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp ${imgui_SOURCE_DIR}/imgui_widgets.cpp 
+  ${imgui_SOURCE_DIR}/imstb_rectpack.h ${imgui_SOURCE_DIR}/imstb_textedit.h 
+  ${imgui_SOURCE_DIR}/imstb_truetype.h ${imgui_SOURCE_DIR}/imgui_impl_glfw.cpp 
+ ${imgui_SOURCE_DIR}/imgui_impl_glfw.h  ${imgui_SOURCE_DIR}/imgui_impl_opengl3.cpp 
+ ${imgui_SOURCE_DIR}/imgui_impl_opengl3.h
+  )
 add_executable(${EXECUTABLE_NAME} ./main.cpp)
 add_library(glad STATIC glad.c)
 add_library(stb_image stbi_lib.c)
@@ -27,6 +41,7 @@ add_library(FrameBuffer STATIC EFrameBuffer.cpp)
 add_library(PostProcessingPipeline STATIC EPostProcessingPipeline.cpp)
 
 
+target_link_libraries(EWindow PRIVATE imgui)
 target_link_libraries(Camera PRIVATE Object3D)
 target_link_libraries(Group PRIVATE Object3D)
 target_link_libraries(Material PRIVATE Texture)
