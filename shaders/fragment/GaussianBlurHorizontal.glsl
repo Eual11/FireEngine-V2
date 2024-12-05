@@ -13,7 +13,7 @@ uniform sampler2D screenTexture;
 void main()
 {
     float sigma = 4.0f;
-    int radius = 32;
+    int radius = 7;
     int scale = 2;
 
     float sum = 0.0f;

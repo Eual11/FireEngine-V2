@@ -248,8 +248,8 @@ EBloom::EBloom(int w, int h, float threshold) {
   this->threshold = threshold;
   this->width = w;
   this->height = h;
-  framebuffers[0] = std::make_shared<EFrameBuffer>(w, h);
-  framebuffers[1] = std::make_shared<EFrameBuffer>(w, h);
+  framebuffers[0] = std::make_shared<EFrameBuffer>(w, h, true);
+  framebuffers[1] = std::make_shared<EFrameBuffer>(w, h, true);
   effects[0] = std::make_unique<Shader>("../shaders/vertex/quad_verts.glsl",
                                         "../shaders/fragment/Threshold.glsl");
 

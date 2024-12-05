@@ -36,6 +36,7 @@ int main() {
   auto cameraPtr = std::make_shared<Camera>(camera);
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Firev2", false);
   nWindow.BindCamera(cameraPtr);
+  nWindow.DisableVsync();
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
@@ -52,7 +53,7 @@ int main() {
                                               "../shaders/fragment/basic.glsl",
                                               uniforms);
 
-  unsigned int amount = 1000;
+  unsigned int amount = 10000;
   std::vector<glm::mat4> modelMatrices;
   modelMatrices.resize(amount);
   srand(glfwGetTime()); // initialize random seed
@@ -91,11 +92,11 @@ int main() {
   /* astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f)); */
   /* astroid->setRotation(45, 10, 0); */
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto mars = loader.loadModel("../models/planet/planet.obj", mat);
+  auto helm = loader.loadModel("../models/Lucy100k.ply", mat);
   mat->uniforms["radius"] = radius;
   sun->setPosition(0, 0, 0);
-  mars->setPosition(70, 0, 0);
-  mars->setScale(2, 2, 2);
+  helm->setPosition(30, 10, 60);
+  helm->setScale(0.01, 0.01, 0.01);
   sun->setScale(2, 2, 2);
   astroid->setPosition(0, 0, 0);
   auto pnt = createRef<PointLight>(
@@ -106,9 +107,9 @@ int main() {
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
   zaWardu->add(astroid);
   zaWardu->add(sun);
-  zaWardu->add(mars);
+  zaWardu->add(helm);
 
-  zaWardu->AddLight(pnt);
+  /* zaWardu->AddLight(pnt); */
   /* zaWardu->AddLight(pnt2); */
   /* zaWardu->AddLight(pnt3); */
   /* zaWardu->loadCubeMaps({ */
