@@ -36,6 +36,7 @@ private:
   bool resizeUpdatesEnabled_ = false;
   bool cameraBound = false;
   bool isOpen_ = false;
+  bool vsyncEnabled = false;
   float lastFrameTime_ = 0.0f;
   float cursorPosX = 0.0f;
   float cursorPosY = 0.0f;
@@ -77,6 +78,8 @@ public:
   void DisableVsync();
   void Update();
   void UpdateUniforms(Shader &shader);
+
+  bool getVsyncState() const { return vsyncEnabled; }
 
   // bindings
   //

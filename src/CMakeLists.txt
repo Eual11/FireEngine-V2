@@ -39,9 +39,10 @@ add_library(ELight STATIC ELight.cpp)
 add_library(EWorld STATIC EWorld.cpp)
 add_library(FrameBuffer STATIC EFrameBuffer.cpp)
 add_library(PostProcessingPipeline STATIC EPostProcessingPipeline.cpp)
-
+add_library(UI EUI.cpp)
 
 target_link_libraries(EWindow PRIVATE imgui)
+target_link_libraries(UI PRIVATE EWindow PRIVATE Camera PRIVATE EWorld PRIVATE Renderer)
 target_link_libraries(Camera PRIVATE Object3D)
 target_link_libraries(Group PRIVATE Object3D)
 target_link_libraries(Material PRIVATE Texture)
@@ -55,7 +56,7 @@ target_link_libraries(BoxGeometry PRIVATE BufferGeometry)
 target_link_libraries(Renderer PRIVATE EWorld PRIVATE Model PRIVATE ELight PRIVATE EWindow PRIVATE FrameBuffer PRIVATE QuadGeometry PRIVATE PostProcessingPipeline)
 #  PRIVATE "$ENV{C_LIBRARY_PATH}\\SDL3_mixer.lib"
 #glfw, assimp
-target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE Texture PRIVATE stb_image PRIVATE Camera PRIVATE Renderer PRIVATE  "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model PRIVATE EWindow PRIVATE EWorld PRIVATE ModelLoader PRIVATE Texture PRIVATE BoxGeometry )
+target_link_libraries(${EXECUTABLE_NAME}  PRIVATE glad PRIVATE Shader PRIVATE Texture PRIVATE stb_image PRIVATE Camera PRIVATE Renderer PRIVATE  "${CMAKE_SOURCE_DIR}\\lib\\glfw3.lib" PRIVATE Model PRIVATE EWindow PRIVATE EWorld PRIVATE ModelLoader PRIVATE Texture PRIVATE BoxGeometry PRIVATE UI )
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 

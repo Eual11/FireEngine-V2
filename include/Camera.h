@@ -7,13 +7,14 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/quaternion_geometric.hpp>
 
+#include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
 enum class CameraMovement { STATIC, FORWARD, BACKWARD, LEFT, RIGHT };
 class Camera : public EObject3D {
 public:
-  /* glm::vec3 Pos = glm::vec3(0.0f, 0.0f, 0.0f); */
   float fYaw = 270.0f;
   float fPitch = 0.0f;
+  float fRoll = 0.0f; // currently unused
   float max_speed = 10.0f;
   float acceleration = 20.0f;
   float cameraVelocity = 0.0f;
@@ -57,6 +58,27 @@ public:
 
   void ProcessScroll(float yOffset);
   void SetAspectRatio(float aspect);
+  void setFov(float fov) { Fov = fov; }
+  float getFov() const { return Fov; }
+
+  // the orientation of camera
+  //{yaw, pitch, roll}
+  glm::vec3 getOrientation() const { return glm::vec3(fYaw, fPitch, fRoll); }
+  void setOrientation(const glm::vec3 &orientation) {
+    fYaw = orientation.x;
+    fPitch = orientation.y;
+    fRoll = orientation.z;
+    UpdateVectors();
+  }
+  void setNearFarPlanes(float near, float far) {
+    zFar = far;
+    zNear = near;
+  }
+
+  // returns clipping planes as vector 2
+  // x is near cliping plane
+  // y is far clipping plane
+  glm::vec2 getNearFarPlanes() const { return glm::vec2(zNear, zFar); }
   void UpdateUniforms(Shader &shader);
   void render(Shader &) override;
   void setInstanceUBO(unsigned int ubo, unsigned int count) override {};

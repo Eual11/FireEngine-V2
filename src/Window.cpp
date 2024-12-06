@@ -142,6 +142,7 @@ void Window::MouseCallback(double xpos, double ypos) {
 
   if (imguiIO->WantCaptureMouse)
     return;
+
   float deltaX = cursorPosX - xpos;
   float deltaY = cursorPosY - ypos;
   cursorPosX = xpos;
@@ -153,6 +154,8 @@ void Window::MouseCallback(double xpos, double ypos) {
     deltaY = 0.0f;
     firstMove = false;
   } else {
+    if (glfwGetMouseButton(window_, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
+      return;
     if (cameraBound) {
       camera_->ProcessMouseMovement(deltaX, deltaY, true);
     }
@@ -244,8 +247,18 @@ void Window::DestroyWindow() {
   window_ = nullptr;
   glfwTerminate();
 }
-void Window::EnableVsync() { glfwSwapInterval(1); }
-void Window::DisableVsync() { glfwSwapInterval(0); }
+void Window::EnableVsync() {
+  if (vsyncEnabled)
+    return;
+  glfwSwapInterval(1);
+  vsyncEnabled = true;
+}
+void Window::DisableVsync() {
+  if (!vsyncEnabled)
+    return;
+  glfwSwapInterval(0);
+  vsyncEnabled = false;
+}
 void Window::Update() {
   float curTime = glfwGetTime();
   deltaTime = curTime - lastFrameTime_;
