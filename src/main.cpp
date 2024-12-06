@@ -25,7 +25,7 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-glm::vec3 camPos(0.0f, 20.0f, 100.0f);
+glm::vec3 camPos(0.0f, 0.0f, 10.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
@@ -92,22 +92,21 @@ int main() {
   /* astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f)); */
   /* astroid->setRotation(45, 10, 0); */
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto helm = loader.loadModel("../models/Lucy100k.ply", mat);
+  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
   mat->uniforms["radius"] = radius;
   sun->setPosition(0, 0, 0);
-  helm->setPosition(30, 10, 60);
-  helm->setScale(0.01, 0.01, 0.01);
+  helm->setPosition(0, 0, 0);
   sun->setScale(2, 2, 2);
   astroid->setPosition(0, 0, 0);
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(0.0f, 0.0f, 0.0f), 4.0f, 0.01f, 0.001f);
+      glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0.01f, 0.01f);
 
-  pnt->setPosition(0, 20, 0);
+  pnt->setPosition(0, 10, 0);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
 
   zaWardu->add(helm);
-  /* zaWardu->AddLight(pnt); */
+  zaWardu->AddLight(pnt);
   /* zaWardu->AddLight(pnt2); */
   /* zaWardu->AddLight(pnt3); */
   /* zaWardu->loadCubeMaps({ */
@@ -120,16 +119,7 @@ int main() {
   /* }); */
   /**/
 
-  zaWardu->loadCubeMaps({
-
-      "../assets/space_2/skybox_right1.png",
-      "../assets/space_2/skybox_left2.png",
-      "../assets/space_2/skybox_top3.png",
-      "../assets/space_2/skybox_bottom4.png",
-      "../assets/space_2/skybox_front5.png",
-      "../assets/space_2/skybox_back6.png",
-
-  });
+  zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   float spiralRadius = 5.0f;
   float spiralHeight = 10.0f;
@@ -140,11 +130,38 @@ int main() {
   bool window_closed = false;
 
   EngineState state;
+
+  // Renderer States
+
+  state.rendererState.enableDepthTesting = rend.getDepthTesting();
+  state.rendererState.enableStencilTesting = rend.getStencilTesting();
+  state.rendererState.polymode = rend.getPolyMode();
+  // Camera States
   state.cameraState.Poition = camera.getPosition();
   state.cameraState.Orientation = camera.getOrientation();
   state.cameraState.clipPlanes = camera.getNearFarPlanes();
   state.cameraState.Fov = camera.getFov();
   state.vsyncEnabled = nWindow.getVsyncState();
+
+  // scene/world state
+  state.worldstate.skyboxEnabled = zaWardu->hasSkyBox;
+  state.worldstate.skyboxReloaded = false;
+  state.worldstate.cubeMaps = zaWardu->getCubemapNames();
+
+  state.worldstate.skyboxEnabled = zaWardu->hasSkyBox;
+  state.worldstate.skyboxReloaded = false;
+  state.worldstate.cubeMaps = zaWardu->getCubemapNames();
+
+  auto it =
+      std::find(state.worldstate.cubeMaps.begin(),
+                state.worldstate.cubeMaps.end(), zaWardu->getCurCubeMap());
+  if (it != state.worldstate.cubeMaps.end()) {
+    state.worldstate.curSkyboxIdx =
+        std::distance(state.worldstate.cubeMaps.begin(), it);
+  } else {
+    // Handle the case where the current cube map is not found
+    state.worldstate.curSkyboxIdx = -1; // or some invalid index
+  }
   while (nWindow.isOpen()) {
 
     StartUIFrame();
@@ -156,6 +173,8 @@ int main() {
     EndUIFrame();
 
     UpdateEngine(nWindow, state);
+    UpdateRenderer(rend, state);
+    UpdateWorld(*(zaWardu.get()), state);
     UpdateCamera(*(cameraPtr.get()), state);
     nWindow.Update();
   }

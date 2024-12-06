@@ -27,11 +27,12 @@ void RenderUI(EngineState &state) {
     }
     ImGui::PopStyleColor();
 
-    static bool check = false;
-    ImGui::Checkbox("Checkbox", &check);
+    ImGui::SeparatorText("Loaded Objects");
+    ImGui::Text("Damaged Helmet");
     ImGui::End();
   }
-
+  ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 300, 0),
+                          ImGuiCond_Once);
   if (ImGui::Begin("Options")) {
 
     if (ImGui::CollapsingHeader("Application")) {
@@ -45,15 +46,33 @@ void RenderUI(EngineState &state) {
     if (ImGui::CollapsingHeader("Renderer")) {
       ImGui::Indent(8);
       ImGui::SeparatorText("Renderer Options");
-      static bool depthTesting = true;
-      static bool stencilTesting = false;
       static bool backfaceCulling = false;
       static bool blending = true;
 
-      ImGui::Checkbox("Depth Testing", &depthTesting);
-      ImGui::Checkbox("Stencil Testing", &stencilTesting);
+      ImGui::Checkbox("Depth Testing", &state.rendererState.enableDepthTesting);
+      ImGui::Checkbox("Stencil Testing",
+                      &state.rendererState.enableStencilTesting);
       ImGui::Checkbox("Backface Culling", &backfaceCulling);
       ImGui::Checkbox("Blending", &blending);
+
+      ImGui::SeparatorText("Poly Fill Mode");
+
+      int current_idx = (int)(state.rendererState.polymode);
+
+      const char *modes[] = {"Fill", "Line", "Point"};
+
+      if (ImGui::BeginCombo("PolyMode", modes[current_idx])) {
+
+        for (int i = 0; i < IM_ARRAYSIZE(modes); i++) {
+          bool isSelected = (current_idx == i);
+
+          if (ImGui::Selectable(modes[i], isSelected)) {
+            current_idx = i;
+          }
+        }
+        ImGui::EndCombo();
+      }
+      state.rendererState.polymode = (PolyMode)(current_idx);
 
       ImGui::Unindent(8);
     }
@@ -100,19 +119,42 @@ void RenderUI(EngineState &state) {
     if (ImGui::CollapsingHeader("Scene")) {
       ImGui::Indent(8);
 
-      static bool skyboxEnable = true;
+      ImGui::Checkbox("Enable Skybox", &state.worldstate.skyboxEnabled);
 
-      ImGui::Checkbox("Enable Skybox", &skyboxEnable);
-      static int selected_item = 1;
+      auto items = state.worldstate.cubeMaps;
 
-      const char *items[] = {"Blue Sky", "Nebula", "MilkyWay"};
-
-      if (!skyboxEnable) {
+      if (!state.worldstate.skyboxEnabled) {
         ImGui::BeginDisabled();
       }
-      if (ImGui::Combo("Skybox", &selected_item, items, IM_ARRAYSIZE(items))) {
+
+      std::string label = "";
+      int idx = state.worldstate.curSkyboxIdx;
+
+      // Check if idx is valid before accessing cubeMaps
+      if (idx >= 0 && idx < (int)state.worldstate.cubeMaps.size()) {
+        label = state.worldstate.cubeMaps[idx];
       }
-      if (!skyboxEnable) {
+
+      if (ImGui::BeginCombo("Skyboxes", label.c_str())) {
+        for (int i = 0; i < (int)state.worldstate.cubeMaps.size(); i++) {
+          bool isSelected = idx == i;
+          if (ImGui::Selectable(state.worldstate.cubeMaps[i].c_str(),
+                                isSelected)) {
+            if (!isSelected) {
+              state.worldstate.curSkyboxIdx = i;
+              state.worldstate.skyboxReloaded = true;
+            }
+          }
+
+          // Ensure only one item can remain selected
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo(); // Make sure to end the combo
+      }
+
+      if (!state.worldstate.skyboxEnabled) {
         ImGui::EndDisabled();
       }
       ImGui::Unindent(8);
@@ -142,4 +184,34 @@ void UpdateCamera(Camera &camera, EngineState &state) {
                           state.cameraState.clipPlanes.y);
   camera.setFov(state.cameraState.Fov);
   state.cameraState.updateByUI = false;
+}
+void UpdateRenderer(ERenderer &renderer, EngineState &state) {
+
+  if (state.rendererState.enableDepthTesting) {
+    renderer.EnableDepthTesting();
+  } else
+    renderer.DisableDepthTesting();
+
+  if (state.rendererState.enableStencilTesting) {
+    renderer.EnableStencilTesting();
+  } else
+    renderer.DisableStencilTesting();
+
+  renderer.setPolyMode(state.rendererState.polymode);
+}
+void UpdateWorld(EWorld &world, EngineState &state) {
+  if (!state.worldstate.skyboxEnabled) {
+    world.unloadCubeMaps();
+    return;
+  }
+  if (state.worldstate.skyboxReloaded) {
+
+    // load a new cubemap
+    if (state.worldstate.curSkyboxIdx >= 0)
+      world.unloadCubeMaps();
+    world.loadCubeMaps(
+        state.worldstate.cubeMaps[state.worldstate.curSkyboxIdx]);
+  }
+
+  state.worldstate.skyboxReloaded = false;
 }

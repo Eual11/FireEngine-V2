@@ -35,6 +35,11 @@ public:
 
   void setVec3(std::string name, float x, float y, float z);
   void setVec4(std::string name, float x, float y, float z, float w);
+  void Destroy() {
+    glDeleteProgram(ID);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+  }
 };
 
 #endif

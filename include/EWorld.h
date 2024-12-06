@@ -15,12 +15,73 @@
 class EWorld : public EObject3D {
 public:
   bool hasSkyBox = false;
+  std::map<std::string, std::vector<std::string>> skyboxes{
+      {"Nebula",
+
+       {
+           "../assets/space_2/skybox_right1.png",
+           "../assets/space_2/skybox_left2.png",
+           "../assets/space_2/skybox_top3.png",
+           "../assets/space_2/skybox_bottom4.png",
+           "../assets/space_2/skybox_front5.png",
+           "../assets/space_2/skybox_back6.png",
+       }},
+      {"Nebula 2",
+
+       {
+           "../assets/space_1/skybox_right1.png",
+           "../assets/space_1/skybox_left2.png",
+           "../assets/space_1/skybox_top3.png",
+           "../assets/space_1/skybox_bottom4.png",
+           "../assets/space_1/skybox_front5.png",
+           "../assets/space_1/skybox_back6.png",
+       }},
+      {"Water Scene",
+       {
+           "../assets/water_scene_cubeMap/right.jpg",
+           "../assets/water_scene_cubeMap/left.jpg",
+           "../assets/water_scene_cubeMap/top.jpg",
+           "../assets/water_scene_cubeMap/bottom.jpg",
+           "../assets/water_scene_cubeMap/front.jpg",
+           "../assets/water_scene_cubeMap/back.jpg",
+
+       }
+
+      },
+      {"Blue Sky",
+       {
+           "../assets/blue_sky_cubeMaps/px.png",
+           "../assets/blue_sky_cubeMaps/nx.png",
+           "../assets/blue_sky_cubeMaps/py.png",
+           "../assets/blue_sky_cubeMaps/ny.png",
+           "../assets/blue_sky_cubeMaps/pz.png",
+           "../assets/blue_sky_cubeMaps/nz.png",
+
+       }
+
+      },
+      {"Interstellar",
+       {
+           "../assets/interstellar_skybox/xpos.png",
+           "../assets/interstellar_skybox/xneg.png",
+           "../assets/interstellar_skybox/ypos.png",
+           "../assets/interstellar_skybox/yneg.png",
+           "../assets/interstellar_skybox/zpos.png",
+           "../assets/interstellar_skybox/zneg.png",
+
+       }
+
+      }
+
+  };
 
 private:
   std::vector<std::pair<std::shared_ptr<EModel>, Shader &>> Objects;
   unsigned int skyboxCubeMap;
   unsigned int skyboxVAO = 0;
+  unsigned int skyboxVBO = 0;
   std::shared_ptr<Shader> skyboxShader = nullptr;
+  std::string curCubeMapName = "";
   // TODO: find replacement for this raw ptr
   Window *attachedWindow = nullptr;
 
@@ -37,6 +98,20 @@ public:
   void AddLight(std::shared_ptr<ELight>);
   void render(Shader &) override;
   unsigned int loadCubeMaps(std::vector<std::string>);
+  unsigned int loadCubeMaps(const std::string &name) {
+    if (skyboxes.find(name) == skyboxes.end())
+      return 0;
+    curCubeMapName = name;
+    return loadCubeMaps(skyboxes[name]);
+  }
+  std::string getCurCubeMap() const { return curCubeMapName; }
+  std::vector<std::string> getCubemapNames() {
+    std::vector<std::string> keys;
+    std::transform(skyboxes.begin(), skyboxes.end(), std::back_inserter(keys),
+                   [](const auto &pair) { return pair.first; });
+    return keys;
+  }
+  void unloadCubeMaps();
   Window *getWindow() const { return attachedWindow; };
   void setWindow(Window *window) { attachedWindow = window; };
   void Render();

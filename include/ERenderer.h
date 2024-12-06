@@ -1,7 +1,9 @@
 #ifndef __ERENDERER_H__
 #define __ERENDERER_H__
 
+#include "EBufferGeometry.h"
 #include "EFrameBuffer.h"
+#include "ELight.h"
 #include "EMaterial.h"
 #include "EObject3D.h"
 #include "EPostProcessingPipeline.h"
@@ -15,6 +17,8 @@ template <typename T, typename... Args>
 std::shared_ptr<T> createRef(Args &&...args) {
   return std::make_shared<T>(std::forward<Args>(args)...);
 }
+
+enum class PolyMode { FILL, LINE, POINT };
 class ERenderer {
 public:
   ERenderer();
@@ -22,6 +26,8 @@ public:
   void setWindow(Window *_win) { window = _win; }
   void EnableDepthTesting();
   void EnableStencilTesting();
+  bool getDepthTesting() const { return depthTestingEnabled; }
+  bool getStencilTesting() const { return stencilTestingEnabled; }
   // HACK: outlines should be a property of mesh/model not the renderer itself
   // but we will leave this for now
   void EnableOutlines() {
@@ -38,6 +44,26 @@ public:
   void setDepthTestFunc(unsigned int);
   void addEffect(const std::shared_ptr<EPostProcessingEffect> &);
   void addEfect(PostProcessingEffect);
+  PolyMode getPolyMode() const { return polymode; }
+  void setPolyMode(PolyMode mode) {
+
+    polymode = mode;
+
+    switch (polymode) {
+    case PolyMode::FILL: {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      break;
+    }
+    case PolyMode::LINE: {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      break;
+    }
+    case PolyMode::POINT: {
+      glPolygonMode(GL_FRONT_AND_BACK, POINT);
+      break;
+    }
+    }
+  }
 
   void Render(std::shared_ptr<EWorld> &);
 
@@ -48,6 +74,7 @@ private:
   bool outlinesEnabled = false;
   glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
   unsigned int clearBit = GL_COLOR_BUFFER_BIT;
+  PolyMode polymode = PolyMode::FILL;
 
   std::shared_ptr<Shader> outlineShader = nullptr;
   float outlineSize = 1.2;

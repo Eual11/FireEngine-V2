@@ -92,11 +92,10 @@ unsigned int EWorld::loadCubeMaps(std::vector<std::string> faces) {
   skyboxShader = std::make_shared<Shader>(
       Shader("../shaders/vertex/sykbox.glsl",
              "../shaders/fragment/skybox.glsl")); // generating skybox VAO
-  unsigned int vbo;
   glGenVertexArrays(1, &skyboxVAO);
-  glGenBuffers(1, &vbo);
+  glGenBuffers(1, &skyboxVBO);
   glBindVertexArray(skyboxVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices,
                GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
@@ -107,7 +106,26 @@ unsigned int EWorld::loadCubeMaps(std::vector<std::string> faces) {
   hasSkyBox = true;
   return skyboxCubeMap;
 }
+void EWorld::unloadCubeMaps() {
+  if (skyboxShader) {
+    // Delete the shader program
 
+    if (hasSkyBox) {
+      // Delete the skybox texture
+      glDeleteTextures(1, &skyboxCubeMap);
+
+      // Delete the skybox VAO and VBO
+      glDeleteVertexArrays(1, &skyboxVAO);
+      glDeleteBuffers(1, &skyboxVBO);
+
+      // Optionally, delete the shader if no longer needed
+      skyboxShader.reset(); // This releases the shared pointer to the shader
+
+      // Mark the skybox as unloaded
+      hasSkyBox = false;
+    }
+  }
+}
 void EWorld::RenderSkybox() {
   // disabling depth mapping so the sky box won't write anything to the depth
   // buffer
