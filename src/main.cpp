@@ -41,7 +41,6 @@ int main() {
 
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
-  rend.addEfect(PostProcessingEffect::Bloom);
 
   // TODO: tidy this up, it is disguting
   UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
@@ -137,13 +136,97 @@ int main() {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  bool window_closed = false;
   while (nWindow.isOpen()) {
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::ShowDemoWindow();
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    if (ImGui::Begin("Hierarchy", &window_closed),
+        ImGuiWindowFlags_NoCollapse) {
+      ImGui::SeparatorText("World");
+
+      static int click = 0;
+      if (ImGui::Button("Add Object")) {
+      }
+      ImGui::SameLine();
+
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      if (ImGui::Button("Remove Object")) {
+      }
+      ImGui::PopStyleColor();
+
+      static bool check = false;
+      ImGui::Checkbox("Checkbox", &check);
+      ImGui::End();
+    }
+
+    if (ImGui::Begin("Options")) {
+
+      if (ImGui::CollapsingHeader("Renderer")) {
+        ImGui::Indent(8);
+        ImGui::SeparatorText("Renderer Options");
+        static bool depthTesting = true;
+        static bool stencilTesting = false;
+        static bool backfaceCulling = false;
+        static bool blending = true;
+
+        ImGui::Checkbox("Depth Testing", &depthTesting);
+        ImGui::Checkbox("Stencil Testing", &stencilTesting);
+        ImGui::Checkbox("Backface Culling", &backfaceCulling);
+        ImGui::Checkbox("Blending", &blending);
+
+        ImGui::Unindent(8);
+      }
+
+      if (ImGui::CollapsingHeader("Camera")) {
+        ImGui::Indent(8);
+
+        ImGui::SeparatorText("ZFar/ZNear");
+        static float zFar = 100;
+        static float zNear = 0.1f;
+        ImGui::SliderFloat("Zfar", &zFar, 4000.0f, 10000.0f);
+        ImGui::SliderFloat("ZNear", &zNear, 0.001, 100.0f);
+
+        ImGui::SeparatorText("Position");
+
+        static float posx = 0.0f;
+        static float posy = 0.0f;
+        static float posz = 0.0f;
+
+        ImGui::DragFloat("xPos", &posx);
+        ImGui::DragFloat("yPos", &posy);
+        ImGui::DragFloat("zPos", &posz);
+
+        ImGui::Unindent(8);
+      }
+      if (ImGui::CollapsingHeader("Scene")) {
+        ImGui::Indent(8);
+
+        static bool skyboxEnable = true;
+
+        ImGui::Checkbox("Enable Skybox", &skyboxEnable);
+        static int selected_item = 1;
+
+        const char *items[] = {"Blue Sky", "Nebula", "MilkyWay"};
+
+        if (!skyboxEnable) {
+          ImGui::BeginDisabled();
+        }
+        if (ImGui::Combo("Skybox", &selected_item, items,
+                         IM_ARRAYSIZE(items))) {
+        }
+        if (!skyboxEnable) {
+          ImGui::EndDisabled();
+        }
+        ImGui::Unindent(8);
+      }
+
+      ImGui::End();
+    }
+
     mat->uniforms["time"] = glfwGetTime();
     rend.Render(zaWardu);
 
