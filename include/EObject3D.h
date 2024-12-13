@@ -6,7 +6,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
+template <typename T> using Ref = std::shared_ptr<T>;
 
+template <typename T, typename... Args>
+
+std::shared_ptr<T> createRef(Args &&...args) {
+  return std::make_shared<T>(std::forward<Args>(args)...);
+}
 class EObject3D : public std::enable_shared_from_this<EObject3D> {
 
 public:
@@ -15,6 +21,8 @@ public:
   glm::quat Rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
   glm::vec3 Scale = glm::vec3(1.0f);
   bool isObject3D = true;
+
+  std::string name;
 
   // TODO: quaternion rotation
 
@@ -25,7 +33,7 @@ public:
   EObject3D()
       : Position(0.0f), Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
         Scale(1.0f), worldModelMatrix(glm::mat4(1.0f)),
-        localModelMatrix(glm::mat4(1.0f)) {};
+        localModelMatrix(glm::mat4(1.0f)), ID(nextID++) {};
 
   void setRotationFromEuler(const glm::vec3 &);
   glm::vec3 getRotationAsEuler(void);
@@ -48,6 +56,7 @@ public:
   void setScale(float x, float y, float z);
 
   glm::vec3 getScale() const;
+  unsigned int getID() const { return ID; }
 
   void translate(const glm::vec3 &delta);
   void scale(const glm::vec3 &factor);
@@ -67,5 +76,7 @@ public:
 
 protected:
   std::vector<std::shared_ptr<EObject3D>> children;
+  inline static unsigned int nextID = 0;
+  unsigned int ID;
 };
 #endif

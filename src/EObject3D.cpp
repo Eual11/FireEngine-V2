@@ -45,7 +45,6 @@ void EObject3D::updateWorldMatrix() {
   if (auto p = this->parent.lock()) {
     // maybe this should be reversed
     worldModelMatrix = p->getWorldMatrix() * localModelMatrix;
-    /* prettyPrintMat4(getWorldMatrix()); */
 
   } else {
     worldModelMatrix = localModelMatrix;
