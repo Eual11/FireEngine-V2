@@ -22,8 +22,6 @@ public:
   glm::vec3 Scale = glm::vec3(1.0f);
   bool isObject3D = true;
 
-  std::string name;
-
   // TODO: quaternion rotation
 
   glm::vec3 worldUp = {0.0f, 1.0f, 0.0f};
@@ -33,7 +31,10 @@ public:
   EObject3D()
       : Position(0.0f), Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
         Scale(1.0f), worldModelMatrix(glm::mat4(1.0f)),
-        localModelMatrix(glm::mat4(1.0f)), ID(nextID++) {};
+        localModelMatrix(glm::mat4(1.0f)), ID(nextID++) {
+
+    name = "Object_" + std::to_string(ID);
+  };
 
   void setRotationFromEuler(const glm::vec3 &);
   glm::vec3 getRotationAsEuler(void);
@@ -73,10 +74,14 @@ public:
   void remove(const std::shared_ptr<EObject3D> &);
   void setModelMatrix(glm::mat4 transform);
   std::vector<std::shared_ptr<EObject3D>> getChildren();
+  bool hasChildren() const { return children.size() != 0; }
+  std::string getName() const { return name; }
+  void setName(std::string name) { this->name = name; }
 
 protected:
   std::vector<std::shared_ptr<EObject3D>> children;
   inline static unsigned int nextID = 0;
   unsigned int ID;
+  std::string name;
 };
 #endif

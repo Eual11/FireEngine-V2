@@ -33,7 +33,8 @@ struct EngineState {
 
   // a weak pointer to the world
   std::shared_ptr<EWorld> World;
-  std::weak_ptr<EObject3D> curSelected;
+  std::shared_ptr<EObject3D> curSelected;
+
   bool vsyncEnabled;
 };
 
@@ -43,4 +44,5 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state);
 void UpdateWorld(EWorld &world, EngineState &state);
 void RenderUI(EngineState &state);
 void StartUIFrame();
+void traverse(EngineState &state, std::shared_ptr<EObject3D> obj);
 void EndUIFrame();

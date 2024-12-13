@@ -52,10 +52,10 @@ int main() {
   /* astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f)); */
   /* astroid->setRotation(45, 10, 0); */
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
+  auto helm = loader.loadModel("../models/scene.gltf", mat);
   sun->setPosition(0, 0, 0);
   helm->setPosition(0, 0, 0);
-  sun->setScale(2, 2, 2);
+  helm->setScale(0.01, 0.01, 0.01);
   astroid->setPosition(0, 0, 0);
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -65,6 +65,7 @@ int main() {
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
 
   zaWardu->AddLight(pnt);
+  zaWardu->add(helm);
 
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
@@ -96,7 +97,7 @@ int main() {
 
   // passing world ptr
   state.World = zaWardu;
-
+  zaWardu->setName("zaWardu");
   auto it =
       std::find(state.worldstate.cubeMaps.begin(),
                 state.worldstate.cubeMaps.end(), zaWardu->getCurCubeMap());
@@ -126,4 +127,5 @@ int main() {
   printf("Good Bye\n");
 
   return 0;
+  ;
 }

@@ -3,6 +3,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/trigonometric.hpp>
 #include <iomanip>
+#include <memory>
 
 void EObject3D::setRotationFromEuler(const glm::vec3 &rot) {
   Rotation = glm::quat(glm::radians(rot));
@@ -10,7 +11,11 @@ void EObject3D::setRotationFromEuler(const glm::vec3 &rot) {
 }
 
 void EObject3D::traverse(std::function<void(std::shared_ptr<EObject3D>)> func) {
-  func(shared_from_this());
+  try {
+    func(shared_from_this());
+  } catch (std::bad_weak_ptr) {
+    std::cout << "bad ptr\n";
+  }
   for (auto &d : children) {
     d->traverse(func);
   }

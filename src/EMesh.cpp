@@ -18,12 +18,12 @@ EMesh::EMesh(std::shared_ptr<EBufferGeometry> geo,
 EMesh::~EMesh() {
 
   // this may cause alot of problems
-  /* if (geometry) { */
-  /*   geometry->dispose(); */
-  /* } */
-  /* glDeleteVertexArrays(1, &VAO); */
-  /* glDeleteBuffers(1, &VBO); */
-  /* glDeleteBuffers(1, &EBO); */
+  if (geometry) {
+    geometry->dispose();
+  }
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
 }
 
 void EMesh::render(Shader &shader) {

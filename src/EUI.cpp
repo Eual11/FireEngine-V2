@@ -16,7 +16,6 @@ void StartUIFrame() {
 void RenderUI(EngineState &state) {
   ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
   if (ImGui::Begin("Hierarchy"), ImGuiWindowFlags_NoCollapse) {
-    ImGui::SeparatorText("World");
 
     if (ImGui::Button("Add Object")) {
 
@@ -34,7 +33,8 @@ void RenderUI(EngineState &state) {
         auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
         cube->setPosition(0, 0, 0);
         state.World->add(cube);
-        std::cout << "Added to " << state.World->name << " !\n";
+
+        std::cout << "Added to " << state.World->getName() << " !\n";
       }
     }
     ImGui::SameLine();
@@ -44,8 +44,13 @@ void RenderUI(EngineState &state) {
     }
     ImGui::PopStyleColor();
 
-    ImGui::SeparatorText("Loaded Objects");
-    ImGui::Text("Damaged Helmet");
+    ImGui::SeparatorText("Objects");
+
+    if (ImGui::TreeNode("World")) {
+
+      traverse(state, std::static_pointer_cast<EObject3D>(state.World));
+      ImGui::TreePop();
+    }
     ImGui::End();
   }
   ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 300, 0),
@@ -231,4 +236,24 @@ void UpdateWorld(EWorld &world, EngineState &state) {
   }
 
   state.worldstate.skyboxReloaded = false;
+}
+void traverse(EngineState &state, std::shared_ptr<EObject3D> obj) {
+  if (!obj)
+    return;
+
+  if (obj->hasChildren()) {
+    // has children, change the rendering logic to
+    for (auto &d : obj->getChildren()) {
+      traverse(state, d);
+    }
+  } else {
+
+    if (ImGui::Selectable(obj->getName().c_str(), state.curSelected == obj)) {
+      std::cout << "Selected " << obj << std::endl;
+      state.curSelected = obj;
+    }
+    for (auto &d : obj->getChildren()) {
+      traverse(state, d);
+    }
+  }
 }
