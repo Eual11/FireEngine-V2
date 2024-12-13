@@ -19,6 +19,23 @@ void RenderUI(EngineState &state) {
     ImGui::SeparatorText("World");
 
     if (ImGui::Button("Add Object")) {
+
+      // for test let's just create a new cube lmao
+      if (state.World) {
+        UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+
+        auto tex = ETexture::load(
+            "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+        uniforms["tex"] = tex;
+        auto mat = std::make_shared<ShaderMaterial>(
+            "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+            uniforms);
+
+        auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
+        cube->setPosition(0, 0, 0);
+        state.World->add(cube);
+        std::cout << "Added to " << state.World->name << " !\n";
+      }
     }
     ImGui::SameLine();
 

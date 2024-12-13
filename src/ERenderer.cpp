@@ -78,7 +78,11 @@ void inline ERenderer::setClearColor(float r, float g, float b, float a) {
 void ERenderer::setDepthTestFunc(unsigned int func) { glDepthFunc(func); }
 
 void ERenderer::Render(std::shared_ptr<EWorld> &world) {
-
+  // binding the input buffer for the effects pipeline, i.e the input is the
+  // renderered world
+  // pipe the output of framebuffer to the window's framebuffer with
+  // post-processing (currently only forward rendering post post-processing)
+  //
   effectPipeline.getInputFramebuffer()->Bind();
   glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
   glClear(clearBit);
@@ -87,7 +91,9 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     RenderSkybox(world);
     glDepthFunc(GL_LESS);
   }
-  if (!shaders_compiled) {
+  if (!world->shouldRecompileMaterials()) {
+    // compiles shaders assosiated with the game world, currently compiles
+    // shaders for the skybox
     CompileWorldShader(world);
     try {
       CompileShaders(world);
@@ -95,8 +101,9 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
       printf("Bad A weak ptr\n");
       return;
     }
-    shaders_compiled = true;
-    PrintShaderMap(shader_map);
+
+    // materials have been recompiled
+    world->setRecompiled(true);
   }
   for (auto &child : world->getChildren()) {
 
@@ -138,19 +145,14 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
       FetchShaderAndRender(world, child);
   }
 
-  if (shader_map.find(std::static_pointer_cast<EObject3D>(fbQuad)) !=
-      shader_map.end()) {
-    Shader &shader = *shader_map[fbQuad].get();
-
-    if (window) {
-      // effects should be able to depth value to the depth buffer
-      glDepthMask(GL_FALSE);
-      DisableDepthTesting();
-      effectPipeline.applyEffects();
-      // enabling it back, it is etiquette to revert what you did
-      glDepthMask(GL_TRUE);
-      EnableDepthTesting();
-    }
+  if (window) {
+    // effects should be able to depth value to the depth buffer
+    glDepthMask(GL_FALSE);
+    DisableDepthTesting();
+    effectPipeline.applyEffects();
+    // enabling it back, it is etiquette to revert what you did
+    glDepthMask(GL_TRUE);
+    EnableDepthTesting();
   }
 }
 
@@ -175,10 +177,6 @@ void ERenderer::RenderSkybox(std::shared_ptr<EWorld> &world) {
     glDepthMask(GL_TRUE);
     glStencilMask(0xFF);
   }
-
-  // pipe the output of framebuffer to the window's framebuffer with
-  // post-processing (currently only forward rendering post post-processing)
-  //
 }
 void ERenderer::CompileShaders(std::shared_ptr<EObject3D> object) {
 

@@ -10,14 +10,6 @@
 #include "EWorld.h"
 #include "Window.h"
 
-template <typename T> using Ref = std::shared_ptr<T>;
-
-template <typename T, typename... Args>
-
-std::shared_ptr<T> createRef(Args &&...args) {
-  return std::make_shared<T>(std::forward<Args>(args)...);
-}
-
 enum class PolyMode { FILL, LINE, POINT };
 class ERenderer {
 public:
@@ -89,8 +81,6 @@ private:
   std::map<std::shared_ptr<EObject3D>, std::shared_ptr<Shader>> shader_map;
   // shaders compiled so far
   std::map<std::string, std::shared_ptr<Shader>> compiled_shaders;
-
-  bool shaders_compiled = false;
 
   void CompileShaders(std::shared_ptr<EObject3D>);
   void CalculateLighting(const std::shared_ptr<EWorld> &, Shader &);

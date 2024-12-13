@@ -1,5 +1,7 @@
 #include "../_dep/imgui-src/imgui.h"
 #include "Camera.h"
+#include "EBoxGeometry.h"
+#include "EObject3D.h"
 #include "ERenderer.h"
 #include "EWorld.h"
 #include "Window.h"
@@ -28,6 +30,10 @@ struct EngineState {
   CameraState cameraState;
   RendererState rendererState;
   WorldState worldstate;
+
+  // a weak pointer to the world
+  std::shared_ptr<EWorld> World;
+  std::weak_ptr<EObject3D> curSelected;
   bool vsyncEnabled;
 };
 

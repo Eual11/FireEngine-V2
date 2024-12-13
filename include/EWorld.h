@@ -15,6 +15,9 @@
 class EWorld : public EObject3D {
 public:
   bool hasSkyBox = false;
+  // returns true if all materils
+  bool shouldRecompileMaterials() const { return shaders_compiled; }
+  void setRecompiled(bool val) { shaders_compiled = val; }
   std::map<std::string, std::vector<std::string>> skyboxes{
       {"Nebula",
 
@@ -81,6 +84,9 @@ private:
   unsigned int skyboxVAO = 0;
   unsigned int skyboxVBO = 0;
   std::shared_ptr<Shader> skyboxShader = nullptr;
+  // this tells the compiler if the World needs shader re-compilation
+  // after modification
+  bool shaders_compiled = false;
   std::string curCubeMapName = "";
   // TODO: find replacement for this raw ptr
   Window *attachedWindow = nullptr;
@@ -119,6 +125,14 @@ public:
   unsigned int getSkyboxVAO() const { return skyboxVAO; }
   unsigned int getSkyboxCubeMap() const { return skyboxCubeMap; }
   std::vector<std::shared_ptr<ELight>> Lights;
+  void add(const std::shared_ptr<EObject3D> &obj) {
+    EObject3D::add(obj);
+    shaders_compiled = false;
+  }
+  void remove(const std::shared_ptr<EObject3D> &obj) {
+    EObject3D::remove(obj);
+    shaders_compiled = false;
+  }
   void setInstanceUBO(unsigned int ubo, unsigned int count) override {};
 };
 
