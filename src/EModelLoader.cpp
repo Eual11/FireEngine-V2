@@ -20,6 +20,8 @@ EModelLoader::loadModel(std::string path, std::shared_ptr<Material> material) {
   root_path = std::filesystem::absolute(p.parent_path()).string();
 
   try {
+    // naming model
+    model->setName(scene->mRootNode->mName.C_Str());
     model->add(ProcessNode(glm::mat4(1.0f), scene->mRootNode, scene));
   } catch (std::bad_weak_ptr &) {
     printf("BAD PTR\n!!!");
@@ -48,6 +50,8 @@ std::shared_ptr<EObject3D> EModelLoader::ProcessNode(glm::mat4 m, aiNode *node,
     if (currentNode) {
 
       auto nMesh = ProcessMesh(m, scene->mMeshes[node->mMeshes[i]], scene);
+      // naming mesh
+      nMesh->setName(scene->mMeshes[node->mMeshes[i]]->mName.C_Str());
       currentNode->add(nMesh);
     }
   }

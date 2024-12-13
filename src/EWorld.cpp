@@ -19,8 +19,6 @@ void EWorld::AddObject(std::shared_ptr<EModel> obj, Shader &shader) {
  *              4. Bottom (negative Y)
  *              5. Front (positive Z)
  *              6. Back (negative Z)
- *              Each file should be in a format supported by your image loading
- * library (e.g., JPG, PNG).
  *
  */
 unsigned int EWorld::loadCubeMaps(std::vector<std::string> faces) {

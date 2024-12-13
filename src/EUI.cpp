@@ -30,9 +30,16 @@ void RenderUI(EngineState &state) {
             "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
             uniforms);
 
-        auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
-        cube->setPosition(0, 0, 0);
-        state.World->add(cube);
+        auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
+                                     mat); // `cube` is a shared_ptr already
+        if (state.curSelected) {
+          printf("Adding to curSelected- %s : \n",
+                 state.curSelected->getName().c_str());
+          state.curSelected->add(cube);
+        } else {
+          printf("Adding to world: \n");
+          state.World->add(cube);
+        }
 
         std::cout << "Added to " << state.World->getName() << " !\n";
       }
@@ -41,22 +48,71 @@ void RenderUI(EngineState &state) {
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     if (ImGui::Button("Remove Object")) {
+
+      if (state.curSelected != state.World) {
+        state.World->remove(state.curSelected);
+
+        // TODO: this could be improved
+
+        state.curSelected = nullptr;
+      }
     }
     ImGui::PopStyleColor();
 
     ImGui::SeparatorText("Objects");
 
-    if (ImGui::TreeNode("World")) {
+    traverse(state, std::static_pointer_cast<EObject3D>(state.World));
 
-      traverse(state, std::static_pointer_cast<EObject3D>(state.World));
-      ImGui::TreePop();
-    }
     ImGui::End();
   }
   ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 300, 0),
                           ImGuiCond_Once);
   if (ImGui::Begin("Options")) {
+    if (state.curSelected && state.curSelected != state.World) {
 
+      if (state.curSelected && state.curSelected != state.World) {
+        if (ImGui::CollapsingHeader("Object")) {
+          ImGui::SeparatorText(state.curSelected->getName().c_str());
+
+          // Position Controls (translation)
+          ImGui::Text("Position");
+          glm::vec3 currentPos = state.curSelected->getPosition();
+          if (ImGui::SliderFloat3("Position", &currentPos[0], -100.0f,
+                                  100.0f)) {
+            // Update the position of the selected object
+            state.curSelected->setPosition(currentPos.x, currentPos.y,
+                                           currentPos.z);
+          }
+
+          // Rotation Controls (Euler angles - pitch, yaw, roll)
+          ImGui::Text("Rotation");
+          glm::vec3 currentRotation = state.curSelected->getRotation();
+          if (ImGui::SliderFloat3("Rotation (Degrees)", &currentRotation[0],
+                                  -180.0f, 180.0f)) {
+            // Update the rotation (convert degrees to radians if necessary)
+            state.curSelected->setRotation(currentRotation.x, currentRotation.y,
+                                           currentRotation.z);
+          }
+
+          // Scale Controls
+          ImGui::Text("Scale");
+          glm::vec3 currentScale = state.curSelected->getScale();
+          if (ImGui::SliderFloat3("Scale", &currentScale[0], 0.1f, 10.0f)) {
+            // Update the scale of the selected object
+            state.curSelected->setScale(currentScale.x, currentScale.y,
+                                        currentScale.z);
+          }
+
+          // Optionally, display the current position, rotation, and scale
+          ImGui::Text("Current Position: %.2f, %.2f, %.2f", currentPos.x,
+                      currentPos.y, currentPos.z);
+          ImGui::Text("Current Rotation: %.2f, %.2f, %.2f", currentRotation.x,
+                      currentRotation.y, currentRotation.z);
+          ImGui::Text("Current Scale: %.2f, %.2f, %.2f", currentScale.x,
+                      currentScale.y, currentScale.z);
+        }
+      }
+    }
     if (ImGui::CollapsingHeader("Application")) {
       ImGui::Indent(8);
       ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -241,19 +297,33 @@ void traverse(EngineState &state, std::shared_ptr<EObject3D> obj) {
   if (!obj)
     return;
 
+  ImGui::PushID(obj.get());
   if (obj->hasChildren()) {
     // has children, change the rendering logic to
-    for (auto &d : obj->getChildren()) {
-      traverse(state, d);
+
+    ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_OpenOnArrow;
+
+    if (state.curSelected == obj) {
+      flag |= ImGuiTreeNodeFlags_Selected;
     }
+    if (ImGui::TreeNodeEx(obj->getName().c_str(), flag)) {
+
+      if (ImGui::IsItemClicked()) {
+        state.curSelected = obj;
+        std::cout << "Selected " << obj->getName() << std::endl;
+      }
+      for (auto &d : obj->getChildren()) {
+        traverse(state, d);
+      }
+      ImGui::TreePop();
+    }
+
   } else {
 
     if (ImGui::Selectable(obj->getName().c_str(), state.curSelected == obj)) {
-      std::cout << "Selected " << obj << std::endl;
       state.curSelected = obj;
-    }
-    for (auto &d : obj->getChildren()) {
-      traverse(state, d);
+      std::cout << "Selected " << obj->getName() << std::endl;
     }
   }
+  ImGui::PopID();
 }

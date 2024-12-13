@@ -79,11 +79,12 @@ void EObject3D::add(const std::shared_ptr<EObject3D> &child) {
 
     try {
       child->parent = shared_from_this();
+      children.push_back(child);
+      child->updateWorldMatrix();
+
     } catch (const std::bad_weak_ptr &) {
-      printf("Bad A weak ptr\n");
+      printf("failed to add: Bad Weak ptr\n");
     }
-    children.push_back(child);
-    child->updateWorldMatrix();
   }
 }
 void EObject3D::remove(const std::shared_ptr<EObject3D> &child) {
