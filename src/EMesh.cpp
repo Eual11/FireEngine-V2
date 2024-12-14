@@ -28,6 +28,7 @@ EMesh::~EMesh() {
 
 void EMesh::render(Shader &shader) {
 
+  // Good for now, but what if each mesh or renderable object has its own shader
   if (geometry && material) {
     geometry->bind();
     shader.setMat4("uModel", getWorldMatrix());
@@ -49,5 +50,8 @@ void EMesh::render(Shader &shader) {
         glDrawArraysInstanced(GL_TRIANGLES, 0, 32, instaceCount);
     }
     geometry->unbind();
+  }
+  for (auto &d : children) {
+    d->render(shader);
   }
 }

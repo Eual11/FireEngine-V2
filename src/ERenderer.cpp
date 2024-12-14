@@ -94,7 +94,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
   if (!world->shouldRecompileMaterials()) {
     // compiles shaders assosiated with the game world, currently compiles
     // shaders for the skybox
-    CompileWorldShader(world);
+    /* CompileWorldShader(world); */
     try {
       CompileShaders(world);
     } catch (std::bad_weak_ptr) {
@@ -182,13 +182,19 @@ void ERenderer::CompileShaders(std::shared_ptr<EObject3D> object) {
 
   if (!object)
     return;
+
+  if (object->getType() == EObject3D::Type::Mesh) {
+    CompileMeshShader(object);
+  } // if it's a mesh set up materials and everything
+  else if (object->getType() == EObject3D::Type::Model) {
+    CompileModelShader(object);
+  } else if (object->getType() == EObject3D::Type::World) {
+    auto world = std::dynamic_pointer_cast<EWorld>(object);
+    CompileWorldShader(world);
+  }
+
   for (auto &child : object->getChildren()) {
-    if (child->getType() == EObject3D::Type::Mesh) {
-      CompileMeshShader(child);
-    } // if it's a mesh set up materials and everything
-    else if (child->getType() == EObject3D::Type::Model) {
-      CompileModelShader(child);
-    }
+
     CompileShaders(child); // then recursively go through the childs
   }
 }
@@ -237,6 +243,7 @@ void ERenderer::CompileMeshShader(std::shared_ptr<EObject3D> &object) {
       }
     }
   }
+  // recursively compile mesh shaders for children
 }
 void ERenderer::CompileWorldShader(std::shared_ptr<EWorld> &world) {
 

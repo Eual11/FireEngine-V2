@@ -62,15 +62,8 @@ int main() {
 
   pnt->setPosition(0, 10, 0);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
-  auto tex = ETexture::load(
-      "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
-  uniforms["tex"] = tex;
-  auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
-                               mat); // `cube` is a shared_ptr already
-
   /* zaWardu->AddLight(pnt); */
-  /* zaWardu->add(helm); */
-  zaWardu->add(cube);
+  zaWardu->add(helm);
 
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
