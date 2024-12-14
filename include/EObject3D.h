@@ -10,7 +10,7 @@ template <typename T> using Ref = std::shared_ptr<T>;
 
 template <typename T, typename... Args>
 
-std::shared_ptr<T> createRef(Args &&...args) {
+inline std::shared_ptr<T> createRef(Args &&...args) {
   return std::make_shared<T>(std::forward<Args>(args)...);
 }
 class EObject3D : public std::enable_shared_from_this<EObject3D> {

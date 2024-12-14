@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-class EMesh : public EObject3D, std::enable_shared_from_this<EMesh> {
+class EMesh : public EObject3D {
 
 public:
   EMesh(std::vector<EVertex>, std::vector<ETexture>, std::vector<unsigned int>);

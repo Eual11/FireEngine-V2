@@ -35,10 +35,19 @@ void RenderUI(EngineState &state) {
         if (state.curSelected) {
           printf("Adding to curSelected- %s : \n",
                  state.curSelected->getName().c_str());
+
+          std::cout << "Before adding, cube use count: " << cube.use_count()
+                    << std::endl;
           state.curSelected->add(cube);
+          std::cout << "After adding, cube use count: " << cube.use_count()
+                    << std::endl;
         } else {
           printf("Adding to world: \n");
+          std::cout << "Before adding, cube use count: " << cube.use_count()
+                    << std::endl;
           state.World->add(cube);
+          std::cout << "After adding, cube use count: " << cube.use_count()
+                    << std::endl;
         }
 
         std::cout << "Added to " << state.World->getName() << " !\n";

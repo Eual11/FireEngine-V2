@@ -128,10 +128,7 @@ public:
   unsigned int getSkyboxVAO() const { return skyboxVAO; }
   unsigned int getSkyboxCubeMap() const { return skyboxCubeMap; }
   std::vector<std::shared_ptr<ELight>> Lights;
-  void add(const std::shared_ptr<EObject3D> &obj) {
-    EObject3D::add(obj);
-    shaders_compiled = false;
-  }
+
   void remove(const std::shared_ptr<EObject3D> &obj) {
     EObject3D::remove(obj);
     shaders_compiled = false;
