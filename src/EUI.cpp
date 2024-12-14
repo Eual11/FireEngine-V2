@@ -42,6 +42,7 @@ void RenderUI(EngineState &state) {
         }
 
         std::cout << "Added to " << state.World->getName() << " !\n";
+        state.World->setRecompiled(false);
       }
     }
     ImGui::SameLine();

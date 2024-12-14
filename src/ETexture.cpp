@@ -16,7 +16,9 @@ void ETexture::setFilter(ETexture_Filter min_filter,
 
 std::shared_ptr<ETexture> ETexture::load(std::string path,
                                          std::string root_path) {
-  std::unordered_map<std::string, std::shared_ptr<ETexture>> texture_cache;
+  // static texture cache
+  static std::unordered_map<std::string, std::shared_ptr<ETexture>>
+      texture_cache;
   std::string filename = path;
 
   if (root_path != "") {
@@ -35,6 +37,7 @@ std::shared_ptr<ETexture> ETexture::load(std::string path,
     filename = "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg";
   }
   if (texture_cache.find(filename) != texture_cache.end()) {
+    printf("Found from cache\n");
     return texture_cache[filename];
   }
 
@@ -85,4 +88,10 @@ std::shared_ptr<ETexture> ETexture::load(std::string path,
   stbi_set_flip_vertically_on_load(false);
   texture_cache[filename] = new_tex;
   return new_tex;
+}
+void ETexture::destroy() {
+  if (ID) {
+    glDeleteTextures(1, &ID);
+    ID = 0;
+  }
 }

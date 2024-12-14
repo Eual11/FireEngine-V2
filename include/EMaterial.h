@@ -33,7 +33,7 @@ public:
   MaterialType type;
 
   virtual void Apply(Shader &shader) = 0;
-  virtual ~Material() = default;
+  virtual ~Material() { textures.clear(); };
 };
 
 class BasicMaterial : public Material {

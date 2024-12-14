@@ -93,6 +93,11 @@ void EObject3D::remove(const std::shared_ptr<EObject3D> &child) {
   if (it != children.end()) {
     (*it)->parent.reset();
     children.erase(it);
+
+    return;
+  }
+  for (auto &currentChild : children) {
+    currentChild->remove(child);
   }
 }
 void EObject3D::setPosition(float x, float y, float z) {

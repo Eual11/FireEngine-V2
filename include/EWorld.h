@@ -17,6 +17,9 @@ public:
   bool hasSkyBox = false;
   // returns true if all materils
   bool shouldRecompileMaterials() const { return shaders_compiled; }
+  // should be called after adding or removing from the scene
+  //  after renderer compiles all shaders assosated with the scene it sets it to
+  //  true
   void setRecompiled(bool val) { shaders_compiled = val; }
   std::map<std::string, std::vector<std::string>> skyboxes{
       {"Nebula",

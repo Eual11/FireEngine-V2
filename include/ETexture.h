@@ -39,5 +39,6 @@ struct ETexture {
   std::string path = "";
   void setWraping(ETexture_Wraping s, ETexture_Wraping t);
   void setFilter(ETexture_Filter min_filter, ETexture_Filter mag_filter);
+  void destroy();
 };
 ETexture TextureFromFile(std::string path, std::string root_path = "");
