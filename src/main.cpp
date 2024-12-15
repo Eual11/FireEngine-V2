@@ -49,8 +49,6 @@ int main() {
 
   EModelLoader loader;
   auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
-  /* astroid->scale(glm::vec3(2.0f, 1.0f, 3.0f)); */
-  /* astroid->setRotation(45, 10, 0); */
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
   auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
   sun->setPosition(0, 0, 0);
@@ -62,7 +60,7 @@ int main() {
 
   pnt->setPosition(0, 10, 0);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
-  /* zaWardu->AddLight(pnt); */
+  zaWardu->AddLight(pnt);
   zaWardu->add(helm);
 
   zaWardu->loadCubeMaps("Nebula");
