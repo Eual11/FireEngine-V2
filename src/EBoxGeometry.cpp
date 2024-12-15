@@ -70,8 +70,8 @@ EPlaneGeometry::EPlaneGeometry(float width, float height) {
   this->width = width;
   this->height = height;
 
-  float w = width / 2;
-  float h = height / 2;
+  float w = width;
+  float h = height;
 
   vertices = {
 

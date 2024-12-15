@@ -96,6 +96,8 @@ void Camera::ProcessScroll(float yOffset) {
     Fov = 1.0;
 }
 void Camera::UpdateUniforms(Shader &shader) {
+  shader.setFloat("uZFar", zFar);
+  shader.setFloat("uZNear", zNear);
   shader.setVec3("uViewPos", Position);
   shader.setMat4("uView", getLookAt());
   shader.setMat4("uProjection", getProjection());

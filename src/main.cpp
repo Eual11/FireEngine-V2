@@ -25,7 +25,7 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-glm::vec3 camPos(0.0f, 0.0f, 10.0f);
+glm::vec3 camPos(0.0f, 5.0f, 10.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 

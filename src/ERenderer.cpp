@@ -106,13 +106,6 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     world->setRecompiled(true);
   }
 
-  if (grid) {
-    if (shader_map.find(fGrid) != shader_map.end()) {
-      Shader &shader = *shader_map[fGrid].get();
-      window->UpdateUniforms(shader);
-      fGrid->render(shader);
-    }
-  }
   for (auto &child : world->getChildren()) {
 
     if (shader_map.find(child) != shader_map.end()) {
@@ -151,6 +144,14 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
       }
     } else
       FetchShaderAndRender(world, child);
+  }
+
+  if (grid) {
+    if (shader_map.find(fGrid) != shader_map.end()) {
+      Shader &shader = *shader_map[fGrid].get();
+      window->UpdateUniforms(shader);
+      fGrid->render(shader);
+    }
   }
 
   if (window) {
