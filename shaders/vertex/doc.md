@@ -23,6 +23,8 @@ example: `uDeltaTime`
 4. `uViewPos`: Camera's position in world space
 5. `uDeltaTime`: Time elapsed in seconds since the last frame used for frame independent physics
 6. `uTime`: global time, time elapsed in seconds since the start of the program
+7. `uZFar`: Far cliping plane of the camera
+7. `uZNear`: Near cliping plane of the camera
 
 ### Output
 1. `fragPosition`: `vec3` vertex position in world space 
