@@ -33,11 +33,11 @@ ERenderer::ERenderer(Window *window) {
 
   auto geo = std::make_shared<EQuadGeometry>(1.0f, 1.0f);
 
-  auto mat = std::make_shared<ShaderMaterial>(
-      "../shaders/vertex/quad_verts.glsl", "../shaders/fragment/fb.glsl");
+  auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/grid.glsl",
+                                              "../shaders/fragment/grid.glsl");
 
-  fbQuad = std::make_shared<EMesh>(geo, mat);
-  auto qd = std::static_pointer_cast<EObject3D>(fbQuad);
+  fGrid = std::make_shared<EMesh>(geo, mat);
+  auto qd = std::static_pointer_cast<EObject3D>(fGrid);
   CompileMeshShader(qd);
   effectPipeline = EPostProcessingPipeline(window);
   effectPipeline.Init();
@@ -104,6 +104,14 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
     // materials have been recompiled
     world->setRecompiled(true);
+  }
+
+  if (grid) {
+    if (shader_map.find(fGrid) != shader_map.end()) {
+      Shader &shader = *shader_map[fGrid].get();
+      window->UpdateUniforms(shader);
+      fGrid->render(shader);
+    }
   }
   for (auto &child : world->getChildren()) {
 

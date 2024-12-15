@@ -20,6 +20,17 @@ public:
   void EnableStencilTesting();
   bool getDepthTesting() const { return depthTestingEnabled; }
   bool getStencilTesting() const { return stencilTestingEnabled; }
+  bool girdEnabled() const { return grid; }
+  inline void EnableGrid() {
+    if (grid)
+      return;
+    grid = true;
+  }
+  inline void DisableGrid() {
+    if (!grid)
+      return;
+    grid = false;
+  }
   // HACK: outlines should be a property of mesh/model not the renderer itself
   // but we will leave this for now
   void EnableOutlines() {
@@ -64,6 +75,7 @@ private:
   bool depthTestingEnabled = false;
   bool stencilTestingEnabled = false;
   bool outlinesEnabled = false;
+  bool grid = true;
   glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
   unsigned int clearBit = GL_COLOR_BUFFER_BIT;
   PolyMode polymode = PolyMode::FILL;
@@ -72,7 +84,7 @@ private:
   float outlineSize = 1.2;
   /* std::unique_ptr<EFrameBuffer> framebuffer; */
 
-  std::shared_ptr<EMesh> fbQuad;
+  std::shared_ptr<EMesh> fGrid;
 
   EPostProcessingPipeline effectPipeline;
 

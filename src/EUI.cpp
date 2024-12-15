@@ -120,6 +120,7 @@ void RenderUI(EngineState &state) {
       static bool backfaceCulling = false;
       static bool blending = true;
 
+      ImGui::Checkbox("Grid", &state.rendererState.enableGrid);
       ImGui::Checkbox("Depth Testing", &state.rendererState.enableDepthTesting);
       ImGui::Checkbox("Stencil Testing",
                       &state.rendererState.enableStencilTesting);
@@ -267,6 +268,11 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state) {
     renderer.EnableStencilTesting();
   } else
     renderer.DisableStencilTesting();
+
+  if (state.rendererState.enableGrid) {
+    renderer.EnableGrid();
+  } else
+    renderer.DisableGrid();
 
   renderer.setPolyMode(state.rendererState.polymode);
 }

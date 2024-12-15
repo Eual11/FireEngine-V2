@@ -20,6 +20,7 @@ struct RendererState {
 
   bool enableDepthTesting;
   bool enableStencilTesting;
+  bool enableGrid;
   PolyMode polymode;
 };
 struct WorldState {

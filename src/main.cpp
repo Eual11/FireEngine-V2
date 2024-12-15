@@ -75,6 +75,8 @@ int main() {
   state.rendererState.enableDepthTesting = rend.getDepthTesting();
   state.rendererState.enableStencilTesting = rend.getStencilTesting();
   state.rendererState.polymode = rend.getPolyMode();
+  state.rendererState.enableGrid = rend.girdEnabled();
+
   // Camera States
   state.cameraState.Poition = camera.getPosition();
   state.cameraState.Orientation = camera.getOrientation();
