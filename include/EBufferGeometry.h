@@ -2,6 +2,7 @@
 #define _EOBJECTGEOMETRY_H
 
 #include <glad/glad.h>
+#include <glm/ext/scalar_constants.hpp>
 #include <glm/glm.hpp>
 #include <string>
 #include <unordered_map>

@@ -2,7 +2,7 @@
 #include <memory>
 
 // NOTE: this hierarchy structure of Model is very bad and wastes alot of
-// memeory
+// memory
 // TODO: GET A BETTER STRUCTURE
 void EModel::render(Shader &shader) {
   if (material) {

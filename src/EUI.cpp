@@ -1,4 +1,10 @@
 #include "../include/EUI.h"
+std::vector<ObjectLoaderEntry> entries{
+    {"Cube", AddCube},
+    {"Sphere", AddSphere},
+    {"Torus", AddTorus},
+
+};
 void UpdateEngine(Window &window, EngineState &state) {
 
   if (state.vsyncEnabled) {
@@ -15,46 +21,35 @@ void StartUIFrame() {
 }
 void RenderUI(EngineState &state) {
   ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-  if (ImGui::Begin("Hierarchy"), ImGuiWindowFlags_NoCollapse) {
+  if (ImGui::Begin("Hierarchy", nullptr,
+                   ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar)) {
 
-    if (ImGui::Button("Add Object")) {
+    if (ImGui::BeginMenuBar()) {
+      if (ImGui::BeginMenu("Add")) {
 
-      // for test let's just create a new cube lmao
-      if (state.World) {
-        UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
-
-        auto tex = ETexture::load(
-            "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
-        uniforms["tex"] = tex;
-        auto mat = std::make_shared<ShaderMaterial>(
-            "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
-            uniforms);
-
-        auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
-                                     mat); // `cube` is a shared_ptr already
-        if (state.curSelected) {
-          state.curSelected->add(cube);
-        } else {
-          state.World->add(cube);
+        for (auto &entry : entries) {
+          if (ImGui::MenuItem(entry.entry_name.c_str())) {
+            entry.action(state);
+          }
         }
-
-        state.World->setRecompiled(false);
+        ImGui::EndMenu();
       }
-    }
-    ImGui::SameLine();
+      ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      if (ImGui::Button("Remove Object")) {
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-    if (ImGui::Button("Remove Object")) {
+        if (state.curSelected != state.World) {
+          state.World->remove(state.curSelected);
 
-      if (state.curSelected != state.World) {
-        state.World->remove(state.curSelected);
+          // TODO: this could be improved
 
-        // TODO: this could be improved
-
-        state.curSelected = nullptr;
+          state.curSelected = nullptr;
+        }
       }
+
+      ImGui::PopStyleColor();
+
+      ImGui::EndMenuBar();
     }
-    ImGui::PopStyleColor();
 
     ImGui::SeparatorText("Objects");
 
@@ -324,3 +319,51 @@ void traverse(EngineState &state, std::shared_ptr<EObject3D> obj) {
   }
   ImGui::PopID();
 }
+
+void AddCube(EngineState &state) {
+  if (state.World) {
+    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+
+    auto tex = ETexture::load(
+        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    uniforms["tex"] = tex;
+    auto mat = std::make_shared<ShaderMaterial>(
+        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+        uniforms);
+
+    auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
+                                 mat); // `cube` is a shared_ptr already
+    if (state.curSelected) {
+      state.curSelected->add(cube);
+    } else {
+      state.World->add(cube);
+    }
+
+    state.World->setRecompiled(false);
+  }
+
+  return;
+}
+void AddSphere(EngineState &state) {
+  if (state.World) {
+    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+
+    auto tex = ETexture::load(
+        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    uniforms["tex"] = tex;
+    auto mat = std::make_shared<ShaderMaterial>(
+        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+        uniforms);
+
+    auto sphere =
+        createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 5, 5, mat));
+    if (state.curSelected) {
+      state.curSelected->add(sphere);
+    } else {
+      state.World->add(sphere);
+    }
+
+    state.World->setRecompiled(false);
+  }
+}
+void AddTorus(EngineState &state) { return; }

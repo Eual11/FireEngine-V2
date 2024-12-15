@@ -4,6 +4,7 @@
 #include "EModelLoader.h"
 #include "EObject3D.h"
 #include "ERenderer.h"
+#include "EUVSphereGeometry.h"
 #include "EWorld.h"
 #include "Window.h"
 
@@ -40,6 +41,11 @@ struct EngineState {
   bool vsyncEnabled;
 };
 
+struct ObjectLoaderEntry {
+  std::string entry_name;
+  std::function<void(EngineState &state)> action;
+};
+
 void UpdateEngine(Window &window, EngineState &state);
 void UpdateCamera(Camera &camera, EngineState &state);
 void UpdateRenderer(ERenderer &renderer, EngineState &state);
@@ -48,3 +54,7 @@ void RenderUI(EngineState &state);
 void StartUIFrame();
 void traverse(EngineState &state, std::shared_ptr<EObject3D> obj);
 void EndUIFrame();
+
+void AddCube(EngineState &state);
+void AddSphere(EngineState &state);
+void AddTorus(EngineState &state);
