@@ -56,5 +56,6 @@ void traverse(EngineState &state, std::shared_ptr<EObject3D> obj);
 void EndUIFrame();
 
 void AddCube(EngineState &state);
+void AddPlane(EngineState &state);
 void AddSphere(EngineState &state);
 void AddTorus(EngineState &state);

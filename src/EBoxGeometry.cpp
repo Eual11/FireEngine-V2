@@ -1,6 +1,9 @@
 #include "../include/EBoxGeometry.h"
 
 EBoxGeometry::EBoxGeometry(float width, float height, float depth) {
+
+  this->width = width;
+  this->height = height;
   float w = width / 2, h = height / 2, d = depth / 2;
   vertices = {
       // Front face
@@ -57,6 +60,29 @@ EBoxGeometry::EBoxGeometry(float width, float height, float depth) {
 
              // Bottom face
              20, 21, 22, 22, 23, 20};
+
+  glGenVertexArrays(1, &VAO);
+  setupGeometry();
+}
+
+EPlaneGeometry::EPlaneGeometry(float width, float height) {
+
+  this->width = width;
+  this->height = height;
+
+  float w = width / 2;
+  float h = height / 2;
+
+  vertices = {
+
+      {{-w, -h, 0}, {0, 0, 1}, {0, 0}},
+      {{w, -h, 0}, {0, 0, 1}, {1, 0}},
+      {{w, h, 0}, {0, 0, 1}, {1, 1}},
+      {{-w, h, 0}, {0, 0, 1}, {0, 1}}
+
+  };
+
+  indices = {0, 1, 2, 2, 3, 0};
 
   glGenVertexArrays(1, &VAO);
   setupGeometry();

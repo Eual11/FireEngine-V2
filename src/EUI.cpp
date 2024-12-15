@@ -1,6 +1,7 @@
 #include "../include/EUI.h"
 std::vector<ObjectLoaderEntry> entries{
     {"Cube", AddCube},
+    {"Plane", AddPlane},
     {"Sphere", AddSphere},
     {"Torus", AddTorus},
 
@@ -356,11 +357,33 @@ void AddSphere(EngineState &state) {
         uniforms);
 
     auto sphere =
-        createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 5, 5, mat));
+        createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 30, 30), mat);
     if (state.curSelected) {
       state.curSelected->add(sphere);
     } else {
       state.World->add(sphere);
+    }
+
+    state.World->setRecompiled(false);
+  }
+}
+void AddPlane(EngineState &state) {
+
+  if (state.World) {
+    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+
+    auto tex = ETexture::load(
+        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    uniforms["tex"] = tex;
+    auto mat = std::make_shared<ShaderMaterial>(
+        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+        uniforms);
+
+    auto plane = createRef<EMesh>(createRef<EPlaneGeometry>(), mat);
+    if (state.curSelected) {
+      state.curSelected->add(plane);
+    } else {
+      state.World->add(plane);
     }
 
     state.World->setRecompiled(false);
