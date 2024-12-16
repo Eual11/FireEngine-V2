@@ -7,6 +7,7 @@ EUVSphereGeometry::EUVSphereGeometry(float radius, unsigned int stacks,
   this->sectors = sectors;
   this->stacks = stacks;
   this->radius = radius;
+  this->name = "UVSphere";
   float inver_rad = 1.0f / radius;
   for (unsigned int i = 0; i < stacks; i++) {
 

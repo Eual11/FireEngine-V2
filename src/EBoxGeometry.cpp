@@ -4,6 +4,7 @@ EBoxGeometry::EBoxGeometry(float width, float height, float depth) {
 
   this->width = width;
   this->height = height;
+  this->name = "Cube";
   float w = width / 2, h = height / 2, d = depth / 2;
   vertices = {
       // Front face
@@ -72,6 +73,7 @@ EPlaneGeometry::EPlaneGeometry(float width, float height) {
 
   float w = width;
   float h = height;
+  this->name = "Plane";
 
   vertices = {
 

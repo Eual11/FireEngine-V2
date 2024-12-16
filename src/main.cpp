@@ -50,7 +50,7 @@ int main() {
   EModelLoader loader;
   auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", mat);
+  auto helm = loader.loadModel("../models/scene.gltf", mat);
   sun->setPosition(0, 0, 0);
   helm->setPosition(0, 0, 0);
   astroid->setPosition(0, 0, 0);

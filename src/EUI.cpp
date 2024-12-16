@@ -64,7 +64,11 @@ void RenderUI(EngineState &state) {
     if (state.curSelected && state.curSelected != state.World) {
 
       if (state.curSelected && state.curSelected != state.World) {
-        if (ImGui::CollapsingHeader("Object")) {
+
+        std::string obj_name = state.curSelected->getName();
+        if (obj_name.length() >= 20)
+          obj_name = obj_name.substr(0, 15) + "...";
+        if (ImGui::CollapsingHeader((obj_name + " Properties").c_str())) {
           ImGui::SeparatorText(state.curSelected->getName().c_str());
 
           // Position Controls (translation)

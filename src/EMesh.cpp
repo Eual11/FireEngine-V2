@@ -1,6 +1,7 @@
 #include "../include/EMesh.h"
 EMesh::EMesh(std::vector<EVertex> verts, std::vector<ETexture> texs,
-             std::vector<unsigned int> indx) {
+             std::vector<unsigned int> indx)
+    : EObject3D() {
 
   this->geometry =
       std::make_shared<EBufferGeometry>(EBufferGeometry(verts, indx));
@@ -8,12 +9,14 @@ EMesh::EMesh(std::vector<EVertex> verts, std::vector<ETexture> texs,
   this->textures = texs;
 }
 EMesh::EMesh(std::shared_ptr<EBufferGeometry> geo,
-             std::shared_ptr<Material> mat) {
+             std::shared_ptr<Material> mat)
+    : EObject3D() {
   this->geometry = geo;
   if (!mat) {
     this->material = std::make_shared<PhongMaterial>(PhongMaterial());
   } else
     this->material = mat;
+  this->setName(geometry->name + "_" + std::to_string(ID));
 }
 EMesh::~EMesh() {
 

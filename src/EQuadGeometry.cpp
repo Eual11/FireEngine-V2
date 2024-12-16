@@ -8,6 +8,7 @@ EQuadGeometry::EQuadGeometry(float w, float h) {
       {{1.0f, 1.0f, 0.0f}, {0, 0, 1}, {1, 1}},   // top-right
       {{-1.0f, 1.0f, 0.0f}, {0, 0, 1}, {0, 1}}   // top-left
   };
+  this->name = "Quad";
 
   indices = {
       0, 1, 2, // first triangle

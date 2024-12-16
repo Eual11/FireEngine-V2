@@ -24,6 +24,8 @@ struct VertexAttrib {
 class EBufferGeometry {
 
 public:
+  // used when creating meshes from geometry to name them
+  std::string name;
   EBufferGeometry(std::vector<EVertex>, std::vector<unsigned int>);
   EBufferGeometry();
 
