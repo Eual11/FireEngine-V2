@@ -25,8 +25,10 @@ BasicMaterial::BasicMaterial(glm::vec3 ambient_color, glm::vec3 diffuse_color,
 void BasicMaterial::Apply(Shader &shader) {
   unsigned int numDiffuse = 1;
   unsigned int numSpecular = 1;
+  unsigned int numNormal = 1;
   bool diffuseBound = false;
   bool specularBound = false;
+  bool normalBound = false;
 
   shader.Use();
 
@@ -46,10 +48,16 @@ void BasicMaterial::Apply(Shader &shader) {
       shader.setInt("material." + tex_name, i);
       specularBound = true;
       glBindTexture(GL_TEXTURE_2D, tex.ID);
+    } else if (tex.type == "texture_normal") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numNormal++);
+      shader.setInt("material." + tex_name, i);
+      normalBound = true;
     }
   }
   shader.setBool("material.diffuse_bound", diffuseBound);
   shader.setBool("material.specular_bound", specularBound);
+  shader.setBool("material.normal_bound", normalBound);
 
   glActiveTexture(GL_TEXTURE0);
 }
@@ -57,8 +65,12 @@ void BasicMaterial::Apply(Shader &shader) {
 void PhongMaterial::Apply(Shader &shader) {
   unsigned int numDiffuse = 1;
   unsigned int numSpecular = 1;
+  unsigned int numNormal = 1;
+
+  // flags to see if a specfic texture type is bound or not
   bool diffuseBound = false;
   bool specularBound = false;
+  bool normalBound = false;
 
   shader.Use();
 
@@ -80,10 +92,16 @@ void PhongMaterial::Apply(Shader &shader) {
       shader.setInt("material." + tex_name, i);
       specularBound = true;
       glBindTexture(GL_TEXTURE_2D, tex.ID);
+    } else if (tex.type == "texture_normal") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numNormal++);
+      shader.setInt("material." + tex_name, i);
+      normalBound = true;
     }
   }
   shader.setBool("material.diffuse_bound", diffuseBound);
   shader.setBool("material.specular_bound", specularBound);
+  shader.setBool("material.normal_bound", normalBound);
 
   glActiveTexture(GL_TEXTURE0);
 }
