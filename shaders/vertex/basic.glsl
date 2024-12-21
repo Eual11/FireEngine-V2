@@ -2,7 +2,8 @@
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTexCoord;
-layout(location = 3) in mat4 instanceMatrix;
+layout(location = 3) in vec3 inTangent;
+layout(location = 4) in mat4 instanceMatrix;
 uniform mat4 uModel;
 uniform mat4 uView;
 
@@ -14,6 +15,7 @@ uniform float radius;
 out vec4 fragPosition;
 out vec3 fragNormal;
 out vec2 fragTexCoord;
+out mat3 TBN;
 
 void main()
 {
@@ -33,6 +35,15 @@ void main()
         gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0f);
     }
 
+    //testing tangentSpace
+
+    vec3 biTangent = normalize(cross(inNormal, inTangent));
+    vec3 T = normalize(vec3(uModel * vec4(inTangent, 0.0f)));
+    vec3 B = normalize(vec3(uModel * vec4(biTangent, 0.0f)));
+    vec3 N = normalize(vec3(uModel * vec4(inNormal, 0.0f)));
+
+    TBN = mat3(T, B, N);
+    //end of tangent space test
     fragPosition = ((uModel * vec4(inPosition, 1.0f)));
     fragNormal = normalize(mat3(transpose(inverse(uModel))) * inNormal);
 

@@ -14,6 +14,7 @@ example: `uDeltaTime`
 1. `inPosition`: `vec3` - Vertex position in object space
 2. `inNormal`: `vec3`- Normal associated with the vertex
 3. `inTexCoord`: `vec2` Texture Coordinate
+4. `inTangent`: `vec3` Vertex Tangent Space basis
 
 ### Uniform
 

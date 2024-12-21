@@ -27,14 +27,18 @@ struct Material
     vec3 specular_color;
     sampler2D texture_diffuse1;
     sampler2D texture_specular1;
+    sampler2D texture_normal1;
     bool diffuse_bound;
     bool specular_bound;
+    bool normal_bound;
     float shininess;
 };
 
 in vec4 fragPosition;
 in vec3 fragNormal;
 in vec2 fragTexCoord;
+in mat3 TBN;
+uniform bool enableNormalMapping;
 
 uniform Light dirLights[MAX_LIGHTS_COUNT];
 uniform Light pointLights[MAX_LIGHTS_COUNT];
@@ -59,33 +63,42 @@ void main()
     vec3 ambient = ambientIntensity * ambientLight * vec3(texture(material.texture_diffuse1, fragTexCoord));
     vec3 viewDir = normalize(uViewPos - vec3(fragPosition));
 
+    vec3 normal;
+    normal = fragNormal;
+    if (material.normal_bound && enableNormalMapping)
+    {
+        normal = texture(material.texture_normal1, fragTexCoord).rgb;
+        normal = normalize(TBN * (normal * 2.0f - 1.0f));
+    }
+
     //calculating the cumulative directional lights
 
     for (int i = 0; i < MAX_LIGHTS_COUNT; i++)
     {
         if (dirLights[i].light_active)
         {
-            result += calculateDirectionalLight(dirLights[i], fragNormal, viewDir);
+            result += calculateDirectionalLight(dirLights[i], normal, viewDir);
         }
     }
     for (int i = 0; i < MAX_LIGHTS_COUNT; i++)
     {
         if (pointLights[i].light_active)
         {
-            result += calculatePointLight(pointLights[i], fragNormal, viewDir);
+            result += calculatePointLight(pointLights[i], normal, viewDir);
         }
     }
     for (int i = 0; i < MAX_LIGHTS_COUNT; i++)
     {
         if (spotLights[i].light_active)
         {
-            result += calculateSpotLight(spotLights[i], fragNormal, viewDir);
+            result += calculateSpotLight(spotLights[i], normal, viewDir);
         }
     }
     result += ambient;
 
     //NOTE: debugging normals
     //    FragColor = vec4(normalize(fragNormal) * 0.5 + 0.5, 1.0f);
+
     FragColor = vec4(result, 1.0f);
 }
 
