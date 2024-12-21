@@ -25,7 +25,7 @@ int WINDOW_HEIGHT = 600;
 float fYaw = 270.0f;
 float fPitch = 0.0f;
 float fZoom = 45.0f;
-glm::vec3 camPos(0.0f, 5.0f, 10.0f);
+glm::vec3 camPos(0.0f, 0.0f, 10.0f);
 glm::vec3 camFront(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
@@ -50,7 +50,7 @@ int main() {
   EModelLoader loader;
   auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto helm = loader.loadModel("../models/scene.gltf", mat);
+  auto helm = loader.loadModel("../models/test_rock/scene.gltf", mat);
   sun->setPosition(0, 0, 0);
   helm->setPosition(0, 0, 0);
   astroid->setPosition(0, 0, 0);
@@ -58,7 +58,7 @@ int main() {
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0.01f, 0.01f);
 
-  pnt->setPosition(0, 10, 0);
+  pnt->setPosition(0, 8, 0);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
   zaWardu->AddLight(pnt);
   zaWardu->add(helm);
@@ -76,6 +76,7 @@ int main() {
   state.rendererState.enableStencilTesting = rend.getStencilTesting();
   state.rendererState.polymode = rend.getPolyMode();
   state.rendererState.enableGrid = rend.girdEnabled();
+  state.rendererState.enableNormalMapping = rend.getNormalMapping();
 
   // Camera States
   state.cameraState.Poition = camera.getPosition();
