@@ -22,7 +22,7 @@ EUVSphereGeometry::EUVSphereGeometry(float radius, unsigned int stacks,
 
       // tex coords
       float u = (float)(i) / (stacks - 1);
-      float v = (float)(j) / (sectors - 1);
+      float v = (float)(j) / (sectors);
 
       // normals
       float nx = x * inver_rad;

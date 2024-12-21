@@ -1,4 +1,6 @@
 #include "../include/EModelLoader.h"
+#include <assimp/postprocess.h>
+#include <glm/geometric.hpp>
 #include <memory>
 
 std::shared_ptr<EModel>
@@ -8,7 +10,8 @@ EModelLoader::loadModel(std::string path, std::shared_ptr<Material> material) {
   Assimp::Importer importer;
 
   const aiScene *scene =
-      importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate);
+      importer.ReadFile(path, aiProcess_GenNormals | aiProcess_Triangulate |
+                                  aiProcess_CalcTangentSpace);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE ||
       !scene->mRootNode || !model) {
@@ -90,6 +93,12 @@ std::shared_ptr<EMesh> EModelLoader::ProcessMesh(glm::mat4 &m, aiMesh *mesh,
                            mesh->mNormals[i].z);
     }
 
+    if (mesh->HasTangentsAndBitangents()) {
+      v.Tangent = glm::normalize(glm::vec3(
+          mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z));
+    } else {
+      v.Tangent = glm::vec3(1.0f, 0.0f, 0.0f); // Default or fallback tangent
+    }
     vertices.push_back(v);
   }
   std::shared_ptr<Material> meshMaterial = nullptr;
@@ -129,6 +138,12 @@ std::shared_ptr<EMesh> EModelLoader::ProcessMesh(glm::mat4 &m, aiMesh *mesh,
     phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
                                        specularTextures.begin(),
                                        specularTextures.end());
+    std::vector<ETexture> normalTextures =
+        loadMaterialTexture(mat, aiTextureType_NORMALS, "texture_normal");
+    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                       normalTextures.begin(),
+                                       normalTextures.end());
+
     meshMaterial = phongMeshMaterial;
   }
 

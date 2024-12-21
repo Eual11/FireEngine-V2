@@ -130,6 +130,12 @@ void RenderUI(EngineState &state) {
                       &state.rendererState.enableStencilTesting);
       ImGui::Checkbox("Backface Culling", &backfaceCulling);
       ImGui::Checkbox("Blending", &blending);
+      bool pst = state.rendererState.enableNormalMapping;
+      ImGui::Checkbox("Normal Mapping",
+                      &state.rendererState.enableNormalMapping);
+      if (pst != state.rendererState.enableNormalMapping) {
+        state.rendererState.update = true;
+      }
 
       ImGui::SeparatorText("Poly Fill Mode");
 
@@ -278,6 +284,9 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state) {
   } else
     renderer.DisableGrid();
 
+  if (state.rendererState.update) {
+    renderer.setNormalMapping(state.rendererState.enableNormalMapping);
+  }
   renderer.setPolyMode(state.rendererState.polymode);
 }
 void UpdateWorld(EWorld &world, EngineState &state) {
