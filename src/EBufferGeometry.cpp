@@ -56,6 +56,9 @@ void EBufferGeometry::setupPredefinedAttribs() {
   predefinedAttribs.push_back({"TexCoord", GL_FLOAT, 2, sizeof(EVertex),
                                currentLocation++, offsetof(EVertex, TexCoord),
                                GL_FALSE});
+  predefinedAttribs.push_back({"Tangent", GL_FLOAT, 3, sizeof(EVertex),
+                               currentLocation++, offsetof(EVertex, Tangent),
+                               GL_FALSE});
 }
 void EBufferGeometry::addCustomAttribF(VertexAttrib attrib, const float *data,
                                        size_t len) {
