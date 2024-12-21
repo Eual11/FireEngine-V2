@@ -7,19 +7,7 @@ ERenderer::ERenderer() {
   EnableDepthTesting();
   setDepthTestFunc(GL_LESS);
 }
-void PrintShaderMap(
-    const std::map<std::shared_ptr<EObject3D>, std::shared_ptr<Shader>>
-        shader_map) {
-  for (const auto &entry : shader_map) {
-    const std::shared_ptr<EObject3D> &obj_ptr = entry.first;
-    const Shader &shader = *entry.second;
 
-    // Print the address of the EObject3D and Shader name
-    /* std::cout << "Object Address: " << obj_ptr.get() << " | Shader: " <<
-     * &shader */
-    /*           << std::endl; */
-  }
-}
 ERenderer::ERenderer(Window *window) {
   this->window = window;
 
@@ -114,6 +102,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
       if (window) {
         // rendering to default framebuffer
         window->UpdateUniforms(shader);
+        shader.setBool("enableNormalMapping", normalMapping);
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, shader);
 
@@ -364,6 +353,7 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
       Shader *shader = shader_map[obj].get();
       if (window) {
         window->UpdateUniforms(*shader);
+        shader->setBool("enableNormalMapping", normalMapping);
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, *shader);
 
