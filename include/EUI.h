@@ -21,6 +21,8 @@ struct RendererState {
   bool enableDepthTesting;
   bool enableStencilTesting;
   bool enableGrid;
+  bool enableNormalMapping;
+  bool update;
   PolyMode polymode;
 };
 struct WorldState {
