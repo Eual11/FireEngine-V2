@@ -37,10 +37,13 @@ void main()
 
     //testing tangentSpace
 
-    vec3 biTangent = normalize(cross(inNormal, inTangent));
     vec3 T = normalize(vec3(uModel * vec4(inTangent, 0.0f)));
-    vec3 B = normalize(vec3(uModel * vec4(biTangent, 0.0f)));
     vec3 N = normalize(vec3(uModel * vec4(inNormal, 0.0f)));
+
+    //renormalizing Tangent using Gram-Schmit Process
+    T = normalize(T - (dot(T, N) * N));
+
+    vec3 B = cross(N, T);
 
     TBN = mat3(T, B, N);
     //end of tangent space test
