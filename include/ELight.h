@@ -24,6 +24,7 @@ public:
   float quadratic;
   float inner_cutoff;
   float outer_cutoff;
+  bool visualize = false;
 
   LightType type = UNDEFINED;
   void render(Shader &shader) override {

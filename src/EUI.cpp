@@ -1,4 +1,5 @@
 #include "../include/EUI.h"
+#include <algorithm>
 #include <memory>
 std::vector<ObjectLoaderEntry> entries{
     {"Cube", AddCube},
@@ -39,23 +40,27 @@ void RenderUI(EngineState &state) {
           if (ImGui::MenuItem("Ambient")) {
             state.World->AddLight(
                 createRef<AmbientLight>(glm::vec3(1.0f), 0.6f));
+            state.World->setRecompiled(false);
           }
 
           if (ImGui::MenuItem("Directioanl")) {
             state.World->AddLight(createRef<DirectionalLight>(
                 glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
                 glm::vec3(0.0f, 0.0f, 1.0f)));
+            state.World->setRecompiled(false);
           }
 
           if (ImGui::MenuItem("Spot")) {
             state.World->AddLight(createRef<SpotLight>(
                 glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+            state.World->setRecompiled(false);
           }
           if (ImGui::MenuItem("Point")) {
             state.World->AddLight(createRef<PointLight>(
                 glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f)));
+            state.World->setRecompiled(false);
           }
 
           ImGui::EndMenu();
@@ -71,6 +76,18 @@ void RenderUI(EngineState &state) {
           // TODO: this could be improved
 
           state.curSelectedObject = nullptr;
+        }
+      }
+      if (ImGui::Button("Remove Light")) {
+
+        if (state.curSelectedLight) {
+          state.World->Lights.erase(std::remove(state.World->Lights.begin(),
+                                                state.World->Lights.end(),
+                                                state.curSelectedLight),
+                                    state.World->Lights.end());
+          state.curSelectedLight = nullptr;
+
+          state.World->setRecompiled(false);
         }
       }
 

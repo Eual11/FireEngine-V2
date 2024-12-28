@@ -83,6 +83,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     // compiles shaders assosiated with the game world, currently compiles
     // shaders for the skybox
     /* CompileWorldShader(world); */
+
     try {
       CompileShaders(world);
     } catch (std::bad_weak_ptr) {
@@ -151,6 +152,13 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     // enabling it back, it is etiquette to revert what you did
     glDepthMask(GL_TRUE);
     EnableDepthTesting();
+  }
+
+  for (const auto &light : world->Lights) {
+
+    if (light->visualize) {
+      // render
+    }
   }
 }
 

@@ -5,6 +5,7 @@
 #include "EFrameBuffer.h"
 #include "ELight.h"
 #include "EMaterial.h"
+#include "EModel.h"
 #include "EObject3D.h"
 #include "EPostProcessingPipeline.h"
 #include "EWorld.h"
@@ -88,6 +89,9 @@ private:
   /* std::unique_ptr<EFrameBuffer> framebuffer; */
 
   std::shared_ptr<EMesh> fGrid;
+  std::shared_ptr<EModel> directional_helper;
+  std::shared_ptr<EModel> pointlight_helper;
+  std::shared_ptr<EModel> spotlight_helper;
 
   EPostProcessingPipeline effectPipeline;
 
