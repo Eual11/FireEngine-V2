@@ -1,4 +1,5 @@
 #include "../include/EUI.h"
+#include <memory>
 std::vector<ObjectLoaderEntry> entries{
     {"Cube", AddCube},
     {"Plane", AddPlane},
@@ -33,17 +34,43 @@ void RenderUI(EngineState &state) {
             entry.action(state);
           }
         }
+        if (ImGui::BeginMenu("Light")) {
+
+          if (ImGui::MenuItem("Ambient")) {
+            state.World->AddLight(
+                createRef<AmbientLight>(glm::vec3(1.0f), 0.6f));
+          }
+
+          if (ImGui::MenuItem("Directioanl")) {
+            state.World->AddLight(createRef<DirectionalLight>(
+                glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(0.0f, 0.0f, 1.0f)));
+          }
+
+          if (ImGui::MenuItem("Spot")) {
+            state.World->AddLight(createRef<SpotLight>(
+                glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+          }
+          if (ImGui::MenuItem("Point")) {
+            state.World->AddLight(createRef<PointLight>(
+                glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f)));
+          }
+
+          ImGui::EndMenu();
+        }
         ImGui::EndMenu();
       }
       ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
       if (ImGui::Button("Remove Object")) {
 
-        if (state.curSelected != state.World) {
-          state.World->remove(state.curSelected);
+        if (state.curSelectedObject != state.World) {
+          state.World->remove(state.curSelectedObject);
 
           // TODO: this could be improved
 
-          state.curSelected = nullptr;
+          state.curSelectedObject = nullptr;
         }
       }
 
@@ -54,50 +81,52 @@ void RenderUI(EngineState &state) {
 
     ImGui::SeparatorText("Objects");
 
-    traverse(state, std::static_pointer_cast<EObject3D>(state.World));
+    TraverseObjects(state, std::static_pointer_cast<EObject3D>(state.World));
 
+    ImGui::SeparatorText("Lights");
+    TraverseLights(state);
     ImGui::End();
   }
   ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 300, 0),
                           ImGuiCond_Once);
   if (ImGui::Begin("Options")) {
-    if (state.curSelected && state.curSelected != state.World) {
+    if (state.curSelectedObject && state.curSelectedObject != state.World) {
 
-      if (state.curSelected && state.curSelected != state.World) {
+      if (state.curSelectedObject && state.curSelectedObject != state.World) {
 
-        std::string obj_name = state.curSelected->getName();
+        std::string obj_name = state.curSelectedObject->getName();
         if (obj_name.length() >= 20)
           obj_name = obj_name.substr(0, 15) + "...";
         if (ImGui::CollapsingHeader((obj_name + " Properties").c_str())) {
-          ImGui::SeparatorText(state.curSelected->getName().c_str());
+          ImGui::SeparatorText(state.curSelectedObject->getName().c_str());
 
           // Position Controls (translation)
           ImGui::Text("Position");
-          glm::vec3 currentPos = state.curSelected->getPosition();
+          glm::vec3 currentPos = state.curSelectedObject->getPosition();
           if (ImGui::SliderFloat3("Position", &currentPos[0], -100.0f,
                                   100.0f)) {
             // Update the position of the selected object
-            state.curSelected->setPosition(currentPos.x, currentPos.y,
-                                           currentPos.z);
+            state.curSelectedObject->setPosition(currentPos.x, currentPos.y,
+                                                 currentPos.z);
           }
 
           // Rotation Controls (Euler angles - pitch, yaw, roll)
           ImGui::Text("Rotation");
-          glm::vec3 currentRotation = state.curSelected->getRotation();
+          glm::vec3 currentRotation = state.curSelectedObject->getRotation();
           if (ImGui::SliderFloat3("Rotation (Degrees)", &currentRotation[0],
                                   -180.0f, 180.0f)) {
             // Update the rotation (convert degrees to radians if necessary)
-            state.curSelected->setRotation(currentRotation.x, currentRotation.y,
-                                           currentRotation.z);
+            state.curSelectedObject->setRotation(
+                currentRotation.x, currentRotation.y, currentRotation.z);
           }
 
           // Scale Controls
           ImGui::Text("Scale");
-          glm::vec3 currentScale = state.curSelected->getScale();
+          glm::vec3 currentScale = state.curSelectedObject->getScale();
           if (ImGui::SliderFloat3("Scale", &currentScale[0], 0.1f, 10.0f)) {
             // Update the scale of the selected object
-            state.curSelected->setScale(currentScale.x, currentScale.y,
-                                        currentScale.z);
+            state.curSelectedObject->setScale(currentScale.x, currentScale.y,
+                                              currentScale.z);
           }
 
           // Optionally, display the current position, rotation, and scale
@@ -110,6 +139,67 @@ void RenderUI(EngineState &state) {
         }
       }
     }
+    if (state.curSelectedLight) {
+      std::string light_name = state.curSelectedLight->getName();
+      if (light_name.length() >= 20)
+        light_name = light_name.substr(0, 15) + "...";
+
+      if (ImGui::CollapsingHeader(light_name.c_str())) {
+
+        // Light properties
+
+        // Position and Translation
+        ImGui::Text("Position");
+        glm::vec3 cur_pos = state.curSelectedLight->getPosition();
+
+        if (ImGui::SliderFloat3("Light Position", &cur_pos[0], -100.0f,
+                                100.0f)) {
+
+          state.curSelectedLight->setPosition(cur_pos.x, cur_pos.y, cur_pos.z);
+        }
+
+        if (state.curSelectedLight->type == LightType::DIRECTIONAL ||
+            state.curSelectedLight->type == LightType::SPOTLIGHT) {
+
+          static glm::vec3 dir =
+              state.curSelectedLight->direction; // Keep a local editable copy
+
+          // Show sliders for direction components
+          if (ImGui::SliderFloat3("Light Direction", &dir[0], -1.0f, 1.0f)) {
+            // Normalize the vector after editing to ensure it's a valid
+            // direction
+            state.curSelectedLight->direction = glm::normalize(dir);
+          }
+        }
+        ImGui::Text("Intensity");
+        if (ImGui::SliderFloat("Light Intensity",
+                               &state.curSelectedLight->intensity, 0.0f,
+                               100.0f)) {
+        }
+
+        ImGui::Text("Color");
+        glm::vec3 color;
+
+        // Ambient Color
+        color = state.curSelectedLight->ambient_color;
+        if (ImGui::ColorEdit3("Ambient Color", &color[0])) {
+          state.curSelectedLight->ambient_color = color;
+        }
+
+        // Diffuse Color
+        color = (state.curSelectedLight->diffuse_color);
+        if (ImGui::ColorEdit3("Diffuse Color", &color[0])) {
+          state.curSelectedLight->diffuse_color = color;
+        }
+
+        // Specular Color
+        color = state.curSelectedLight->specular_color;
+        if (ImGui::ColorEdit3("Specular Color", &color[0])) {
+          state.curSelectedLight->specular_color = color;
+        }
+      }
+    }
+
     if (ImGui::CollapsingHeader("Application")) {
       ImGui::Indent(8);
       ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -305,7 +395,19 @@ void UpdateWorld(EWorld &world, EngineState &state) {
 
   state.worldstate.skyboxReloaded = false;
 }
-void traverse(EngineState &state, std::shared_ptr<EObject3D> obj) {
+
+void TraverseLights(EngineState &state) {
+  if (state.World) {
+    for (auto &light : state.World->Lights) {
+
+      if (ImGui::Selectable(light->getName().c_str(),
+                            state.curSelectedLight == light)) {
+        state.curSelectedLight = light;
+      }
+    }
+  }
+}
+void TraverseObjects(EngineState &state, std::shared_ptr<EObject3D> obj) {
   if (!obj)
     return;
 
@@ -315,25 +417,26 @@ void traverse(EngineState &state, std::shared_ptr<EObject3D> obj) {
 
     ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_OpenOnArrow;
 
-    if (state.curSelected == obj) {
+    if (state.curSelectedObject == obj) {
       flag |= ImGuiTreeNodeFlags_Selected;
     }
     if (ImGui::TreeNodeEx(obj->getName().c_str(), flag)) {
 
       if (ImGui::IsItemClicked()) {
-        state.curSelected = obj;
+        state.curSelectedObject = obj;
         std::cout << "Selected " << obj->getName() << std::endl;
       }
       for (auto &d : obj->getChildren()) {
-        traverse(state, d);
+        TraverseObjects(state, d);
       }
       ImGui::TreePop();
     }
 
   } else {
 
-    if (ImGui::Selectable(obj->getName().c_str(), state.curSelected == obj)) {
-      state.curSelected = obj;
+    if (ImGui::Selectable(obj->getName().c_str(),
+                          state.curSelectedObject == obj)) {
+      state.curSelectedObject = obj;
       std::cout << "Selected " << obj->getName() << std::endl;
     }
   }
@@ -353,8 +456,8 @@ void AddCube(EngineState &state) {
 
     auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
                                  mat); // `cube` is a shared_ptr already
-    if (state.curSelected) {
-      state.curSelected->add(cube);
+    if (state.curSelectedObject) {
+      state.curSelectedObject->add(cube);
     } else {
       state.World->add(cube);
     }
@@ -377,8 +480,8 @@ void AddSphere(EngineState &state) {
 
     auto sphere =
         createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 30, 30), mat);
-    if (state.curSelected) {
-      state.curSelected->add(sphere);
+    if (state.curSelectedObject) {
+      state.curSelectedObject->add(sphere);
     } else {
       state.World->add(sphere);
     }
@@ -399,8 +502,8 @@ void AddPlane(EngineState &state) {
         uniforms);
 
     auto plane = createRef<EMesh>(createRef<EPlaneGeometry>(), mat);
-    if (state.curSelected) {
-      state.curSelected->add(plane);
+    if (state.curSelectedObject) {
+      state.curSelectedObject->add(plane);
     } else {
       state.World->add(plane);
     }

@@ -306,7 +306,7 @@ void ERenderer::CalculateLighting(const std::shared_ptr<EWorld> &world,
           shader.setBool(light_ref + ".light_active", true);
           shader.setVec3(light_ref + ".diffuse_color", Plight->diffuse_color);
           shader.setVec3(light_ref + ".specular_color", Plight->specular_color);
-          shader.setVec3(light_ref + ".position", Plight->position);
+          shader.setVec3(light_ref + ".position", Plight->getPosition());
           shader.setFloat(light_ref + ".intensity", Plight->intensity);
           shader.setFloat(light_ref + ".constant", 1.0f);
           shader.setFloat(light_ref + ".linear", Plight->linear);
@@ -327,7 +327,7 @@ void ERenderer::CalculateLighting(const std::shared_ptr<EWorld> &world,
           shader.setVec3(light_ref + ".diffuse_color", Slight->diffuse_color);
           shader.setVec3(light_ref + ".specular_color", Slight->specular_color);
           shader.setVec3(light_ref + ".direction", Slight->direction);
-          shader.setVec3(light_ref + ".position", Slight->position);
+          shader.setVec3(light_ref + ".position", Slight->getPosition());
           shader.setFloat(light_ref + ".intensity", Slight->intensity);
           shader.setFloat(light_ref + ".inner_cutoff", Slight->inner_cutoff);
           shader.setFloat(light_ref + ".outer_cutoff", Slight->outer_cutoff);

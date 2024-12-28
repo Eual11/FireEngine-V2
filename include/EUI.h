@@ -1,8 +1,8 @@
 #include "../_dep/imgui-src/imgui.h"
 #include "Camera.h"
 #include "EBoxGeometry.h"
+#include "ELight.h"
 #include "EModelLoader.h"
-#include "EObject3D.h"
 #include "ERenderer.h"
 #include "EUVSphereGeometry.h"
 #include "EWorld.h"
@@ -39,7 +39,8 @@ struct EngineState {
 
   // a weak pointer to the world
   std::shared_ptr<EWorld> World;
-  std::shared_ptr<EObject3D> curSelected;
+  std::shared_ptr<EObject3D> curSelectedObject;
+  std::shared_ptr<ELight> curSelectedLight;
 
   bool vsyncEnabled;
 };
@@ -55,7 +56,8 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state);
 void UpdateWorld(EWorld &world, EngineState &state);
 void RenderUI(EngineState &state);
 void StartUIFrame();
-void traverse(EngineState &state, std::shared_ptr<EObject3D> obj);
+void TraverseObjects(EngineState &state, std::shared_ptr<EObject3D> obj);
+void TraverseLights(EngineState &state);
 void EndUIFrame();
 
 void AddCube(EngineState &state);

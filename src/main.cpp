@@ -50,19 +50,15 @@ int main() {
   EModelLoader loader;
   auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
   auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  auto helm =
-      loader.loadModel("../models/survival_guitar_backpack/scene.gltf", mat);
   sun->setPosition(0, 0, 0);
-  helm->setPosition(0, 0, 0);
   astroid->setPosition(0, 0, 0);
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
-      glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 0.01f, 0.01f);
+      glm::vec3(0.0f, 0.0f, 3.0f), 1.0f, 0.01f, 0.01f);
 
-  pnt->setPosition(0, 8, 0);
+  pnt->setPosition(12, 1, 3);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
   zaWardu->AddLight(pnt);
-  zaWardu->add(helm);
 
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
