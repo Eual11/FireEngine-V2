@@ -287,6 +287,11 @@ void RenderUI(EngineState &state) {
       if (ImGui::DragFloat("zPos", &state.cameraState.Poition.z)) {
         state.cameraState.updateByUI = true;
       }
+      ImGui::SeparatorText("Kinematics");
+
+      ImGui::SliderFloat("max_speed", &state.cameraState.max_speed, 1, 1000.0f);
+      ImGui::SliderFloat("acceleration", &state.cameraState.acceleration, 1,
+                         1000.0f);
 
       ImGui::SeparatorText("Orientation");
 
@@ -373,6 +378,8 @@ void UpdateCamera(Camera &camera, EngineState &state) {
                           state.cameraState.clipPlanes.y);
   camera.setFov(state.cameraState.Fov);
   state.cameraState.updateByUI = false;
+  camera.max_speed = state.cameraState.max_speed;
+  camera.acceleration = state.cameraState.acceleration;
 }
 void UpdateRenderer(ERenderer &renderer, EngineState &state) {
 

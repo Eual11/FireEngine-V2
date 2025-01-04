@@ -38,7 +38,6 @@ int main() {
   Window nWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Firev2", false);
   nWindow.BindCamera(cameraPtr);
   nWindow.EnableCursor();
-
   auto zaWardu = std::make_shared<EWorld>(&nWindow);
   ERenderer rend(&nWindow);
 
@@ -48,10 +47,8 @@ int main() {
                                               uniforms);
 
   EModelLoader loader;
-  auto astroid = loader.loadModel("../models/rock/rock.obj", mat);
-  auto sun = loader.loadModel("../models/planet/sun/scene.gltf", mat);
-  sun->setPosition(0, 0, 0);
-  astroid->setPosition(0, 0, 0);
+
+  auto sponza = loader.loadModel("../models/Sponza/sponza.obj");
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(0.0f, 0.0f, 3.0f), 1.0f, 0.01f, 0.01f);
@@ -59,7 +56,7 @@ int main() {
   pnt->setPosition(12, 1, 3);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
   zaWardu->AddLight(pnt);
-
+  zaWardu->add(sponza);
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   glEnable(GL_BLEND);
