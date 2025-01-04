@@ -13,6 +13,8 @@ struct CameraState {
   glm::vec3 Poition;
   glm::vec3 Orientation;
   glm::vec2 clipPlanes;
+  float max_speed;
+  float acceleration;
   float Fov;
   bool updateByUI = false;
 };
