@@ -120,8 +120,8 @@ void RenderUI(EngineState &state) {
           // Position Controls (translation)
           ImGui::Text("Position");
           glm::vec3 currentPos = state.curSelectedObject->getPosition();
-          if (ImGui::SliderFloat3("Position", &currentPos[0], -100.0f,
-                                  100.0f)) {
+          if (ImGui::SliderFloat3("Position", &currentPos[0], -10000.0f,
+                                  10000.0f)) {
             // Update the position of the selected object
             state.curSelectedObject->setPosition(currentPos.x, currentPos.y,
                                                  currentPos.z);
@@ -140,7 +140,7 @@ void RenderUI(EngineState &state) {
           // Scale Controls
           ImGui::Text("Scale");
           glm::vec3 currentScale = state.curSelectedObject->getScale();
-          if (ImGui::SliderFloat3("Scale", &currentScale[0], 0.1f, 10.0f)) {
+          if (ImGui::SliderFloat3("Scale", &currentScale[0], 0.001f, 1000.0f)) {
             // Update the scale of the selected object
             state.curSelectedObject->setScale(currentScale.x, currentScale.y,
                                               currentScale.z);
@@ -169,8 +169,8 @@ void RenderUI(EngineState &state) {
         ImGui::Text("Position");
         glm::vec3 cur_pos = state.curSelectedLight->getPosition();
 
-        if (ImGui::SliderFloat3("Light Position", &cur_pos[0], -100.0f,
-                                100.0f)) {
+        if (ImGui::SliderFloat3("Light Position", &cur_pos[0], -10000.0f,
+                                10000.0f)) {
 
           state.curSelectedLight->setPosition(cur_pos.x, cur_pos.y, cur_pos.z);
         }
@@ -237,6 +237,7 @@ void RenderUI(EngineState &state) {
                       &state.rendererState.enableStencilTesting);
       ImGui::Checkbox("Backface Culling", &backfaceCulling);
       ImGui::Checkbox("Blending", &blending);
+      ImGui::Checkbox("Gamma Correction", &state.rendererState.gammaCorrect);
       bool pst = state.rendererState.enableNormalMapping;
       ImGui::Checkbox("Normal Mapping",
                       &state.rendererState.enableNormalMapping);
@@ -270,9 +271,10 @@ void RenderUI(EngineState &state) {
       ImGui::Indent(8);
 
       ImGui::SeparatorText("ZFar/ZNear");
-      ImGui::SliderFloat("zNear", &state.cameraState.clipPlanes.x, 0.1, 100.0f);
-      ImGui::SliderFloat("zFar", &state.cameraState.clipPlanes.y, 100.0f,
+      ImGui::SliderFloat("zNear", &state.cameraState.clipPlanes.x, 0.1,
                          1000.0f);
+      ImGui::SliderFloat("zFar", &state.cameraState.clipPlanes.y, 10.0f,
+                         100000.0f);
 
       ImGui::SeparatorText("Position");
 
@@ -401,6 +403,9 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state) {
   if (state.rendererState.update) {
     renderer.setNormalMapping(state.rendererState.enableNormalMapping);
   }
+
+  renderer.setGammaCorrection(state.rendererState.gammaCorrect);
+
   renderer.setPolyMode(state.rendererState.polymode);
 }
 void UpdateWorld(EWorld &world, EngineState &state) {

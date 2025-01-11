@@ -77,6 +77,8 @@ int main() {
   state.cameraState.Orientation = camera.getOrientation();
   state.cameraState.clipPlanes = camera.getNearFarPlanes();
   state.cameraState.Fov = camera.getFov();
+  state.cameraState.max_speed = camera.max_speed;
+  state.cameraState.acceleration = camera.acceleration;
   state.vsyncEnabled = nWindow.getVsyncState();
 
   // scene/world state

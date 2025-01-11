@@ -104,6 +104,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
         // rendering to default framebuffer
         window->UpdateUniforms(shader);
         shader.setBool("enableNormalMapping", normalMapping);
+        shader.setBool("gammaCorrect", gammaCorrection);
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, shader);
 
@@ -362,6 +363,7 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
       if (window) {
         window->UpdateUniforms(*shader);
         shader->setBool("enableNormalMapping", normalMapping);
+        shader->setBool("gammaCorrect", gammaCorrection);
         window->UpdateUniforms(*outlineShader);
         CalculateLighting(world, *shader);
 
