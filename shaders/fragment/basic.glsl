@@ -50,6 +50,8 @@ uniform Material material;
 uniform vec3 ambientLight;
 uniform float ambientIntensity;
 
+uniform bool gammaCorrect;
+
 out vec4 FragColor;
 
 //functions to calculate light
@@ -99,6 +101,8 @@ void main()
     //NOTE: debugging normals
     //    FragColor = vec4(normalize(fragNormal) * 0.5 + 0.5, 1.0f);
 
+    if (gammaCorrect)
+        result = vec3(pow(result.x, 2.2), pow(result.y, 2.2), pow(result.z, 2.2));
     FragColor = vec4(result, 1.0f);
 }
 
