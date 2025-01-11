@@ -22,8 +22,10 @@ public:
   bool getDepthTesting() const { return depthTestingEnabled; }
   bool getStencilTesting() const { return stencilTestingEnabled; }
   bool girdEnabled() const { return grid; }
+  bool getGammaCorrection() const { return gammaCorrection; }
   bool getNormalMapping() const { return normalMapping; }
   void setNormalMapping(bool val) { normalMapping = val; }
+  void setGammaCorrection(bool val) { gammaCorrection = val; }
   inline void EnableGrid() {
     if (grid)
       return;
@@ -80,6 +82,7 @@ private:
   bool outlinesEnabled = false;
   bool grid = true;
   bool normalMapping = true;
+  bool gammaCorrection = true;
   glm::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
   unsigned int clearBit = GL_COLOR_BUFFER_BIT;
   PolyMode polymode = PolyMode::FILL;

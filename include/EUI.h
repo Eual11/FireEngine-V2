@@ -25,6 +25,7 @@ struct RendererState {
   bool enableGrid;
   bool enableNormalMapping;
   bool update;
+  bool gammaCorrect;
   PolyMode polymode;
 };
 struct WorldState {
