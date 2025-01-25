@@ -35,8 +35,6 @@ void main()
         gl_Position = uProjection * uView * uModel * vec4(inPosition, 1.0f);
     }
 
-    //testing tangentSpace
-
     vec3 T = normalize(vec3(uModel * vec4(inTangent, 0.0f)));
     vec3 N = normalize(vec3(uModel * vec4(inNormal, 0.0f)));
 
@@ -46,7 +44,6 @@ void main()
     vec3 B = cross(N, T);
 
     TBN = mat3(T, B, N);
-    //end of tangent space test
     fragPosition = ((uModel * vec4(inPosition, 1.0f)));
     fragNormal = normalize(mat3(transpose(inverse(uModel))) * inNormal);
 
