@@ -17,7 +17,8 @@ enum MaterialType {
   MaterialType_Phong,   // basic phong shading
   MaterialType_Lambert, // lambert diffuse shading
   MaterialType_Normal,  // used to visualize normals
-  MaterialType_Shader
+  MaterialType_PBR,     // Physically Based Material
+  MaterialType_Shader   // custom material
 
 };
 
@@ -60,6 +61,12 @@ public:
   NormalMaterial();
   void Apply(Shader &shader) override;
   ~NormalMaterial() override = default;
+};
+class PBRMaterial : public Material {
+public:
+  PBRMaterial() { type = MaterialType_PBR; }
+  void Apply(Shader &shader) override;
+  ~PBRMaterial() override = default;
 };
 
 // Finally

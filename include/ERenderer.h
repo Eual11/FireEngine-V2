@@ -115,7 +115,10 @@ private:
       {MaterialType::MaterialType_Basic, "../shaders/fragment/basic2.glsl"},
       {MaterialType::MaterialType_Phong, "../shaders/fragment/basic.glsl"},
       {MaterialType::MaterialType_Normal,
-       "../shaders/fragment/normal_material.glsl"}};
+       "../shaders/fragment/normal_material.glsl"},
+      {MaterialType_PBR, "../shaders/fragment/PBR.glsl"}
+
+  };
   std::string default_vertex_shader_source = "../shaders/vertex/basic.glsl";
 
   std::string default_skybox_shader_source = "../shaders/vertex/sykbox.glsl";
