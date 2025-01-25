@@ -163,6 +163,7 @@ void PBRMaterial::Apply(Shader &shader) {
   unsigned int numAO = 1;
   unsigned int numNormal = 1;
   unsigned int numMetalRoughness = 1;
+  unsigned int numEmissive = 1.0;
 
   // flags to see if a specfic texture type is bound or not
   bool albedoBound = false;
@@ -171,6 +172,7 @@ void PBRMaterial::Apply(Shader &shader) {
   bool roughnessBound = false;
   bool AOBound = false;
   bool normalBound = false;
+  bool emissiveBound = false;
 
   shader.Use();
 
@@ -212,10 +214,16 @@ void PBRMaterial::Apply(Shader &shader) {
       tex_name = tex.type + std::to_string(numMetalRoughness++);
       shader.setInt(tex_name, i);
       metalRoughnessBound = true;
+    } else if (tex.type == "texture_emissive") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numEmissive++);
+      shader.setInt(tex_name, i);
+      emissiveBound = true;
     }
   }
   shader.setBool("material.albedo_bound", albedoBound);
   shader.setBool("material.metalic_bound", metalicBound);
+  shader.setBool("material.emissive_bound", emissiveBound);
   shader.setBool("material.normal_bound", normalBound);
   shader.setBool("material.roughness_bound", roughnessBound);
   shader.setBool("material.ao_bound", AOBound);

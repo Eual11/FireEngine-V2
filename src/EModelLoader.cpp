@@ -327,13 +327,18 @@ std::shared_ptr<PBRMaterial> EModelLoader::fetchPBRMaterial(aiMaterial *mat) {
       loadMaterialTexture(mat, aiTextureType_AMBIENT_OCCLUSION, "texture_ao");
   pbrMaterial->textures.insert(pbrMaterial->textures.end(), aoTextures.begin(),
                                aoTextures.end());
-
+  std::cout << "ao len: " << aoTextures.size() << std::endl;
   std::vector<ETexture> normalTextures =
       loadMaterialTexture(mat, aiTextureType_NORMALS, "texture_normal");
   pbrMaterial->textures.insert(pbrMaterial->textures.end(),
                                normalTextures.begin(), normalTextures.end());
-
-  // reserved
+  std::vector<ETexture> emissiveTextures =
+      loadMaterialTexture(mat, aiTextureType_EMISSIVE, "texture_emissive");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               emissiveTextures.begin(),
+                               emissiveTextures.end());
+  std::cout << "em len: " << emissiveTextures.size() << std::endl;
+  // reserved emissive
 #if 0
   std::vector<ETexture> metalRoughnessTextures = loadMaterialTexture(
       mat, aiTextureType_UNKNOWN, "texture_metal_roughness");

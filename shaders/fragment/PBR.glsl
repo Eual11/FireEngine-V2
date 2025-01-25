@@ -28,6 +28,7 @@ struct Material
     sampler2D texture_metal_roughness1; //metalic map
     sampler2D texture_ao1; //ambient_occulusion map
     sampler2D texture_roughness1; //roughness map
+    sampler2D texture_emissive; //roughness map
 
     //flags if there is a texture map is bound for each material property
     bool albedo_bound;
@@ -36,6 +37,7 @@ struct Material
     bool metal_roughness_bound; //for gltf metnalRoughness textures
     bool ao_bound;
     bool metalic_bound;
+    bool emissive_bound;
 
     vec3 albedo;
     float metalic;
@@ -108,6 +110,11 @@ void main()
     }
 
     result += ambient;
+
+    if (material.emissive_bound)
+    {
+        result = texture(material.texture_emissive, fragTexCoord).rgb;
+    }
     if (gammaCorrect)
         result = vec3(pow(result.x, 2.2), pow(result.y, 2.2), pow(result.z, 2.2));
 
@@ -165,6 +172,11 @@ vec3 BRDF_CookTorrence(vec3 normal, vec3 light_dir, vec3 viewDir)
     {
         albedo = vec3(texture(material.texture_albedo1, fragTexCoord));
     }
+    float ao = 1.0;
+    if (material.ao_bound)
+    {
+        ao = vec3(texture(material.texture_ao1, fragTexCoord)).r;
+    }
     float metalic = material.metalic;
     if (material.metalic_bound)
     {
@@ -186,5 +198,5 @@ vec3 BRDF_CookTorrence(vec3 normal, vec3 light_dir, vec3 viewDir)
 
     lambert *= Kd;
 
-    return lambert + cookTorrence;
+    return ao * (lambert + cookTorrence);
 }
