@@ -1,5 +1,6 @@
 #include "../include/EMaterial.h"
 #include <memory>
+#include <string>
 #include <type_traits>
 #include <variant>
 
@@ -154,7 +155,62 @@ void ShaderMaterial::Apply(Shader &shader) {
   }
   glActiveTexture(GL_TEXTURE0);
 }
+PBRMaterial::PBRMaterial() : Material() { type = MaterialType_PBR; }
 void PBRMaterial::Apply(Shader &shader) {
-  (void)(shader);
-  // TODO
+  unsigned int numAlbedo = 1;
+  unsigned int numMetalic = 1;
+  unsigned int numRoughness = 1;
+  unsigned int numAO = 1;
+  unsigned int numNormal = 1;
+
+  // flags to see if a specfic texture type is bound or not
+  bool albedoBound = false;
+  bool metalicBound = false;
+  bool roughnessBound = false;
+  bool AOBound = false;
+  bool normalBound = false;
+
+  shader.Use();
+
+  shader.setVec3("material.albedo", albedo);
+  shader.setFloat("material.roughness", roughness);
+  shader.setFloat("material.metalic", metalic);
+
+  for (size_t i = 0; i < textures.size(); i++) {
+    ETexture tex = textures[i];
+    std::string tex_name = "";
+    glActiveTexture(GL_TEXTURE0 + i);
+    if (tex.type == "texture_albedo") {
+      tex_name = tex.type + std::to_string(numAlbedo++);
+      albedoBound = true;
+      shader.setInt("material." + tex_name, i);
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+    } else if (tex.type == "texture_metalic") {
+      tex_name = tex.type + std::to_string(numMetalic++);
+      shader.setInt("material." + tex_name, i);
+      metalicBound = true;
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+    } else if (tex.type == "texture_normal") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numNormal++);
+      shader.setInt("material." + tex_name, i);
+      normalBound = true;
+    } else if (tex.type == "texture_roughness") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numRoughness++);
+      shader.setInt("material." + tex_name, i);
+      roughnessBound = true;
+    } else if (tex.type == "texture_ao") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numAO++);
+      shader.setInt(tex_name, i);
+    }
+  }
+  shader.setBool("material.abledo_bound", albedoBound);
+  shader.setBool("material.metalic_bound", metalicBound);
+  shader.setBool("material.normal_bound", normalBound);
+  shader.setBool("material.roughness_bound", roughnessBound);
+  shader.setBool("material.ao_bound", AOBound);
+
+  glActiveTexture(GL_TEXTURE0);
 }

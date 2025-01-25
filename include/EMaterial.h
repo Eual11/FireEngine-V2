@@ -64,9 +64,13 @@ public:
 };
 class PBRMaterial : public Material {
 public:
-  PBRMaterial() { type = MaterialType_PBR; }
+  PBRMaterial();
   void Apply(Shader &shader) override;
   ~PBRMaterial() override = default;
+
+  glm::vec3 albedo;
+  float metalic;
+  float roughness;
 };
 
 // Finally
