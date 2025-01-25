@@ -32,9 +32,13 @@ private:
                                             std::string name);
   unsigned int TextureFromFile(std::string path);
 
+  std::shared_ptr<PhongMaterial> fetchPhongMaterial(aiMaterial *mat);
+  std::shared_ptr<PBRMaterial> fetchPBRMaterial(aiMaterial *mat);
+
 public:
   EModelLoader() = default;
   std::shared_ptr<EModel>
   loadModel(std::string path, std::shared_ptr<Material> material = nullptr);
 };
+
 #endif

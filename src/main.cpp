@@ -49,7 +49,7 @@ int main() {
   EModelLoader loader;
 
   auto test = createRef<PBRMaterial>();
-  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", test);
+  auto helm = loader.loadModel("../models/DamagedHelmet.gltf");
 
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),

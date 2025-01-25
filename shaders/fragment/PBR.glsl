@@ -25,6 +25,7 @@ struct Material
     sampler2D texture_albedo1; //albedo
     sampler2D texture_normal1; //normal map
     sampler2D texture_metalic1; //metalic map
+    sampler2D texture_metal_roughness1; //metalic map
     sampler2D texture_ao1; //ambient_occulusion map
     sampler2D texture_roughness1; //roughness map
 
@@ -32,6 +33,7 @@ struct Material
     bool albedo_bound;
     bool normal_bound;
     bool roughness_bound;
+    bool metal_roughness_bound; //for gltf metnalRoughness textures
     bool ao_bound;
     bool metalic_bound;
 
@@ -78,8 +80,13 @@ float D(vec3 N, vec3 H, float a);
 void main()
 {
     vec3 result = vec3(0.0f);
-    vec3 albedo;
-    vec3 ambient = ambientIntensity * ambientLight * vec3(0.0);
+    vec3 albedo = material.albedo;
+    if (material.albedo_bound)
+    {
+        albedo = vec3(texture(material.texture_albedo1, fragTexCoord));
+    }
+
+    vec3 ambient = ambientIntensity * ambientLight * albedo;
     vec3 viewDir = normalize(uViewPos - vec3(fragPosition));
 
     vec3 normal;
@@ -147,17 +154,28 @@ vec3 BRDF_CookTorrence(vec3 normal, vec3 light_dir, vec3 viewDir)
     //hard coded material properties
     float roughness = material.roughness;
 
-    //HACK:
-    roughness = 0.1;
-    vec3 albedo = material.diffuse_color;
-    albedo = vec3(1.0, 0.0, 0.0);
-    float metalic = material.metalic;
-    metalic = 0.1;
+    if (material.roughness_bound)
+    {
+        roughness = texture(material.texture_roughness1, fragTexCoord).g;
+    }
 
+    //HACK:
+    vec3 albedo = material.albedo;
+    if (material.albedo_bound)
+    {
+        albedo = vec3(texture(material.texture_albedo1, fragTexCoord));
+    }
+    float metalic = material.metalic;
+    if (material.metalic_bound)
+    {
+        metalic = texture(material.texture_metalic1, fragTexCoord).b;
+    }
+
+    albedo *= (1.0 - metalic);
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metalic);
     vec3 Ks = F(F0, viewDir, half_vector);
-    vec3 Kd = 1.0 - Ks;
+    vec3 Kd = (1.0 - Ks) * (1.0 - metalic);
 
     vec3 lambert = albedo / PI;
 

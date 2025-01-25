@@ -100,9 +100,9 @@ void main()
 
     //NOTE: debugging normals
     //    FragColor = vec4(normalize(fragNormal) * 0.5 + 0.5, 1.0f);
-
     if (gammaCorrect)
-        FragColor = vec4(result, 1.0f);
+        result = vec3(pow(result.x, 2.2), pow(result.y, 2.2), pow(result.z, 2.2));
+    FragColor = vec4(result, 1.0f);
 }
 
 vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)

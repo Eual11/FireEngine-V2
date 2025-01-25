@@ -1,7 +1,9 @@
 #include "../include/EModelLoader.h"
+#include <assimp/material.h>
 #include <assimp/postprocess.h>
 #include <glm/geometric.hpp>
 #include <memory>
+#include <regex>
 
 std::shared_ptr<EModel>
 EModelLoader::loadModel(std::string path, std::shared_ptr<Material> material) {
@@ -107,44 +109,26 @@ std::shared_ptr<EMesh> EModelLoader::ProcessMesh(glm::mat4 &m, aiMesh *mesh,
 
     // TODO: IMPLEMENT A WAY TO SELECT A MATERIAL BASED ON THE SHADING MODEL
     // USED
-    auto phongMeshMaterial = std::make_shared<PhongMaterial>(PhongMaterial());
 
-    float val = 0.0f;
-    aiColor3D color;
+    aiShadingMode shadingMode;
     aiMaterial *mat = scene->mMaterials[mesh->mMaterialIndex];
+    if (mat->Get(AI_MATKEY_SHADING_MODEL, shadingMode) == AI_SUCCESS) {
 
-    if (mat->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
-      phongMeshMaterial->shininess = val;
-    }
-    if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-      phongMeshMaterial->diffuse_color = glm::vec3(color.r, color.g, color.b);
-    }
-    if (mat->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
-      phongMeshMaterial->ambient_color = glm::vec3(color.r, color.g, color.b);
+      std::cout << "Shading Mode is:  " << std::hex << shadingMode << std::endl;
     }
 
-    if (mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS) {
-      phongMeshMaterial->specular_color = glm::vec3(color.r, color.g, color.b);
+    switch (shadingMode) {
+    case aiShadingMode_PBR_BRDF: {
+
+      meshMaterial = fetchPBRMaterial(mat);
+      std::cout << "Used PBR\n";
+      break;
     }
-    std::vector<ETexture> diffuseTextures =
-        loadMaterialTexture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
-
-    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
-                                       diffuseTextures.begin(),
-                                       diffuseTextures.end());
-
-    std::vector<ETexture> specularTextures =
-        loadMaterialTexture(mat, aiTextureType_SPECULAR, "texture_specular");
-    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
-                                       specularTextures.begin(),
-                                       specularTextures.end());
-    std::vector<ETexture> normalTextures =
-        loadMaterialTexture(mat, aiTextureType_NORMALS, "texture_normal");
-    phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
-                                       normalTextures.begin(),
-                                       normalTextures.end());
-
-    meshMaterial = phongMeshMaterial;
+    default: {
+      meshMaterial = fetchPhongMaterial(mat);
+      break;
+    }
+    }
   }
 
   for (int i = 0; i < (int)mesh->mNumFaces; i++) {
@@ -258,4 +242,105 @@ unsigned int EModelLoader::TextureFromFile(std::string path) {
   glBindTexture(GL_TEXTURE_2D, 0);
   stbi_image_free(buf);
   return texID;
+}
+std::shared_ptr<PhongMaterial>
+EModelLoader::fetchPhongMaterial(aiMaterial *mat) {
+
+  auto phongMeshMaterial = std::make_shared<PhongMaterial>(PhongMaterial());
+
+  float val = 0.0f;
+  aiColor3D color;
+
+  aiShadingMode shadingMode;
+  if (mat->Get(AI_MATKEY_SHADING_MODEL, shadingMode) == AI_SUCCESS) {
+
+    std::cout << "Shading Mode is:  " << std::hex << shadingMode << std::endl;
+  }
+  if (mat->Get(AI_MATKEY_SHININESS, val) == AI_SUCCESS) {
+    phongMeshMaterial->shininess = val;
+  }
+  if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+    phongMeshMaterial->diffuse_color = glm::vec3(color.r, color.g, color.b);
+  }
+  if (mat->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
+    phongMeshMaterial->ambient_color = glm::vec3(color.r, color.g, color.b);
+  }
+
+  if (mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS) {
+    phongMeshMaterial->specular_color = glm::vec3(color.r, color.g, color.b);
+  }
+  std::vector<ETexture> diffuseTextures =
+      loadMaterialTexture(mat, aiTextureType_DIFFUSE, "texture_diffuse");
+
+  phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                     diffuseTextures.begin(),
+                                     diffuseTextures.end());
+
+  std::vector<ETexture> specularTextures =
+      loadMaterialTexture(mat, aiTextureType_SPECULAR, "texture_specular");
+  phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                     specularTextures.begin(),
+                                     specularTextures.end());
+  std::vector<ETexture> normalTextures =
+      loadMaterialTexture(mat, aiTextureType_NORMALS, "texture_normal");
+  phongMeshMaterial->textures.insert(phongMeshMaterial->textures.end(),
+                                     normalTextures.begin(),
+                                     normalTextures.end());
+
+  return phongMeshMaterial;
+}
+std::shared_ptr<PBRMaterial> EModelLoader::fetchPBRMaterial(aiMaterial *mat) {
+
+  auto pbrMaterial = std::make_shared<PBRMaterial>();
+
+  float val = 0.0f;
+  aiColor3D color;
+
+  if (mat->Get(AI_MATKEY_METALLIC_FACTOR, val) == AI_SUCCESS) {
+    pbrMaterial->metalic = val;
+  }
+  if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
+    pbrMaterial->albedo = glm::vec3(color.r, color.g, color.b);
+  }
+  if (mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, color) == AI_SUCCESS) {
+    pbrMaterial->roughness = val;
+  }
+
+  std::vector<ETexture> diffuseTextures =
+      loadMaterialTexture(mat, aiTextureType_DIFFUSE, "texture_albedo");
+
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               diffuseTextures.begin(), diffuseTextures.end());
+
+  std::vector<ETexture> metalicTextures =
+      loadMaterialTexture(mat, aiTextureType_METALNESS, "texture_metalic");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               metalicTextures.begin(), metalicTextures.end());
+
+  std::vector<ETexture> roughnessTextures =
+      loadMaterialTexture(mat, aiTextureType_UNKNOWN, "texture_roughness");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               roughnessTextures.begin(),
+                               roughnessTextures.end());
+
+  std::vector<ETexture> aoTextures =
+      loadMaterialTexture(mat, aiTextureType_AMBIENT_OCCLUSION, "texture_ao");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(), aoTextures.begin(),
+                               aoTextures.end());
+
+  std::vector<ETexture> normalTextures =
+      loadMaterialTexture(mat, aiTextureType_NORMALS, "texture_normal");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               normalTextures.begin(), normalTextures.end());
+
+  // reserved
+#if 0
+  std::vector<ETexture> metalRoughnessTextures = loadMaterialTexture(
+      mat, aiTextureType_UNKNOWN, "texture_metal_roughness");
+  pbrMaterial->textures.insert(pbrMaterial->textures.end(),
+                               metalRoughnessTextures.begin(),
+                               metalRoughnessTextures.end());
+#endif
+
+  return pbrMaterial;
 }

@@ -217,7 +217,7 @@ void ERenderer::CompileMeshShader(std::shared_ptr<EObject3D> &object) {
         default_fragment_shader_sources.end()) {
       fragSrc = default_fragment_shader_sources[mesh->getMaterial()->type];
 
-      /* std::cout << "fragSrc: " << fragSrc << std::endl; */
+      std::cout << "Mesh fragSrc: " << fragSrc << std::endl;
       std::string shader_src = vertSrc + fragSrc;
       if (compiled_shaders.find(shader_src) == compiled_shaders.end()) {
 
@@ -421,7 +421,6 @@ void ERenderer::CompileModelShader(std::shared_ptr<EObject3D> &object) {
         shader_map[model] = compiled_shaders[shader_src];
       }
     } else if (model->getMaterial()->type == MaterialType_Shader) {
-
       auto material =
           std::dynamic_pointer_cast<ShaderMaterial>(model->getMaterial());
 
@@ -439,6 +438,9 @@ void ERenderer::CompileModelShader(std::shared_ptr<EObject3D> &object) {
           shader_map[model] = compiled_shaders[shader_src];
         }
       }
+    } else {
+      std::cerr << "Couldn't Locate Shader Src for object" << object->getName()
+                << " \n";
     }
   }
 }

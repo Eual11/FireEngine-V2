@@ -162,10 +162,12 @@ void PBRMaterial::Apply(Shader &shader) {
   unsigned int numRoughness = 1;
   unsigned int numAO = 1;
   unsigned int numNormal = 1;
+  unsigned int numMetalRoughness = 1;
 
   // flags to see if a specfic texture type is bound or not
   bool albedoBound = false;
   bool metalicBound = false;
+  bool metalRoughnessBound = false;
   bool roughnessBound = false;
   bool AOBound = false;
   bool normalBound = false;
@@ -204,13 +206,20 @@ void PBRMaterial::Apply(Shader &shader) {
       glBindTexture(GL_TEXTURE_2D, tex.ID);
       tex_name = tex.type + std::to_string(numAO++);
       shader.setInt(tex_name, i);
+      AOBound = true;
+    } else if (tex.type == "texture_metal_roughness") {
+      glBindTexture(GL_TEXTURE_2D, tex.ID);
+      tex_name = tex.type + std::to_string(numMetalRoughness++);
+      shader.setInt(tex_name, i);
+      metalRoughnessBound = true;
     }
   }
-  shader.setBool("material.abledo_bound", albedoBound);
+  shader.setBool("material.albedo_bound", albedoBound);
   shader.setBool("material.metalic_bound", metalicBound);
   shader.setBool("material.normal_bound", normalBound);
   shader.setBool("material.roughness_bound", roughnessBound);
   shader.setBool("material.ao_bound", AOBound);
+  shader.setBool("material.metal_roughness_bound", metalRoughnessBound);
 
   glActiveTexture(GL_TEXTURE0);
 }
