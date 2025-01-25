@@ -7,7 +7,6 @@ ERenderer::ERenderer() {
   EnableDepthTesting();
   setDepthTestFunc(GL_LESS);
 }
-
 ERenderer::ERenderer(Window *window) {
   this->window = window;
 
@@ -61,6 +60,7 @@ void ERenderer::DisableDepthTesting() {
 }
 void inline ERenderer::setClearColor(float r, float g, float b, float a) {
   clearColor = {r, g, b, a};
+
   glClearColor(r, g, b, a);
 }
 void ERenderer::setDepthTestFunc(unsigned int func) { glDepthFunc(func); }

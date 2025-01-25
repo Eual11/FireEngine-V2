@@ -48,15 +48,21 @@ int main() {
 
   EModelLoader loader;
 
-  auto sponza = loader.loadModel("../models/Sponza/sponza.obj");
+  auto test = createRef<PBRMaterial>();
+  auto helm = loader.loadModel("../models/DamagedHelmet.gltf", test);
+
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(0.0f, 0.0f, 3.0f), 1.0f, 0.01f, 0.01f);
 
   pnt->setPosition(12, 1, 3);
   AmbientLight amb(glm::vec3(1.0f, 1.0f, 1.0f), 0.7);
-  zaWardu->AddLight(pnt);
-  zaWardu->add(sponza);
+  // glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 dir,
+  //  float intensity = 1.0f
+  auto dir = createRef<DirectionalLight>(glm::vec3(1.0), glm::vec3(1.0),
+                                         glm::vec3(0.0, -1.0, 0.0));
+  zaWardu->AddLight(dir);
+  zaWardu->add(helm);
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   glEnable(GL_BLEND);

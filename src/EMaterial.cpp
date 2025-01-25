@@ -154,3 +154,7 @@ void ShaderMaterial::Apply(Shader &shader) {
   }
   glActiveTexture(GL_TEXTURE0);
 }
+void PBRMaterial::Apply(Shader &shader) {
+  (void)(shader);
+  // TODO
+}
