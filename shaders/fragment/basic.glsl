@@ -62,7 +62,11 @@ vec3 calculateSpotLight(Light spotLight, vec3 normal, vec3 viewDir);
 void main()
 {
     vec3 result = vec3(0.0f);
-    vec3 ambient = ambientIntensity * ambientLight * vec3(texture(material.texture_diffuse1, fragTexCoord));
+    vec3 sampled_diffuse = material.diffuse_color;
+    if (material.diffuse_bound)
+        sampled_diffuse =
+            vec3(texture(material.texture_diffuse1, fragTexCoord));
+    vec3 ambient = ambientIntensity * ambientLight *sampled_diffuse ;
     vec3 viewDir = normalize(uViewPos - vec3(fragPosition));
 
     vec3 normal;
@@ -108,8 +112,8 @@ void main()
 vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
 {
     vec3 result = vec3(0.0f);
-    vec3 sampled_diffuse = vec3(1.0f);
-    vec3 sampled_specular = vec3(1.0f);
+    vec3 sampled_diffuse = material.diffuse_color;
+    vec3 sampled_specular = material.diffuse_color;
     if (material.diffuse_bound)
         sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
     if (material.specular_bound)
@@ -128,8 +132,8 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
 vec3 calculatePointLight(Light pointLight, vec3 normal, vec3 viewDir)
 {
     vec3 result = vec3(0.0f);
-    vec3 sampled_diffuse = vec3(1.0f);
-    vec3 sampled_specular = vec3(1.0f);
+    vec3 sampled_diffuse = material.diffuse_color;
+    vec3 sampled_specular = material.diffuse_color;
     if (material.diffuse_bound)
         sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
     if (material.specular_bound)
@@ -166,8 +170,8 @@ vec3 calculateSpotLight(Light spotLight, vec3 normal, vec3 viewDir)
         float epsilon = spotLight.inner_cutoff - spotLight.outer_cutoff;
 
         float I = clamp((theta - spotLight.outer_cutoff) / epsilon, 0.0f, 1.0f);
-        vec3 sampled_diffuse = vec3(1.0f);
-        vec3 sampled_specular = vec3(1.0f);
+        vec3 sampled_diffuse = material.diffuse_color;
+        vec3 sampled_specular = material.diffuse_color;
         if (material.diffuse_bound)
             sampled_diffuse = vec3(texture(material.texture_diffuse1, fragTexCoord));
         if (material.specular_bound)
