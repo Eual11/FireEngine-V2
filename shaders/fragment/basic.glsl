@@ -124,7 +124,7 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
     vec3 diffuse = dirLight.intensity * diff * dirLight.diffuse_color * sampled_diffuse;
     vec3 ref_vec = reflect(-light_dir, normal);
 
-    float spec = pow(max(dot(ref_vec, viewDir), 0.0f), 64.0f);
+    float spec = pow(max(dot(ref_vec, viewDir), 0.0f), material.shininess);
     vec3 specular = spec * dirLight.specular_color * sampled_specular;
     result = diffuse + specular;
     return result;
@@ -150,7 +150,7 @@ vec3 calculatePointLight(Light pointLight, vec3 normal, vec3 viewDir)
     vec3 diffuse = pointLight.intensity * diff * sampled_diffuse * pointLight.diffuse_color;
     vec3 reflect_vec = reflect(-light_dir, normal);
 
-    float spec = pow(max(dot(reflect_vec, viewDir), 0.0f), 64.0f);
+    float spec = pow(max(dot(reflect_vec, viewDir), 0.0f), material.shininess);
 
     vec3 specular = spec * sampled_specular * pointLight.specular_color;
 
@@ -181,7 +181,7 @@ vec3 calculateSpotLight(Light spotLight, vec3 normal, vec3 viewDir)
         vec3 diffuse = spotLight.intensity * diff * sampled_diffuse * spotLight.diffuse_color;
         vec3 reflect_vec = reflect(-light_dir, normal);
 
-        float spec = pow(max(dot(reflect_vec, viewDir), 0.0f), 64.0f);
+        float spec = pow(max(dot(reflect_vec, viewDir), 0.0f), material.shininess);
 
         vec3 specular = spec * sampled_specular * spotLight.specular_color;
         result = (specular + diffuse) * I;
