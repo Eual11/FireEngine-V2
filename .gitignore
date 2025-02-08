@@ -3,3 +3,4 @@ cpm-package-lock.cmake
 todo.md
 .cache/clangd/index
 _dep/imgui-src
+.ignore
