@@ -109,6 +109,13 @@ void main()
         }
     }
 
+    for (int i = 0; i < MAX_LIGHTS_COUNT; i++)
+    {
+        if (pointLights[i].light_active)
+        {
+            result += calculatePointLight(pointLights[i], normal, viewDir);
+        }
+    }
     result += ambient;
 
     if (material.emissive_bound)
@@ -128,6 +135,20 @@ vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
     vec3 BRDF = BRDF_CookTorrence(normal, light_dir, viewDir);
     float diff = max(dot(light_dir, normal), 0.0001);
     result = BRDF * dirLight.diffuse_color * diff * dirLight.intensity;
+
+    return result;
+}
+vec3 calculatePointLight(Light pointLight, vec3 normal, vec3 viewDir)
+{
+    vec3 result = vec3(0.0);
+
+    float D = length(pointLight.position - vec3(fragPosition));
+    //attenuation
+    float F_at = 1.0f / (pointLight.constant + D * pointLight.linear + D * D * pointLight.quadratic);
+    vec3 light_dir = normalize(pointLight.position - vec3(fragPosition));
+    vec3 BRDF = BRDF_CookTorrence(normal, light_dir, viewDir);
+    float diff = max(dot(light_dir, normal), 0.0001);
+    result = BRDF * pointLight.diffuse_color * diff * F_at * pointLight.intensity;
 
     return result;
 }
