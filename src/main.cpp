@@ -62,7 +62,7 @@ int main() {
   auto dir = createRef<DirectionalLight>(glm::vec3(1.0), glm::vec3(1.0),
                                          glm::vec3(0.0, -1.0, 0.0));
   zaWardu->AddLight(dir);
-  zaWardu->add(helm);
+  // zaWardu->add(helm);
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   glEnable(GL_BLEND);

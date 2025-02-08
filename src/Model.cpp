@@ -163,9 +163,14 @@ unsigned int Model::textureFromFile(std::string path, std::string dir) {
   if (std::filesystem::exists(filename)) {
     filename = std::filesystem::canonical(filename).string();
   } else {
+
+    // load default texture if the texture path wasn't found
+    //
+    // as of 2/8/2025 it's been disabled
     printf("filename %s doesn't exist, loading default texture\n",
            filename.c_str());
-    filename = "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg";
+    // filename = "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg";
+    return 0;
   }
 
   glGenTextures(1, &textureID);

@@ -153,6 +153,73 @@ void RenderUI(EngineState &state) {
                       currentRotation.y, currentRotation.z);
           ImGui::Text("Current Scale: %.2f, %.2f, %.2f", currentScale.x,
                       currentScale.y, currentScale.z);
+
+          if (state.curSelectedObject->getType() == EObject3D::Type::Mesh) {
+
+            auto curMesh =
+                std::dynamic_pointer_cast<EMesh>(state.curSelectedObject);
+            auto mat = curMesh->getMaterial();
+
+            // Non PBR Materials
+            if (mat->type != MaterialType_PBR and
+                mat->type != MaterialType_Shader) {
+
+              ImGui::Text("Material Properties");
+
+              glm::vec3 color;
+
+              color = mat->ambient_color;
+
+              if (ImGui::ColorEdit3("Ambient Color", &color[0])) {
+                mat->ambient_color = color;
+              }
+
+              color = mat->diffuse_color;
+
+              if (ImGui::ColorEdit3("Diffuse Color", &color[0])) {
+                mat->diffuse_color = color;
+              }
+
+              color = mat->specular_color;
+
+              if (ImGui::ColorEdit3("Specular Color", &color[0])) {
+                mat->specular_color = color;
+              }
+
+              float shiniess = mat->shininess;
+              if (ImGui::SliderFloat("Shininess", &shiniess, 0.0, 128.0f)) {
+                mat->shininess = shiniess;
+              }
+
+            }
+
+            else if (mat->type == MaterialType_PBR) {
+
+              std::shared_ptr<PBRMaterial> pbr_mat =
+                  std::dynamic_pointer_cast<PBRMaterial>(mat);
+
+              if (pbr_mat) {
+                ImGui::Text("PBR Material Properties");
+
+                glm::vec3 color = pbr_mat->albedo;
+
+                if (ImGui::ColorEdit3("Albedo", &color[0])) {
+                  pbr_mat->albedo = color;
+                }
+
+                float roughness = pbr_mat->roughness;
+                float metalic = pbr_mat->metalic;
+
+                if (ImGui::SliderFloat("Roughness", &roughness, 0.0, 1.0)) {
+                  pbr_mat->roughness = roughness;
+                }
+
+                if (ImGui::SliderFloat("Metalic", &metalic, 0.0, 1.0)) {
+                  pbr_mat->metalic = metalic;
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -476,15 +543,15 @@ void AddCube(EngineState &state) {
   if (state.World) {
     UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
 
-    auto tex = ETexture::load(
-        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
-    uniforms["tex"] = tex;
-    auto mat = std::make_shared<ShaderMaterial>(
-        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
-        uniforms);
+    // auto tex = ETexture::load(
+    //     "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    // uniforms["tex"] = tex;
+    // auto mat = std::make_shared<ShaderMaterial>(
+    //     "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+    //     uniforms);
 
-    auto cube = createRef<EMesh>(createRef<EBoxGeometry>(),
-                                 mat); // `cube` is a shared_ptr already
+    auto mat = std::make_shared<PBRMaterial>();
+    auto cube = createRef<EMesh>(createRef<EBoxGeometry>(), mat);
     if (state.curSelectedObject) {
       state.curSelectedObject->add(cube);
     } else {
@@ -498,15 +565,16 @@ void AddCube(EngineState &state) {
 }
 void AddSphere(EngineState &state) {
   if (state.World) {
-    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+    //    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
 
-    auto tex = ETexture::load(
-        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
-    uniforms["tex"] = tex;
-    auto mat = std::make_shared<ShaderMaterial>(
-        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
-        uniforms);
+    // auto tex = ETexture::load(
+    //     "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    // uniforms["tex"] = tex;
+    // auto mat = std::make_shared<ShaderMaterial>(
+    //     "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+    //     uniforms);
 
+    auto mat = std::make_shared<PBRMaterial>();
     auto sphere =
         createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 30, 30), mat);
     if (state.curSelectedObject) {
@@ -521,14 +589,16 @@ void AddSphere(EngineState &state) {
 void AddPlane(EngineState &state) {
 
   if (state.World) {
-    UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
+    // UniformMap uniforms = {{"time", 0.0f}, {"uAmp", 2.0f}};
 
-    auto tex = ETexture::load(
-        "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
-    uniforms["tex"] = tex;
-    auto mat = std::make_shared<ShaderMaterial>(
-        "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
-        uniforms);
+    // auto tex = ETexture::load(
+    //     "../models/textures/3DLABbg_UV_Map_Checker_01_2048x2048.jpg");
+    // uniforms["tex"] = tex;
+    // auto mat = std::make_shared<ShaderMaterial>(
+    //     "../shaders/vertex/basic.glsl", "../shaders/fragment/basic.glsl",
+    //     uniforms);
+
+    auto mat = std::make_shared<PBRMaterial>();
 
     auto plane = createRef<EMesh>(createRef<EPlaneGeometry>(), mat);
     if (state.curSelectedObject) {
