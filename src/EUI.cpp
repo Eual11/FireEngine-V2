@@ -233,6 +233,9 @@ void RenderUI(EngineState &state) {
         // Light properties
 
         // Position and Translation
+
+
+        ImGui::Checkbox("Display Debug", &state.curSelectedLight->visualize);
         ImGui::Text("Position");
         glm::vec3 cur_pos = state.curSelectedLight->getPosition();
 
@@ -576,7 +579,7 @@ void AddSphere(EngineState &state) {
 
     auto mat = std::make_shared<PBRMaterial>();
     auto sphere =
-        createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 30, 30), mat);
+        createRef<EMesh>(createRef<EUVSphereGeometry>(1.0f, 64, 64), mat);
     if (state.curSelectedObject) {
       state.curSelectedObject->add(sphere);
     } else {

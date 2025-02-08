@@ -1,6 +1,8 @@
 #include "../include/ERenderer.h"
+#include "../include/EModelLoader.h"
 #include "../include/EPostProcessingPipeline.h"
 #include "../include/EQuadGeometry.h"
+#include <glm/ext/vector_float3.hpp>
 #include <memory>
 
 ERenderer::ERenderer() {
@@ -23,9 +25,17 @@ ERenderer::ERenderer(Window *window) {
   auto mat = std::make_shared<ShaderMaterial>("../shaders/vertex/grid.glsl",
                                               "../shaders/fragment/grid.glsl");
 
+  auto basic_mat = std::make_shared<ShaderMaterial>(
+      "../shaders/vertex/basic.glsl", "../shaders/fragment/lightFrag.glsl");
+
+  EModelLoader loader;
+
+  pointlight_helper = loader.loadModel("../models/sphere.obj", basic_mat);
+  pointlight_helper->setScale(0.1, 0.1, 0.1);
   fGrid = std::make_shared<EMesh>(geo, mat);
   auto qd = std::static_pointer_cast<EObject3D>(fGrid);
   CompileMeshShader(qd);
+  CompileModelShader(pointlight_helper);
   effectPipeline = EPostProcessingPipeline(window);
   effectPipeline.Init();
 }
@@ -136,6 +146,27 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     } else
       FetchShaderAndRender(world, child);
   }
+  for (const auto &light : world->Lights) {
+
+    if (light->visualize) {
+      // render
+
+      if (light->type == LightType::POINT) {
+        if (shader_map.find(pointlight_helper) != shader_map.end()) {
+          Shader &shader = *shader_map[pointlight_helper].get();
+          if (window) {
+            glm::vec3 pos = light->getPosition();
+            window->UpdateUniforms(shader);
+            pointlight_helper->setPosition(pos.x, pos.y, pos.z);
+
+            pointlight_helper->render(shader);
+          }
+        } else {
+          printf("COuldn't find shader\n");
+        }
+      }
+    }
+  }
 
   if (grid) {
     if (shader_map.find(fGrid) != shader_map.end()) {
@@ -153,13 +184,6 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     // enabling it back, it is etiquette to revert what you did
     glDepthMask(GL_TRUE);
     EnableDepthTesting();
-  }
-
-  for (const auto &light : world->Lights) {
-
-    if (light->visualize) {
-      // render
-    }
   }
 }
 

@@ -93,7 +93,7 @@ private:
 
   std::shared_ptr<EMesh> fGrid;
   std::shared_ptr<EModel> directional_helper;
-  std::shared_ptr<EModel> pointlight_helper;
+  std::shared_ptr<EObject3D> pointlight_helper;
   std::shared_ptr<EModel> spotlight_helper;
 
   EPostProcessingPipeline effectPipeline;
