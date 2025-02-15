@@ -122,8 +122,6 @@ void main()
     {
         result = texture(material.texture_emissive, fragTexCoord).rgb;
     }
-    if (gammaCorrect)
-        result = vec3(pow(result.x, 2.2), pow(result.y, 2.2), pow(result.z, 2.2));
 
     FragColor = vec4(result, 1.0f);
 }

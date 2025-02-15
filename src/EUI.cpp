@@ -308,6 +308,7 @@ void RenderUI(EngineState &state) {
       ImGui::Checkbox("Backface Culling", &backfaceCulling);
       ImGui::Checkbox("Blending", &blending);
       ImGui::Checkbox("Gamma Correction", &state.rendererState.gammaCorrect);
+      ImGui::Checkbox("Tone Mapping", &state.rendererState.toneMapping);
       bool pst = state.rendererState.enableNormalMapping;
       ImGui::Checkbox("Normal Mapping",
                       &state.rendererState.enableNormalMapping);
@@ -475,6 +476,7 @@ void UpdateRenderer(ERenderer &renderer, EngineState &state) {
   }
 
   renderer.setGammaCorrection(state.rendererState.gammaCorrect);
+  renderer.setToneMapping(state.rendererState.toneMapping);
 
   renderer.setPolyMode(state.rendererState.polymode);
 }

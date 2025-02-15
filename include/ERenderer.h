@@ -22,10 +22,12 @@ public:
   bool getDepthTesting() const { return depthTestingEnabled; }
   bool getStencilTesting() const { return stencilTestingEnabled; }
   bool girdEnabled() const { return grid; }
-  bool getGammaCorrection() const { return gammaCorrection; }
+  bool getGammaCorrection() const { return effectPipeline.getGammaCorrection(); }
+  bool getToneMapping() const {return effectPipeline.getToneMapping();}
   bool getNormalMapping() const { return normalMapping; }
   void setNormalMapping(bool val) { normalMapping = val; }
-  void setGammaCorrection(bool val) { gammaCorrection = val; }
+  void setGammaCorrection(bool val) { effectPipeline.setGammaCorrection(val); }
+  void setToneMapping(bool val) {effectPipeline.setToneMapping(val);} 
   inline void EnableGrid() {
     if (grid)
       return;

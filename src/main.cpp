@@ -49,7 +49,7 @@ int main() {
   EModelLoader loader;
 
   auto test = createRef<PBRMaterial>();
-  auto helm = loader.loadModel("../models/cone.obj");
+  auto helm = loader.loadModel("../models/DamagedHelmet.gltf");
 
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
@@ -77,6 +77,8 @@ int main() {
   state.rendererState.polymode = rend.getPolyMode();
   state.rendererState.enableGrid = rend.girdEnabled();
   state.rendererState.enableNormalMapping = rend.getNormalMapping();
+  state.rendererState.gammaCorrect = rend.getGammaCorrection();
+  state.rendererState.toneMapping = rend.getToneMapping();
 
   // Camera States
   state.cameraState.Poition = camera.getPosition();

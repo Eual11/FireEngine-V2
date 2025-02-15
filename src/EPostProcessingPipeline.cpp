@@ -67,6 +67,8 @@ void EPostProcessingPipeline::RenderToScreen() {
   glActiveTexture(GL_TEXTURE0);
   screenShader.setInt("screenTexture", 0);
   glBindTexture(GL_TEXTURE_2D, framebuffers[inputIndex]->getTexture());
+  screenShader.setBool("enableToneMapping", toneMappingEnabled);
+  screenShader.setBool("enableGammaCorrection", gammaCorrectEnabled);
   window->UpdateUniforms(screenShader);
   quad->render(screenShader);
   glBindTexture(GL_TEXTURE_2D, 0);

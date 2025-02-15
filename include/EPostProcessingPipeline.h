@@ -40,6 +40,8 @@ private:
   Shader screenShader = Shader("../shaders/vertex/quad_verts.glsl",
                                "../shaders/fragment/displayScreen.glsl");
 
+  bool gammaCorrectEnabled = false;
+  bool toneMappingEnabled = false;
   std::shared_ptr<EMesh> quad;
   int inputIndex = 0;
   int outputIndex = 1;
@@ -56,6 +58,11 @@ public:
   }
   void applyEffects();
   void Init();
+  void setToneMapping(bool val) {toneMappingEnabled = val;}
+  void setGammaCorrection(bool val) {gammaCorrectEnabled = val;}
+
+  bool getToneMapping() const { return toneMappingEnabled; }
+  bool getGammaCorrection() const {return gammaCorrectEnabled;}
 };
 
 struct EGreyscaleEffect : public EPostProcessingEffect {

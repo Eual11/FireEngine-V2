@@ -13,7 +13,7 @@ EFrameBuffer::EFrameBuffer(int width, int height, bool onlyColor) {
 
   glGenTextures(1, &color_attachment);
   glBindTexture(GL_TEXTURE_2D, color_attachment);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, nullptr);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -71,7 +71,7 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
   glGenTextures(1, &color_attachment);
   glBindTexture(GL_TEXTURE_2D, color_attachment);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, new_w, new_h, 0, GL_RGB,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, new_w, new_h, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, nullptr);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
