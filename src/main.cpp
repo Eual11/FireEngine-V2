@@ -49,8 +49,9 @@ int main() {
   EModelLoader loader;
 
   auto test = createRef<PBRMaterial>();
-  auto helm = loader.loadModel("../models/DamagedHelmet.gltf");
+  auto sponza = loader.loadModel("../models/Sponza/sponza.obj");
 
+  rend.addEfect(PostProcessingEffect::Bloom);
   auto pnt = createRef<PointLight>(
       glm::vec3(1.0f, 1.0f, 0.9f), glm::vec3(1.0f, 1.0f, 1.0f),
       glm::vec3(0.0f, 0.0f, 3.0f), 1.0f, 0.01f, 0.01f);
@@ -62,7 +63,7 @@ int main() {
   auto dir = createRef<DirectionalLight>(glm::vec3(1.0), glm::vec3(1.0),
                                          glm::vec3(0.0, -1.0, 0.0));
   zaWardu->AddLight(dir);
-  zaWardu->add(helm);
+  zaWardu->add(sponza);
   zaWardu->loadCubeMaps("Nebula");
   zaWardu->AddLight(std::make_shared<AmbientLight>(amb));
   glEnable(GL_BLEND);
