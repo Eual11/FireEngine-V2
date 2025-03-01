@@ -15,6 +15,7 @@ private:
 public:
   EFrameBuffer(int width, int height, bool onlyColor = false, bool onlyDepth=false);
   unsigned int getTexture() const { return color_attachment; }
+  unsigned int getDepthTexture () const {return depth_attachment;}
   void Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, fbo); }
   void Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
   void Resize(int new_w, int new_h);
@@ -22,5 +23,6 @@ public:
   int height;
   // tells if the framebuffer has only a color color_attachment
   bool isColorOnly() const { return onlyColor; }
+  bool isDepthOnly() const {return onlyDepth;}
 };
 #endif

@@ -9,6 +9,7 @@
 #include "EObject3D.h"
 #include "EPostProcessingPipeline.h"
 #include "EWorld.h"
+#include "Shader.h"
 #include "Window.h"
 
 enum class PolyMode { FILL, LINE, POINT };
@@ -97,6 +98,9 @@ private:
   std::shared_ptr<EModel> directional_helper;
   std::shared_ptr<EObject3D> pointlight_helper;
   std::shared_ptr<EModel> spotlight_helper;
+  std::shared_ptr<Shader> shadowShader;
+  std::shared_ptr<EFrameBuffer> shadowMapBuffer;
+  
 
   EPostProcessingPipeline effectPipeline;
 
@@ -128,5 +132,6 @@ private:
   void RenderSkybox(std::shared_ptr<EWorld> &world);
   void CompileWorldShader(std::shared_ptr<EWorld> &object);
   void CompileModelShader(std::shared_ptr<EObject3D> &object);
+  void RenderShadowMap(std::shared_ptr<ELight>&light, glm::mat4 transform);
 };
 #endif

@@ -49,7 +49,7 @@ int main() {
   EModelLoader loader;
 
   auto test = createRef<PBRMaterial>();
-  auto sponza = loader.loadModel("../models/Sponza/sponza.obj");
+  auto sponza = loader.loadModel("../models/DamagedHelmet.gltf");
 
   // rend.addEfect(PostProcessingEffect::Bloom);
   auto pnt = createRef<PointLight>(

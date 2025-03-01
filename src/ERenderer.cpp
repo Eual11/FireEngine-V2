@@ -2,6 +2,9 @@
 #include "../include/EModelLoader.h"
 #include "../include/EPostProcessingPipeline.h"
 #include "../include/EQuadGeometry.h"
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
 #include <memory>
 
@@ -38,6 +41,14 @@ ERenderer::ERenderer(Window *window) {
   CompileModelShader(pointlight_helper);
   effectPipeline = EPostProcessingPipeline(window);
   effectPipeline.Init();
+
+  // creating shadow map buffer
+  shadowMapBuffer = std::make_shared<EFrameBuffer>(
+      window->getSize().w, window->getSize().h, false, true);
+  window->addResizeCallback(
+      [this](int w, int h) { shadowMapBuffer->Resize(w, h); });
+  shadowShader = std::make_shared<Shader>("../shaders/vertex/Shadow.glsl",
+                                          "../shaders/fragment/Shadow.glsl");
 }
 
 void ERenderer::EnableDepthTesting() {
@@ -112,6 +123,43 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
 
       if (window) {
         // rendering to default framebuffer
+        float zFar = window->getBoundCamera()->zFar;
+        float zNear = window->getBoundCamera()->zFar;
+        glm::mat4 lightSpaceTransform(1.0f);
+        std::shared_ptr<ELight> dirLightPtr;
+        for (auto &l : world->Lights) {
+          if (l->type == LightType::DIRECTIONAL) {
+            dirLightPtr = l;
+            break;
+          }
+        }
+
+        if (dirLightPtr.get()) {
+
+          glm::mat4 lightProj =
+              glm::ortho(-zFar, zFar, -zFar, zFar, zNear, zFar);
+          glm::mat4 lightView =
+              glm::lookAt(dirLightPtr->Position, dirLightPtr->direction,
+                          glm::vec3(0.0, 1.0, 0.0));
+
+          lightSpaceTransform = lightProj * lightView;
+
+          Shader &shadow = *shadowShader.get();
+          window->UpdateUniforms(shadow);
+          // render the scene from the light's perspective
+          // rendering to the depth map
+
+          effectPipeline.getInputFramebuffer()->Unbind();
+
+          shadowMapBuffer->Bind();
+          glClear(GL_DEPTH_BUFFER_BIT);
+          shadow.setMat4("lightSpaceTransform", lightSpaceTransform);
+
+          child->render(shadow);
+
+          shadowMapBuffer->Unbind();
+          effectPipeline.getInputFramebuffer()->Bind();
+        }
         window->UpdateUniforms(shader);
         shader.setBool("enableNormalMapping", normalMapping);
         shader.setBool("gammaCorrect", gammaCorrection);
@@ -151,7 +199,8 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
     if (light->visualize) {
       // render
 
-      if (light->type == LightType::POINT) {
+      if (light->type == LightType::POINT ||
+          light->type == LightType::DIRECTIONAL) {
         if (shader_map.find(pointlight_helper) != shader_map.end()) {
           Shader &shader = *shader_map[pointlight_helper].get();
           if (window) {
@@ -384,7 +433,48 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
 
     if (shader_map.find(obj) != shader_map.end()) {
       Shader *shader = shader_map[obj].get();
+
+      float zFar = window->getBoundCamera()->zFar;
+      float zNear = window->getBoundCamera()->zFar;
+      glm::mat4 lightSpaceTransform(1.0f);
+      std::shared_ptr<ELight> dirLightPtr;
+      for (auto &l : world->Lights) {
+        if (l->type == LightType::DIRECTIONAL) {
+          dirLightPtr = l;
+          break;
+        }
+      }
+
+      if (dirLightPtr.get()) {
+
+        glm::mat4 lightProj = glm::ortho(-zFar, zFar, -zFar, zFar, zNear, zFar);
+        glm::mat4 lightView =
+            glm::lookAt(dirLightPtr->Position, dirLightPtr->direction,
+                        glm::vec3(0.0, 1.0, 0.0));
+
+        lightSpaceTransform = lightProj * lightView;
+
+        Shader &shadow = *shadowShader.get();
+        window->UpdateUniforms(shadow);
+        // render the scene from the light's perspective
+        // rendering to the depth map
+
+        effectPipeline.getInputFramebuffer()->Unbind();
+
+        shadowMapBuffer->Bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        shadow.setMat4("lightSpaceTransform", lightSpaceTransform);
+
+        obj->render(shadow);
+
+        shadowMapBuffer->Unbind();
+        effectPipeline.getInputFramebuffer()->Bind();
+      }
       if (window) {
+
+        // render the scene in perspective of the light
+        //  currently only one directional light
+
         window->UpdateUniforms(*shader);
         shader->setBool("enableNormalMapping", normalMapping);
         shader->setBool("gammaCorrect", gammaCorrection);
@@ -525,4 +615,8 @@ void ERenderer::addEfect(PostProcessingEffect effectType) {
     break;
   }
   }
+}
+void ERenderer::RenderShadowMap(std::shared_ptr<ELight> &light,
+                                glm::mat4 transform) {
+  // TODO: nothing for now
 }

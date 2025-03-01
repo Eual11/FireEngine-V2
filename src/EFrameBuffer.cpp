@@ -39,7 +39,7 @@ EFrameBuffer::EFrameBuffer(int width, int height, bool onlyColor,
     }
   } else {
     glGenTextures(1, &depth_attachment);
-    glBindTexture(depth_attachment, GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,depth_attachment);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
                  GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
@@ -127,7 +127,7 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
     depth_attachment = 0;
 
     glGenTextures(1, &depth_attachment);
-    glBindTexture(depth_attachment, GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, depth_attachment);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
                  GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
