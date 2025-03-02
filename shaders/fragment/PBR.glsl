@@ -49,6 +49,7 @@ in vec3 fragNormal;
 in vec2 fragTexCoord;
 in mat3 TBN;
 
+uniform sampler2D shadowTexture;
 uniform bool enableNormalMapping;
 
 //fixed number of lights
@@ -123,7 +124,8 @@ void main()
         result = texture(material.texture_emissive, fragTexCoord).rgb;
     }
 
-    FragColor = vec4(result, 1.0f);
+    vec3 d = vec3(texture(shadowTexture, fragTexCoord));
+    FragColor = vec4(d, 1.0f);
 }
 
 vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
