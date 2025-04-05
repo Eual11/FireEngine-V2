@@ -128,7 +128,7 @@ void EFrameBuffer::Resize(int new_w, int new_h) {
 
     glGenTextures(1, &depth_attachment);
     glBindTexture(GL_TEXTURE_2D, depth_attachment);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, new_w, new_h, 0,
                  GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

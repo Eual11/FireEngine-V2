@@ -1,4 +1,4 @@
-set(EXECUTABLE_NAME "e")
+set(EXECUTABLE_NAME "FireEngine")
 include_directories($ENV{CPLUS_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/include" "${CMAKE_SOURCE_DIR}/_dep/imgui_src" "${CMAKE_SOURCE_DIR}/_dep/imgui-src/backends")
 
 

@@ -61,7 +61,8 @@ int main() {
   // glm::vec3 dif_col, glm::vec3 spec_color, glm::vec3 dir,
   //  float intensity = 1.0f
   auto dir = createRef<DirectionalLight>(glm::vec3(1.0), glm::vec3(1.0),
-                                         glm::vec3(0.0, -1.0, 0.0));
+                                         glm::vec3(0.0, 0.0, 1.0));
+  dir->Position = camera.getPosition();
   zaWardu->AddLight(dir);
   zaWardu->add(sponza);
   zaWardu->loadCubeMaps("Nebula");

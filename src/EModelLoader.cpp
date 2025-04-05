@@ -125,7 +125,8 @@ std::shared_ptr<EMesh> EModelLoader::ProcessMesh(glm::mat4 &m, aiMesh *mesh,
       break;
     }
     default: {
-      meshMaterial = fetchPhongMaterial(mat);
+      meshMaterial = fetchPBRMaterial(mat);
+      std::cout << "Used Phong\n";
       break;
     }
     }

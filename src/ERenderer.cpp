@@ -139,7 +139,7 @@ void ERenderer::Render(std::shared_ptr<EWorld> &world) {
           glm::mat4 lightProj =
               glm::ortho(-zFar, zFar, -zFar, zFar, zNear, zFar);
           glm::mat4 lightView =
-              glm::lookAt(dirLightPtr->Position, dirLightPtr->direction,
+              glm::lookAt(glm::vec3(0.0, 0.0, 10.0), dirLightPtr->direction,
                           glm::vec3(0.0, 1.0, 0.0));
 
           lightSpaceTransform = lightProj * lightView;
@@ -447,9 +447,12 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
 
       if (dirLightPtr.get()) {
 
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
         glm::mat4 lightProj = glm::ortho(-zFar, zFar, -zFar, zFar, zNear, zFar);
         glm::mat4 lightView =
-            glm::lookAt(dirLightPtr->Position, dirLightPtr->direction,
+            glm::lookAt(dirLightPtr->Position,
+                        dirLightPtr->Position + dirLightPtr->direction,
                         glm::vec3(0.0, 1.0, 0.0));
 
         lightSpaceTransform = lightProj * lightView;
@@ -462,15 +465,22 @@ void ERenderer::FetchShaderAndRender(const std::shared_ptr<EWorld> &world,
         effectPipeline.getInputFramebuffer()->Unbind();
 
         shadowMapBuffer->Bind();
+        glClearDepth(1.0);
         glClear(GL_DEPTH_BUFFER_BIT);
+
         shadow.setMat4("lightSpaceTransform", lightSpaceTransform);
 
         obj->render(shadow);
 
         shadowMapBuffer->Unbind();
+
+        glClearDepth(1.0);
         effectPipeline.getInputFramebuffer()->Bind();
       }
       if (window) {
+        glActiveTexture(GL_TEXTURE0 + 8);
+        glBindTexture(GL_TEXTURE_2D, shadowMapBuffer->getDepthTexture());
+        shader->setInt("shadowTexture", 8);
 
         // render the scene in perspective of the light
         //  currently only one directional light
