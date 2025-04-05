@@ -102,8 +102,6 @@ void main()
     }
     result += ambient;
 
-    //NOTE: debugging normals
-    //    FragColor = vec4(normalize(fragNormal) * 0.5 + 0.5, 1.0f);
     FragColor = vec4(result, 1.0f);
 }
 

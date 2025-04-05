@@ -124,8 +124,7 @@ void main()
         result = texture(material.texture_emissive, fragTexCoord).rgb;
     }
 
-    vec3 d = vec3(texture(shadowTexture, fragTexCoord));
-    FragColor = vec4(d, 1.0f);
+    FragColor = vec4(result, 1.0f);
 }
 
 vec3 calculateDirectionalLight(Light dirLight, vec3 normal, vec3 viewDir)
